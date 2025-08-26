@@ -1,0 +1,41 @@
+import { HeroSection } from "@/components/landing/hero-section";
+import { ProjectsSection } from "@/components/landing/projects-section";
+import { PartnersSection } from "@/components/landing/partners-section";
+import { TestimonialsSection } from "@/components/landing/testimonials-section";
+import { Footer } from "@/components/layout/footer";
+import { AppHeader } from "@/components/layout/public-header";
+import { GlobeBackground } from "@/components/ui/globe-background";
+
+export default function LandingPage() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Header overlay for landing page */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+        <AppHeader />
+      </div>
+      
+      {/* Globe Background - Fixed dan terlihat di semua section */}
+      <GlobeBackground />
+      
+    {/* Main content with sticky hero and overlapping sections */}
+    {/* Make main opt-out for pointer events so background globe can receive drag events.
+      Interactive sections must opt-in with pointer-events-auto on their root. */}
+    <main className="flex-1 relative z-20 pointer-events-none">
+        <div id="home">
+          <HeroSection />
+        </div>
+        <div id="projects">
+          <ProjectsSection />
+        </div>
+        <div id="partners">
+          <PartnersSection />
+        </div>
+        <div id="testimonials">
+          <TestimonialsSection />
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+}

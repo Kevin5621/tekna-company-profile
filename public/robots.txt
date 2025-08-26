@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://tekna.com/sitemap.xml
+
+# Disallow admin and dashboard areas
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /api/
+
+# Allow blog and public pages
+Allow: /blog/
+Allow: /career/
+Allow: /projects/
+Allow: /partners/
+Allow: /testimonials/
+
+# Crawl delay
+Crawl-delay: 1

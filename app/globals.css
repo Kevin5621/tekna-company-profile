@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+    
+    /* Variable font settings */
+    --font-inter: "Inter", system-ui, sans-serif;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    
+    /* Primary color updated */
+    --primary: 182 97% 37%;
+    --primary-foreground: 0 0% 100%; /* putih untuk kontras */
+    
+    --secondary: 182 20% 94%; /* soft teal tint */
+    --secondary-foreground: 240 10% 3.9%;
+    --accent: 46 15% 95.33%;
+    --accent-foreground: 240 10% 3.9%;
+    --destructive: 3.65 81.71% 68.85%;
+    --destructive-foreground: 0 0% 98%;
+    --muted: 182 15% 95%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --border: 182 10% 90%;
+    --input: 182 10% 90%;
+    --ring: 182 97% 37%;
+    
+    /* Additional semantic colors */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 98%;
+    
+    /* Sidebar variables */
+  --sidebar: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  /* Use primary as the sidebar's accent / interactive color so hover and icons follow primary */
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--primary);
+  --sidebar-accent-foreground: var(--primary-foreground);
+  --sidebar-border: 182 25% 20%;
+  --sidebar-ring: var(--primary);
+  }
+
+  .dark {
+    --background: 182 15% 8%;
+    --foreground: 0 0% 98%;
+    --card: 182 15% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 182 15% 12%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* Primary dark */
+    --primary: 182 97% 40%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 182 30% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 182 25% 20%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 3.65 81.71% 68.85%;
+    --destructive-foreground: 0 0% 98%;
+    --muted: 182 20% 20%;
+    --muted-foreground: 0 0% 63.9%;
+    --border: 182 20% 25%;
+    --input: 182 20% 25%;
+    --ring: 182 97% 40%;
+    
+    /* Additional semantic colors - dark mode */
+    --success: 142 76% 40%;
+    --success-foreground: 0 0% 98%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 98%;
+    --info: 199 89% 55%;
+    --info-foreground: 0 0% 98%;
+    
+    /* Dark sidebar */
+  --sidebar: 182 20% 12%;
+  --sidebar-foreground: 0 0% 98%;
+  /* Keep primary mapping consistent in dark mode */
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--primary);
+  --sidebar-accent-foreground: var(--primary-foreground);
+  --sidebar-border: 182 25% 20%;
+  --sidebar-ring: var(--primary);
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  /* Ensure sidebar/footer links and icons use primary as hover/interactive color
+     without changing layout. This targets the `.bg-sidebar` container used in the
+     footer/component layout so hover and svg fills/strokes follow the primary token. */
+  .bg-sidebar svg,
+  .bg-sidebar svg * {
+    color: hsl(var(--sidebar-foreground));
+    fill: hsl(var(--sidebar-foreground));
+    stroke: hsl(var(--sidebar-foreground));
+  }
+
+  .bg-sidebar a:hover,
+  .bg-sidebar button:hover,
+  .bg-sidebar .hover\:text-sidebar-accent:hover,
+  .bg-sidebar a:hover svg,
+  .bg-sidebar button:hover svg {
+    color: hsl(var(--sidebar-accent));
+    fill: hsl(var(--sidebar-accent));
+    stroke: hsl(var(--sidebar-accent));
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-variation-settings: "wght" 400;
+  }
+
+  /* Ensure variable fonts work properly */
+  .font-sans {
+    font-family: var(--font-inter), "Inter", system-ui, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  .font-var {
+    font-family: var(--font-inter), "Inter", system-ui, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Custom layout styles for sidebar */
+@layer components {
+  /* Remove any custom sidebar styles and let shadcn/ui handle it */
+  .dashboard-content {
+    max-width: 72rem;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  /* Responsive layout */
+  @media (max-width: 1024px) {
+    .dashboard-content {
+      max-width: 100%;
+    }
+  }
+}
