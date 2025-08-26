@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+// import { createClient } from "@/lib/supabase/client";
 
 export interface AnalyticsData {
   date: string;
@@ -33,17 +33,17 @@ export interface ChartDataItem {
 export class AnalyticsClientService {
   /**
    * Record a page view (for client-side tracking)
+   * 
+   * NOTE: Currently disabled for cost optimization
    */
-  static async recordPageView(pageData: {
-    sessionId: string;
-    pagePath: string;
-    pageTitle?: string;
-    pageType?: string;
-    referrerPath?: string;
-    timeOnPage?: number;
-    scrollDepth?: number;
-    isExit?: boolean;
-  }) {
+  static async recordPageView() {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    console.log('📊 [AnalyticsClientService] Page view tracking disabled (mock mode)');
+    return { id: 'mock-page-view-id' };
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = createClient();
     
     try {
@@ -64,25 +64,22 @@ export class AnalyticsClientService {
       console.error('Error recording page view:', error);
       return null;
     }
+    */
   }
 
   /**
    * Create or update session (for client-side tracking)
+   * 
+   * NOTE: Currently disabled for cost optimization
    */
-  static async createOrUpdateSession(sessionData: {
-    sessionId: string;
-    userAgent?: string;
-    ipAddress?: string;
-    referrer?: string;
-    utmSource?: string;
-    utmMedium?: string;
-    utmCampaign?: string;
-    deviceType?: string;
-    browser?: string;
-    os?: string;
-    country?: string;
-    city?: string;
-  }) {
+  static async createOrUpdateSession() {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    console.log('📊 [AnalyticsClientService] Session tracking disabled (mock mode)');
+    return { id: 'mock-session-id' };
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = createClient();
     
     try {
@@ -105,20 +102,30 @@ export class AnalyticsClientService {
       return data;
     } catch (error) {
       console.error('Error creating/updating session:', error);
-      return null;
+      return false;
     }
+    */
   }
 
   /**
    * End session (for client-side tracking)
+   * 
+   * NOTE: Currently disabled for cost optimization
    */
-  static async endSession(sessionId: string, durationSeconds?: number) {
+  static async endSession() {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    console.log('📊 [AnalyticsClientService] Session ending disabled (mock mode)');
+    return true;
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = createClient();
     
     try {
       const { error } = await supabase.rpc('end_session', {
         p_session_id: sessionId,
-        p_duration_seconds: durationSeconds || null
+        durationSeconds || null
       });
 
       if (error) throw error;
@@ -127,5 +134,6 @@ export class AnalyticsClientService {
       console.error('Error ending session:', error);
       return false;
     }
+    */
   }
 }

@@ -1,7 +1,9 @@
 -- Migration: Website Analytics System
 -- Description: Comprehensive analytics tracking for website views, sessions, and page analytics
 -- Created: 2025-01-01
+-- NOTE: COMMENTED OUT FOR NOW - ANALYTICS FEATURES COMING SOON
 
+/*
 -- =====================================================
 -- WEBSITE ANALYTICS SYSTEM
 -- =====================================================
@@ -364,3 +366,7 @@ GRANT EXECUTE ON FUNCTION aggregate_daily_analytics(DATE) TO authenticated;
 -- Grant usage on schema
 GRANT USAGE ON SCHEMA public TO anon;
 GRANT USAGE ON SCHEMA public TO authenticated;
+*/
+
+-- END OF COMMENTED ANALYTICS MIGRATION
+-- Analytics features will be implemented in future updates

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+// import { createClient } from "@/lib/supabase/server";
 
 export interface AnalyticsData {
   date: string;
@@ -32,9 +32,23 @@ export interface ChartDataItem {
 
 export class AnalyticsService {
   /**
-   * Get real-time analytics data for chart
+   * Get analytics data for chart (currently using mock data for cost optimization)
+   * 
+   * NOTE: Database queries are commented out to reduce costs
+   * Uncomment the code below when you want to enable real analytics tracking
    */
   static async getChartData(days: number = 30): Promise<ChartDataItem[]> {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    // Return mock data instead of querying database
+    
+    console.log(`📊 [AnalyticsService] Using mock data for ${days} days (database tracking disabled)`);
+    
+    // Return mock data for now
+    return this.getFallbackChartData(days);
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = await createClient();
     
     try {
@@ -140,6 +154,7 @@ export class AnalyticsService {
       // Return fallback data if there's an error
       return this.getFallbackChartData(days);
     }
+    */
   }
 
   /**
@@ -173,9 +188,55 @@ export class AnalyticsService {
   }
 
   /**
-   * Get real-time analytics overview
+   * Get analytics overview (currently using mock data for cost optimization)
+   * 
+   * NOTE: Database queries are commented out to reduce costs
+   * Uncomment the code below when you want to enable real analytics tracking
    */
   static async getAnalyticsOverview() {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    // Return mock data instead of querying database
+    
+    console.log('📊 [AnalyticsService] Using mock overview data (database tracking disabled)');
+    
+    // Return mock data for now
+    return {
+      today: { 
+        page_views: 150, 
+        sessions: 45, 
+        unique_visitors: 38, 
+        bounce_rate: 25.5, 
+        avg_session_duration: 180 
+      },
+      yesterday: { 
+        page_views: 120, 
+        sessions: 32, 
+        unique_visitors: 28 
+      },
+      weekly_total: 850,
+      monthly_total: 3200,
+      top_pages: [
+        { page_path: '/', page_title: 'Home', views: 45 },
+        { page_path: '/blog', page_title: 'Blog', views: 28 },
+        { page_path: '/career', page_title: 'Career', views: 22 },
+        { page_path: '/about', page_title: 'About', views: 18 },
+        { page_path: '/contact', page_title: 'Contact', views: 15 }
+      ],
+      top_referrers: [
+        { referrer: 'google.com', count: 25 },
+        { referrer: 'facebook.com', count: 18 },
+        { referrer: 'linkedin.com', count: 12 }
+      ],
+      device_breakdown: [
+        { device_type: 'desktop', count: 65 },
+        { device_type: 'mobile', count: 28 },
+        { device_type: 'tablet', count: 7 }
+      ]
+    };
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = await createClient();
     
     try {
@@ -279,21 +340,22 @@ export class AnalyticsService {
         device_breakdown: []
       };
     }
+    */
   }
 
   /**
    * Record a page view (for client-side tracking)
+   * 
+   * NOTE: Currently disabled for cost optimization
    */
-  static async recordPageView(pageData: {
-    sessionId: string;
-    pagePath: string;
-    pageTitle?: string;
-    pageType?: string;
-    referrerPath?: string;
-    timeOnPage?: number;
-    scrollDepth?: number;
-    isExit?: boolean;
-  }) {
+  static async recordPageView() {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    console.log('📊 [AnalyticsService] Page view tracking disabled (mock mode)');
+    return { id: 'mock-page-view-id' };
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = await createClient();
     
     try {
@@ -314,25 +376,22 @@ export class AnalyticsService {
       console.error('Error recording page view:', error);
       return null;
     }
+    */
   }
 
   /**
    * Create or update session (for client-side tracking)
+   * 
+   * NOTE: Currently disabled for cost optimization
    */
-  static async createOrUpdateSession(sessionData: {
-    sessionId: string;
-    userAgent?: string;
-    ipAddress?: string;
-    referrer?: string;
-    utmSource?: string;
-    utmMedium?: string;
-    utmCampaign?: string;
-    deviceType?: string;
-    browser?: string;
-    os?: string;
-    country?: string;
-    city?: string;
-  }) {
+  static async createOrUpdateSession() {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    console.log('📊 [AnalyticsService] Session tracking disabled (mock mode)');
+    return { id: 'mock-session-id' };
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = await createClient();
     
     try {
@@ -357,12 +416,22 @@ export class AnalyticsService {
       console.error('Error creating/updating session:', error);
       return null;
     }
+    */
   }
 
   /**
    * End session (for client-side tracking)
+   * 
+   * NOTE: Currently disabled for cost optimization
    */
-  static async endSession(sessionId: string, durationSeconds?: number) {
+  static async endSession() {
+    // NOTE: Database tracking is currently disabled for cost optimization
+    console.log('📊 [AnalyticsService] Session ending disabled (mock mode)');
+    return true;
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     const supabase = await createClient();
     
     try {
@@ -377,5 +446,6 @@ export class AnalyticsService {
       console.error('Error ending session:', error);
       return false;
     }
+    */
   }
 }

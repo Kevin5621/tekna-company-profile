@@ -620,11 +620,49 @@ export class DashboardService {
   }
 
   /**
-   * Get chart data for analytics (delegated to AnalyticsService)
+   * Get chart data for analytics (currently using mock data for cost optimization)
+   * 
+   * NOTE: AnalyticsService is commented out to reduce costs
+   * Uncomment the code below when you want to enable real analytics tracking
    */
   static async getChartData(days: number = 30) {
+    // NOTE: AnalyticsService is currently disabled for cost optimization
+    // Return mock data instead
+    
+    console.log(`📊 [DashboardService] Using mock chart data for ${days} days (analytics disabled)`);
+    
+    // Generate mock data for now
+    const mockData = [];
+    const today = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      
+      // Generate realistic-looking mock data
+      const baseWebsiteViews = 100 + Math.floor(Math.random() * 200);
+      const baseBlogViews = 30 + Math.floor(Math.random() * 80);
+      const baseCareerViews = 15 + Math.floor(Math.random() * 40);
+      const baseCareerApplications = 3 + Math.floor(Math.random() * 12);
+      
+      mockData.push({
+        date: dateKey,
+        website_views: baseWebsiteViews,
+        blog_views: baseBlogViews,
+        career_applications: baseCareerApplications,
+        career_views: baseCareerViews
+      });
+    }
+    
+    return mockData;
+    
+    /*
+    // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
+    
     // Import AnalyticsService dynamically to avoid circular dependency
     const { AnalyticsService } = await import('./analytics.service');
     return AnalyticsService.getChartData(days);
+    */
   }
 }

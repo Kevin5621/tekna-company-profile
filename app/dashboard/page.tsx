@@ -7,14 +7,28 @@ import {
   IconMessageCircle,
   IconTrendingUp,
   IconEye,
-  IconCalendar
+  IconCalendar,
+  IconBriefcase
 } from "@tabler/icons-react";
 import { DashboardService } from "@/lib/services/dashboard.service";
+import { CareerService } from "@/lib/services/career";
 import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 import { DashboardChart } from "@/components/dashboard-chart";
 
 
+
+// Function to get total career applications
+async function getTotalCareerApplications(): Promise<number> {
+  try {
+    const careerService = new CareerService();
+    const applications = await careerService.getAllApplications();
+    return applications.length;
+  } catch (error) {
+    console.error('Error fetching career applications:', error);
+    return 0;
+  }
+}
 
 // Function to get dashboard data using service
 async function getDashboardData(): Promise<DashboardData> {
@@ -76,20 +90,10 @@ async function getDashboardData(): Promise<DashboardData> {
   }
 }
 
-// Function to get chart data
-async function getChartData() {
-  try {
-    return await DashboardService.getChartData(30); // Get last 30 days by default
-  } catch (error) {
-    console.error('Error fetching chart data:', error);
-    return [];
-  }
-}
-
 export default async function DashboardPage() {
-  const [dashboardData, chartData] = await Promise.all([
+  const [dashboardData, totalApplications] = await Promise.all([
     getDashboardData(),
-    getChartData()
+    getTotalCareerApplications()
   ]);
 
   return (
@@ -138,7 +142,64 @@ export default async function DashboardPage() {
       </div>
 
       {/* Analytics Chart */}
-      <DashboardChart initialData={chartData} />
+      <DashboardChart totalApplications={totalApplications} />
+
+      {/* Analytics Section - Career Applications */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Lamaran Karir</CardTitle>
+            <IconBriefcase className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalApplications}</div>
+            <p className="text-xs text-muted-foreground">
+              Total lamaran yang diterima
+            </p>
+            <div className="flex items-center pt-2">
+              <Badge variant="default">
+                Aktif
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="opacity-60">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Analytics Lainnya</CardTitle>
+            <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-muted-foreground">Coming Soon</div>
+            <p className="text-xs text-muted-foreground">
+              Fitur analitik mendalam
+            </p>
+            <div className="flex items-center pt-2">
+              <Badge variant="secondary">
+                Q1 2025
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="opacity-60">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Insights</CardTitle>
+            <IconEye className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-muted-foreground">Coming Soon</div>
+            <p className="text-xs text-muted-foreground">
+              Business intelligence
+            </p>
+            <div className="flex items-center pt-2">
+              <Badge variant="secondary">
+                Segera hadir
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Recent Posts & Quick Actions */}
       <div className="grid gap-6 md:grid-cols-2">
