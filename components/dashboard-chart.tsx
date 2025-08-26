@@ -23,9 +23,10 @@ import { Label } from "@/components/ui/label"
 // Chart data interface
 interface ChartDataItem {
   date: string;
-  posts: number;
-  projects: number;
-  views: number;
+  website_views: number;
+  blog_views: number;
+  career_applications: number;
+  career_views: number;
 }
 
 interface DashboardChartProps {
@@ -35,9 +36,10 @@ interface DashboardChartProps {
 export function DashboardChart({ initialData = [] }: DashboardChartProps) {
   const [timeRange, setTimeRange] = React.useState("30d")
   const [enabledSeries, setEnabledSeries] = React.useState({
-    posts: true,
-    projects: true,
-    views: true
+    website_views: true,
+    blog_views: true,
+    career_applications: true,
+    career_views: true
   })
 
   // Use real data if available, otherwise fallback to mock data
@@ -46,40 +48,40 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
       return initialData;
     }
     
-    // Fallback mock data
-    const mockData = [
-      { date: "2024-01-01", posts: 12, projects: 8, views: 1250 },
-      { date: "2024-01-02", posts: 15, projects: 9, views: 1380 },
-      { date: "2024-01-03", posts: 18, projects: 10, views: 1520 },
-      { date: "2024-01-04", posts: 22, projects: 12, views: 1680 },
-      { date: "2024-01-05", posts: 25, projects: 14, views: 1850 },
-      { date: "2024-01-06", posts: 28, projects: 16, views: 2100 },
-      { date: "2024-01-07", posts: 30, projects: 18, views: 2350 },
-      { date: "2024-01-08", posts: 32, projects: 20, views: 2600 },
-      { date: "2024-01-09", posts: 35, projects: 22, views: 2850 },
-      { date: "2024-01-10", posts: 38, projects: 24, views: 3100 },
-      { date: "2024-01-11", posts: 40, projects: 26, views: 3350 },
-      { date: "2024-01-12", posts: 42, projects: 28, views: 3600 },
-      { date: "2024-01-13", posts: 45, projects: 30, views: 3850 },
-      { date: "2024-01-14", posts: 48, projects: 32, views: 4100 },
-      { date: "2024-01-15", posts: 50, projects: 34, views: 4350 },
-      { date: "2024-01-16", posts: 52, projects: 36, views: 4600 },
-      { date: "2024-01-17", posts: 55, projects: 38, views: 4850 },
-      { date: "2024-01-18", posts: 58, projects: 40, views: 5100 },
-      { date: "2024-01-19", posts: 60, projects: 42, views: 5350 },
-      { date: "2024-01-20", posts: 62, projects: 44, views: 5600 },
-      { date: "2024-01-21", posts: 65, projects: 46, views: 5850 },
-      { date: "2024-01-22", posts: 68, projects: 48, views: 6100 },
-      { date: "2024-01-23", posts: 70, projects: 50, views: 6350 },
-      { date: "2024-01-24", posts: 72, projects: 52, views: 6600 },
-      { date: "2024-01-25", posts: 75, projects: 54, views: 6850 },
-      { date: "2024-01-26", posts: 78, projects: 56, views: 7100 },
-      { date: "2024-01-27", posts: 80, projects: 58, views: 7350 },
-      { date: "2024-01-28", posts: 82, projects: 60, views: 7600 },
-      { date: "2024-01-29", posts: 85, projects: 62, views: 7850 },
-      { date: "2024-01-30", posts: 88, projects: 64, views: 8100 },
-      { date: "2024-01-31", posts: 90, projects: 66, views: 8350 },
-    ];
+         // Fallback mock data
+     const mockData = [
+       { date: "2024-01-01", website_views: 1250, blog_views: 12, career_applications: 8, career_views: 45 },
+       { date: "2024-01-02", website_views: 1380, blog_views: 15, career_applications: 9, career_views: 52 },
+       { date: "2024-01-03", website_views: 1520, blog_views: 18, career_applications: 10, career_views: 58 },
+       { date: "2024-01-04", website_views: 1680, blog_views: 22, career_applications: 12, career_views: 65 },
+       { date: "2024-01-05", website_views: 1850, blog_views: 25, career_applications: 14, career_views: 72 },
+       { date: "2024-01-06", website_views: 2100, blog_views: 28, career_applications: 16, career_views: 80 },
+       { date: "2024-01-07", website_views: 2350, blog_views: 30, career_applications: 18, career_views: 88 },
+       { date: "2024-01-08", website_views: 2600, blog_views: 32, career_applications: 20, career_views: 95 },
+       { date: "2024-01-09", website_views: 2850, blog_views: 35, career_applications: 22, career_views: 102 },
+       { date: "2024-01-10", website_views: 3100, blog_views: 38, career_applications: 24, career_views: 110 },
+       { date: "2024-01-11", website_views: 3350, blog_views: 40, career_applications: 26, career_views: 118 },
+       { date: "2024-01-12", website_views: 3600, blog_views: 42, career_applications: 28, career_views: 125 },
+       { date: "2024-01-13", website_views: 3850, blog_views: 45, career_applications: 30, career_views: 132 },
+       { date: "2024-01-14", website_views: 4100, blog_views: 48, career_applications: 32, career_views: 140 },
+       { date: "2024-01-15", website_views: 4350, blog_views: 50, career_applications: 34, career_views: 148 },
+       { date: "2024-01-16", website_views: 4600, blog_views: 52, career_applications: 36, career_views: 155 },
+       { date: "2024-01-17", website_views: 4850, blog_views: 55, career_applications: 38, career_views: 162 },
+       { date: "2024-01-18", website_views: 5100, blog_views: 58, career_applications: 40, career_views: 170 },
+       { date: "2024-01-19", website_views: 5350, blog_views: 60, career_applications: 42, career_views: 178 },
+       { date: "2024-01-20", website_views: 5600, blog_views: 62, career_applications: 44, career_views: 185 },
+       { date: "2024-01-21", website_views: 5850, blog_views: 65, career_applications: 46, career_views: 192 },
+       { date: "2024-01-22", website_views: 6100, blog_views: 68, career_applications: 48, career_views: 200 },
+       { date: "2024-01-23", website_views: 6350, blog_views: 70, career_applications: 50, career_views: 208 },
+       { date: "2024-01-24", website_views: 6600, blog_views: 72, career_applications: 52, career_views: 215 },
+       { date: "2024-01-25", website_views: 6850, blog_views: 75, career_applications: 54, career_views: 223 },
+       { date: "2024-01-26", website_views: 7100, blog_views: 78, career_applications: 56, career_views: 230 },
+       { date: "2024-01-27", website_views: 7350, blog_views: 80, career_applications: 58, career_views: 238 },
+       { date: "2024-01-28", website_views: 7600, blog_views: 82, career_applications: 60, career_views: 245 },
+       { date: "2024-01-29", website_views: 7850, blog_views: 85, career_applications: 62, career_views: 252 },
+       { date: "2024-01-30", website_views: 8100, blog_views: 88, career_applications: 64, career_views: 260 },
+       { date: "2024-01-31", website_views: 8350, blog_views: 90, career_applications: 66, career_views: 268 },
+     ];
     
     return mockData;
   }, [initialData]);
@@ -149,32 +151,42 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
         <div className="flex flex-wrap items-center gap-6">
           <div className="flex items-center space-x-2">
             <Switch
-              id="posts-toggle"
-              checked={enabledSeries.posts}
-              onCheckedChange={() => toggleSeries('posts')}
+              id="website-views-toggle"
+              checked={enabledSeries.website_views}
+              onCheckedChange={() => toggleSeries('website_views')}
             />
-            <Label htmlFor="posts-toggle" className="text-sm font-medium">
-              Artikel
+            <Label htmlFor="website-views-toggle" className="text-sm font-medium">
+              Website Views
             </Label>
           </div>
           <div className="flex items-center space-x-2">
             <Switch
-              id="projects-toggle"
-              checked={enabledSeries.projects}
-              onCheckedChange={() => toggleSeries('projects')}
+              id="blog-views-toggle"
+              checked={enabledSeries.blog_views}
+              onCheckedChange={() => toggleSeries('blog_views')}
             />
-            <Label htmlFor="projects-toggle" className="text-sm font-medium">
-              Proyek
+            <Label htmlFor="blog-views-toggle" className="text-sm font-medium">
+              Blog Views
             </Label>
           </div>
           <div className="flex items-center space-x-2">
             <Switch
-              id="views-toggle"
-              checked={enabledSeries.views}
-              onCheckedChange={() => toggleSeries('views')}
+              id="career-applications-toggle"
+              checked={enabledSeries.career_applications}
+              onCheckedChange={() => toggleSeries('career_applications')}
             />
-            <Label htmlFor="views-toggle" className="text-sm font-medium">
-              Views
+            <Label htmlFor="career-applications-toggle" className="text-sm font-medium">
+              Career Applications
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="career-views-toggle"
+              checked={enabledSeries.career_views}
+              onCheckedChange={() => toggleSeries('career_views')}
+            />
+            <Label htmlFor="career-views-toggle" className="text-sm font-medium">
+              Career Views
             </Label>
           </div>
         </div>
@@ -185,7 +197,19 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={filteredData}>
               <defs>
-                <linearGradient id="fillPosts" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="fillWebsiteViews" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="5%"
+                    stopColor="#f59e0b"
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor="#f59e0b"
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id="fillBlogViews" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
                     stopColor="#3b82f6"
@@ -197,7 +221,7 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
                     stopOpacity={0.1}
                   />
                 </linearGradient>
-                <linearGradient id="fillProjects" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="fillCareerApplications" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
                     stopColor="#10b981"
@@ -209,15 +233,15 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
                     stopOpacity={0.1}
                   />
                 </linearGradient>
-                <linearGradient id="fillViews" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="fillCareerViews" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor="#f59e0b"
+                    stopColor="#8b5cf6"
                     stopOpacity={0.8}
                   />
                   <stop
                     offset="95%"
-                    stopColor="#f59e0b"
+                    stopColor="#8b5cf6"
                     stopOpacity={0.1}
                   />
                 </linearGradient>
@@ -257,8 +281,10 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
                                 style={{ backgroundColor: item.color }}
                               />
                               <span className="text-muted-foreground">
-                                {item.name === 'posts' ? 'Artikel' : 
-                                 item.name === 'projects' ? 'Proyek' : 'Views'}
+                                {item.name === 'website_views' ? 'Website Views' : 
+                                 item.name === 'blog_views' ? 'Blog Views' : 
+                                 item.name === 'career_applications' ? 'Career Applications' :
+                                 item.name === 'career_views' ? 'Career Views' : item.name}
                               </span>
                               <span className="font-mono font-medium tabular-nums">
                                 {item.value?.toLocaleString()}
@@ -274,34 +300,44 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
               />
               
               {/* Conditional rendering based on toggle state */}
-              {enabledSeries.views && (
+              {enabledSeries.website_views && (
                 <Area
-                  dataKey="views"
+                  dataKey="website_views"
                   type="monotone"
-                  fill="url(#fillViews)"
+                  fill="url(#fillWebsiteViews)"
                   stroke="#f59e0b"
                   strokeWidth={2}
-                  name="views"
+                  name="website_views"
                 />
               )}
-              {enabledSeries.posts && (
+              {enabledSeries.blog_views && (
                 <Area
-                  dataKey="posts"
+                  dataKey="blog_views"
                   type="monotone"
-                  fill="url(#fillPosts)"
+                  fill="url(#fillBlogViews)"
                   stroke="#3b82f6"
                   strokeWidth={2}
-                  name="posts"
+                  name="blog_views"
                 />
               )}
-              {enabledSeries.projects && (
+              {enabledSeries.career_applications && (
                 <Area
-                  dataKey="projects"
+                  dataKey="career_applications"
                   type="monotone"
-                  fill="url(#fillProjects)"
+                  fill="url(#fillCareerApplications)"
                   stroke="#10b981"
                   strokeWidth={2}
-                  name="projects"
+                  name="career_applications"
+                />
+              )}
+              {enabledSeries.career_views && (
+                <Area
+                  dataKey="career_views"
+                  type="monotone"
+                  fill="url(#fillCareerViews)"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  name="career_views"
                 />
               )}
             </AreaChart>
@@ -309,18 +345,22 @@ export function DashboardChart({ initialData = [] }: DashboardChartProps) {
         </div>
         
         {/* Legend */}
-        <div className="flex items-center justify-center gap-6 pt-4">
+        <div className="flex items-center justify-center gap-4 pt-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-amber-500" />
+            <span className="text-sm text-muted-foreground">Website Views</span>
+          </div>
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-blue-500" />
-            <span className="text-sm text-muted-foreground">Artikel</span>
+            <span className="text-sm text-muted-foreground">Blog Views</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-green-500" />
-            <span className="text-sm text-muted-foreground">Proyek</span>
+            <span className="text-sm text-muted-foreground">Career Applications</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="h-3 w-3 rounded-full bg-amber-500" />
-            <span className="text-sm text-muted-foreground">Views</span>
+            <div className="h-3 w-3 rounded-full bg-purple-500" />
+            <span className="text-sm text-muted-foreground">Career Views</span>
           </div>
         </div>
       </CardContent>

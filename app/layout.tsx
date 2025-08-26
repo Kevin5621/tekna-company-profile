@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "@/components/session-provider";
 import { OrganizationStructuredData } from "@/components/structured-data";
 import { ToasterWrapper } from "@/components/ui/toaster-wrapper"
+import { AnalyticsTracker } from "@/components/analytics-tracker";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -94,8 +95,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SessionProvider>
-            {children}
-            <ToasterWrapper />
+            <AnalyticsTracker>
+              {children}
+              <ToasterWrapper />
+            </AnalyticsTracker>
           </SessionProvider>
         </ThemeProvider>
       </body>
