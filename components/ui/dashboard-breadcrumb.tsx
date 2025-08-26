@@ -1,5 +1,6 @@
 'use client'
 
+import React from "react"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,6 +24,7 @@ export function DashboardBreadcrumb({ items }: DashboardBreadcrumbProps) {
   return (
     <Breadcrumb>
       <BreadcrumbList>
+        {/* Dashboard Home - always first */}
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link href="/dashboard" className="flex items-center gap-1">
@@ -31,21 +33,23 @@ export function DashboardBreadcrumb({ items }: DashboardBreadcrumbProps) {
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        <BreadcrumbSeparator />
         
+        {/* Additional breadcrumb items with separators */}
         {items.map((item, index) => (
-          <BreadcrumbItem key={index}>
-            {item.isCurrentPage ? (
-              <BreadcrumbPage>{item.label}</BreadcrumbPage>
-            ) : item.href ? (
-              <BreadcrumbLink asChild>
-                <Link href={item.href}>{item.label}</Link>
-              </BreadcrumbLink>
-            ) : (
-              <BreadcrumbPage>{item.label}</BreadcrumbPage>
-            )}
-            {index < items.length - 1 && <BreadcrumbSeparator />}
-          </BreadcrumbItem>
+          <React.Fragment key={index}>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              {item.isCurrentPage ? (
+                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+              ) : item.href ? (
+                <BreadcrumbLink asChild>
+                  <Link href={item.href}>{item.label}</Link>
+                </BreadcrumbLink>
+              ) : (
+                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+          </React.Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>
