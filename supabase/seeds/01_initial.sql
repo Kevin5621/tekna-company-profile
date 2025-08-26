@@ -353,10 +353,13 @@ DO $$
 DECLARE
   admin_id UUID;
   editor_id UUID;
+  hr_id UUID;
   admin_email TEXT := 'admin@admin.com';
   editor_email TEXT := 'editor@editor.com';
+  hr_email TEXT := 'hr@hr.com';
   admin_password TEXT := 'admin123';
   editor_password TEXT := 'editor123';
+  hr_password TEXT := 'hr123';
 BEGIN
   -- Check if admin user already exists
   IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = admin_email) THEN
@@ -455,6 +458,55 @@ BEGIN
     -- Create editor profile (no display name stored in user_profiles anymore)
     INSERT INTO user_profiles (user_id) VALUES (editor_id);
   END IF;
+
+  -- Check if HR user already exists
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = hr_email) THEN
+    -- Create HR user in Supabase Auth
+    INSERT INTO auth.users (
+      instance_id,
+      id,
+      aud,
+      role,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      recovery_sent_at,
+      last_sign_in_at,
+      raw_app_meta_data,
+      raw_user_meta_data,
+      created_at,
+      updated_at,
+      confirmation_token,
+      email_change,
+      email_change_token_new,
+      recovery_token
+    ) VALUES (
+      '00000000-0000-0000-0000-000000000000',
+      uuid_generate_v4(),
+      'authenticated',
+      'authenticated',
+      hr_email,
+      crypt(hr_password, gen_salt('bf')),
+      now(),
+      now(),
+      now(),
+      '{"provider":"email","providers":["email"]}',
+      '{"display_name":"HR Manager"}',
+      now(),
+      now(),
+      '',
+      '',
+      '',
+      ''
+    ) RETURNING id INTO hr_id;
+    
+    -- Assign HR role
+    INSERT INTO user_roles (user_id, role, is_active) VALUES 
+      (hr_id, 'hr', true);
+    
+    -- Create HR profile
+    INSERT INTO user_profiles (user_id) VALUES (hr_id);
+  END IF;
 END $$;
 
 -- Verify admin users setup
@@ -467,7 +519,7 @@ SELECT
 FROM auth.users u
 JOIN user_roles ur ON u.id = ur.user_id
 LEFT JOIN user_profiles up ON u.id = up.user_id
-WHERE u.email IN ('admin@admin.com', 'editor@editor.com')
+WHERE u.email IN ('admin@admin.com', 'editor@editor.com', 'hr@hr.com')
 ORDER BY u.email;
 
 

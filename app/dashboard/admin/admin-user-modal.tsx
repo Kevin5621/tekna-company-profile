@@ -29,7 +29,7 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
     email: "",
     password: "",
   display_name: "",
-    role: "editor" as 'admin' | 'editor',
+    role: "editor" as 'admin' | 'editor' | 'hr',
     is_active: true,
   });
 
@@ -203,12 +203,15 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="editor">Editor</SelectItem>
+                <SelectItem value="hr">HR</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
               {formData.role === 'editor' 
                 ? "Editors can manage blog posts and projects."
+                : formData.role === 'hr'
+                ? "HR can manage career posts and applications."
                 : "Admins can manage all content and system settings."
               }
             </p>

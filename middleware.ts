@@ -2,6 +2,53 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Define role-based route permissions
+const routePermissions: Record<string, ('admin' | 'editor' | 'hr')[]> = {
+  '/dashboard': ['admin', 'editor', 'hr'],
+  '/dashboard/projects': ['admin', 'editor'],
+  '/dashboard/blog': ['admin', 'editor'],
+  '/dashboard/career': ['admin', 'hr'],
+  '/dashboard/footer': ['admin'],
+  '/dashboard/admin': ['admin'],
+  '/dashboard/newsletter': ['admin'],
+  '/dashboard/settings': ['admin', 'editor', 'hr'],
+}
+
+async function getUserRole(supabase: ReturnType<typeof createServerClient>, userId: string): Promise<string | null> {
+  try {
+    const { data: userRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .single()
+
+    return userRole?.role || null
+  } catch (error) {
+    console.error('Error getting user role:', error)
+    return null
+  }
+}
+
+function hasPermission(pathname: string, userRole: string): boolean {
+  type RoleType = 'admin' | 'editor' | 'hr';
+  
+  // Check exact match first
+  if (routePermissions[pathname]) {
+    return routePermissions[pathname].includes(userRole as RoleType)
+  }
+
+  // Check parent routes for nested paths
+  for (const route in routePermissions) {
+    if (pathname.startsWith(route + '/')) {
+      return routePermissions[route].includes(userRole as RoleType)
+    }
+  }
+
+  // Default: allow access to routes not explicitly defined in routePermissions
+  return true
+}
+
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   
@@ -91,6 +138,16 @@ export async function middleware(req: NextRequest) {
   if (pathname === '/auth/login' && !isAuthenticated) {
     console.log('Middleware - Unauthenticated user on login page, allowing access');
     return res;
+  }
+
+  // Role-based access control for dashboard routes
+  if (isDashboardRoute && isAuthenticated) {
+    const userRole = await getUserRole(supabase, user.id);
+    
+    if (userRole && !hasPermission(pathname, userRole)) {
+      console.log(`Middleware - User role '${userRole}' denied access to '${pathname}', redirecting to dashboard`);
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
   }
 
   return res;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AdminAuthService, AdminUser } from '@/lib/services/admin-auth.service';
 
 export interface PermissionConfig {
-  requiredRole: 'super_admin' | 'admin' | 'editor';
+  requiredRole: 'admin' | 'editor' | 'hr';
   fallback?: React.ReactNode;
   redirectTo?: string;
 }
@@ -30,20 +30,20 @@ export function usePermissions() {
     }
   };
 
-  const hasPermission = (requiredRole: 'super_admin' | 'admin' | 'editor'): boolean => {
+  const hasPermission = (requiredRole: 'admin' | 'editor' | 'hr'): boolean => {
     if (!currentUser) return false;
     
     const roleHierarchy = {
-      'super_admin': 3,
-      'admin': 2,
-      'editor': 1
+      'admin': 3,
+      'editor': 2,
+      'hr': 1
     };
 
     return roleHierarchy[currentUser.role] >= roleHierarchy[requiredRole];
   };
 
   const canManageUsers = (): boolean => {
-    return hasPermission('super_admin');
+    return hasPermission('admin');
   };
 
   const canManageSettings = (): boolean => {
@@ -55,11 +55,11 @@ export function usePermissions() {
   };
 
   const canAccessAdminPanel = (): boolean => {
-    return hasPermission('super_admin');
+    return hasPermission('admin');
   };
 
   const canAccessNewsletter = (): boolean => {
-    return hasPermission('super_admin');
+    return hasPermission('admin');
   };
 
   const refreshUser = () => {
@@ -106,12 +106,12 @@ export function useRoleBasedUI() {
 
   const getRoleDisplayName = (role: string): string => {
     switch (role) {
-      case 'super_admin':
-        return 'Super Admin';
       case 'admin':
         return 'Admin';
       case 'editor':
         return 'Editor';
+      case 'hr':
+        return 'HR';
       default:
         return role;
     }
@@ -119,12 +119,12 @@ export function useRoleBasedUI() {
 
   const getRoleBadgeVariant = (role: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
     switch (role) {
-      case 'super_admin':
-        return 'destructive';
       case 'admin':
-        return 'default';
+        return 'destructive';
       case 'editor':
         return 'secondary';
+      case 'hr':
+        return 'default';
       default:
         return 'outline';
     }
@@ -132,12 +132,12 @@ export function useRoleBasedUI() {
 
   const getRoleColor = (role: string): string => {
     switch (role) {
-      case 'super_admin':
-        return 'text-destructive';
       case 'admin':
-        return 'text-primary';
+        return 'text-destructive';
       case 'editor':
         return 'text-secondary-foreground';
+      case 'hr':
+        return 'text-primary';
       default:
         return 'text-muted-foreground';
     }

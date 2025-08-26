@@ -55,6 +55,8 @@ export default function AdminManagementPage() {
         return "destructive";
       case "editor":
         return "secondary";
+      case "hr":
+        return "default";
       default:
         return "outline";
     }
@@ -66,6 +68,8 @@ export default function AdminManagementPage() {
         return "Admin";
       case "editor":
         return "Editor";
+      case "hr":
+        return "HR";
       default:
         return role;
     }

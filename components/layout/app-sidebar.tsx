@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ClientOnly } from "@/components/ui/client-only"
 import Image from "next/image"
 import { useSession } from "@/components/session-provider"
+import { AdminAuthService, type AdminUser } from "@/lib/services/admin-auth.service"
 import { 
   LayoutDashboard, 
   FolderOpen, 
@@ -25,7 +26,7 @@ interface NavigationItem {
   title: string
   href: string
   icon: React.ComponentType<{ className?: string }>
-  roles: ('admin' | 'editor')[]
+  roles: ('admin' | 'editor' | 'hr')[]
 }
 
 const navigationItems: NavigationItem[] = [
@@ -33,7 +34,7 @@ const navigationItems: NavigationItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ['admin', 'editor']
+    roles: ['admin', 'editor', 'hr']
   },
   {
     title: "Proyek",
@@ -51,7 +52,7 @@ const navigationItems: NavigationItem[] = [
     title: "Career",
     href: "/dashboard/career",
     icon: Briefcase,
-    roles: ['admin', 'editor']
+    roles: ['admin', 'hr']
   },
   {
     title: "Footer",
@@ -78,21 +79,34 @@ const bottomNavigationItems: NavigationItem[] = [
     title: "Pengaturan",
     href: "/dashboard/settings",
     icon: Settings,
-    roles: ['admin']
+    roles: ['admin', 'editor', 'hr']
   },
   {
     title: "Profile",
     href: "/dashboard/settings/profile",
     icon: User,
-    roles: ['admin', 'editor']
+    roles: ['admin', 'editor', 'hr']
   }
 ]
 
 function NavigationItems() {
   const pathname = usePathname()
+  const { user } = useSession()
+  const [currentAdmin, setCurrentAdmin] = React.useState<AdminUser | null>(null)
 
-  // Show all items for now - role filtering will be handled by RLS policies
-  const filteredItems = navigationItems
+  React.useEffect(() => {
+    if (user) {
+      AdminAuthService.getCurrentAdmin()
+        .then(setCurrentAdmin)
+        .catch(() => setCurrentAdmin(null))
+    }
+  }, [user])
+
+  // Filter items based on user role
+  const filteredItems = navigationItems.filter(item => {
+    if (!currentAdmin) return false
+    return item.roles.includes(currentAdmin.role)
+  })
 
   return (
     <nav className="flex-1 px-4 pt-4 space-y-2">
@@ -129,9 +143,22 @@ function NavigationItems() {
 
 function BottomNavigationItems() {
   const pathname = usePathname()
+  const { user } = useSession()
+  const [currentAdmin, setCurrentAdmin] = React.useState<AdminUser | null>(null)
 
-  // Show all items for now - role filtering will be handled by RLS policies
-  const filteredItems = bottomNavigationItems
+  React.useEffect(() => {
+    if (user) {
+      AdminAuthService.getCurrentAdmin()
+        .then(setCurrentAdmin)
+        .catch(() => setCurrentAdmin(null))
+    }
+  }, [user])
+
+  // Filter items based on user role
+  const filteredItems = bottomNavigationItems.filter(item => {
+    if (!currentAdmin) return false
+    return item.roles.includes(currentAdmin.role)
+  })
 
   return (
     <nav className="px-4 pt-4 space-y-2">

@@ -24,7 +24,7 @@ interface NavItem {
   title: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
-  requiredRole: 'super_admin' | 'admin' | 'editor';
+  requiredRole: 'admin' | 'editor' | 'hr';
   badge?: string;
   children?: Omit<NavItem, 'children'>[];
 }
@@ -118,14 +118,14 @@ const navigationItems: NavItem[] = [
     title: "Admin Management",
     href: "/dashboard/admin",
     icon: IconUsers,
-    requiredRole: "super_admin",
+    requiredRole: "admin",
     badge: "Admin Only"
   },
   {
     title: "Newsletter",
     href: "/dashboard/newsletter",
     icon: IconLetterA,
-    requiredRole: "super_admin",
+    requiredRole: "admin",
     badge: "Admin Only"
   },
   {
@@ -157,13 +157,13 @@ export function AdminSidebar() {
     }
   };
 
-  const hasPermission = (requiredRole: 'super_admin' | 'admin' | 'editor') => {
+  const hasPermission = (requiredRole: 'admin' | 'editor' | 'hr') => {
     if (!currentUser) return false;
     
     const roleHierarchy = {
-      'super_admin': 3,
-      'admin': 2,
-      'editor': 1
+      'admin': 3,
+      'editor': 2,
+      'hr': 1
     };
 
     return roleHierarchy[currentUser.role] >= roleHierarchy[requiredRole];

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/client";
 export interface UserRole {
   id: string;
   user_id: string;
-  role: 'admin' | 'editor';
+  role: 'admin' | 'editor' | 'hr';
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -23,7 +23,7 @@ export interface UserProfile {
 export interface AdminUser {
   id: string;
   email: string;
-  role: 'admin' | 'editor';
+  role: 'admin' | 'editor' | 'hr';
   is_active: boolean;
   profile?: UserProfile;
   // optional display_name is returned from server (auth metadata)
@@ -262,7 +262,7 @@ export class AdminAuthService {
    */
   static async createAdminUser(userData: {
     user_id: string;
-    role: 'admin' | 'editor';
+    role: 'admin' | 'editor' | 'hr';
   display_name?: string;
   }) {
     const supabase = createClient();
@@ -306,7 +306,7 @@ export class AdminAuthService {
   static async createCompleteAdminUser(userData: {
     email: string;
     password: string;
-    role: 'admin' | 'editor';
+    role: 'admin' | 'editor' | 'hr';
     display_name?: string;
   }) {
     try {
@@ -393,13 +393,14 @@ export class AdminAuthService {
   /**
    * Check if user has permission
    */
-  static async hasPermission(requiredRole: 'admin' | 'editor') {
+  static async hasPermission(requiredRole: 'admin' | 'editor' | 'hr') {
     try {
       const currentAdmin = await this.getCurrentAdmin();
       
       const roleHierarchy: Record<string, number> = {
-        'admin': 2,
-        'editor': 1
+        'admin': 3,
+        'editor': 2,
+        'hr': 1
       };
 
       return roleHierarchy[currentAdmin.role] >= roleHierarchy[requiredRole];
