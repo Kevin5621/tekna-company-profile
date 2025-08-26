@@ -152,4 +152,159 @@
       max-width: 100%;
     }
   }
+
+  /* Fix floating page issue during scroll */
+  .dashboard-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    gap: 0;
+  }
+
+  .dashboard-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dashboard-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  /* Large screen optimization */
+  @media (min-width: 1400px) {
+    .dashboard-content-wrapper {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+  }
+
+  /* Extra large screen optimization */
+  @media (min-width: 1600px) {
+    .dashboard-content-wrapper {
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+  }
+
+  /* Prevent floating behavior on specific pages */
+  .dashboard-form-page {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .dashboard-form-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    position: relative;
+  }
+
+  /* Ensure proper scroll behavior */
+  .dashboard-scroll-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Fix sidebar positioning */
+  .dashboard-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 16rem;
+    z-index: 40;
+    background-color: hsl(var(--sidebar));
+    border-right: 1px solid hsl(var(--sidebar-border));
+  }
+
+  /* Remove any gap between sidebar and main content */
+  .dashboard-layout > div:first-child {
+    margin-right: 0;
+  }
+
+  .dashboard-layout > div:last-child {
+    margin-left: 0;
+  }
+
+  /* Ensure main content doesn't overlap sidebar on desktop */
+  @media (min-width: 768px) {
+    .dashboard-main {
+      margin-left: 16rem;
+      width: calc(100% - 16rem);
+      padding-left: 0;
+      gap: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    
+    .dashboard-content-wrapper {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  /* Mobile specific fixes */
+  @media (max-width: 767px) {
+    .dashboard-main {
+      margin-left: 0;
+      width: 100%;
+      gap: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    
+    .dashboard-content-wrapper {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      max-width: 100%;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .dashboard-scroll-container {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+
+  /* Large screen optimization */
+  @media (min-width: 1400px) {
+    .dashboard-content-wrapper {
+      max-width: 1400px;
+    }
+  }
+
+  /* Extra large screen optimization */
+  @media (min-width: 1600px) {
+    .dashboard-content-wrapper {
+      max-width: 1600px;
+    }
+  }
 }

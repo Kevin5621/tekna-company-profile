@@ -60,7 +60,7 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-full dashboard-form-page">
       {/* Breadcrumbs */}
       <DashboardBreadcrumb 
         items={[
@@ -75,18 +75,20 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
         <BackButton href="/dashboard/projects" label="Kembali ke Projects" />
       </div>
 
-      <ProjectForm 
-        mode="edit" 
-        projectId={project.id}
-        initialData={{
-          name: project.name,
-          slug: project.slug,
-          project_url: project.project_url || '',
-          description: project.description || '',
-          featured_image_url: project.featured_image_url || '',
-          is_featured: project.is_featured || false,
-        }}
-      />
+      <div className="dashboard-form-container">
+        <ProjectForm 
+          mode="edit" 
+          projectId={project.id}
+          initialData={{
+            name: project.name,
+            slug: project.slug,
+            project_url: project.project_url || '',
+            description: project.description || '',
+            featured_image_url: project.featured_image_url || '',
+            is_featured: project.is_featured || false,
+          }}
+        />
+      </div>
     </div>
   );
 }

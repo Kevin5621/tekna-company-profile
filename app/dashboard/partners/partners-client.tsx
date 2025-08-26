@@ -132,7 +132,7 @@ export default function PartnersClient() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-full dashboard-form-page">
       {/* Breadcrumb */}
       <Breadcrumb>
         <BreadcrumbList>

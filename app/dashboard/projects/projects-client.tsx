@@ -70,7 +70,7 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
       <div className="@container/main flex flex-1 flex-col gap-2">
         <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
           {/* Breadcrumbs */}
-          <div className="px-4 lg:px-6">
+          <div>
             <DashboardBreadcrumb 
               items={[
                 { label: "Proyek", href: "/dashboard/projects" },
@@ -80,7 +80,7 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
           </div>
 
           {/* Header */}
-          <div className="px-4 lg:px-6">
+          <div>
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-bold tracking-tight">Kelola Proyek</h1>
               <p className="text-muted-foreground">
@@ -90,7 +90,7 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
           </div>
 
           {/* Actions Bar */}
-          <div className="px-4 lg:px-6">
+          <div>
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="flex gap-2 w-full sm:w-auto">
                 <div className="relative w-full sm:w-80">
@@ -112,7 +112,7 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
           </div>
 
           {/* Projects Grid */}
-          <div className="px-4 lg:px-6">
+          <div>
             {projects.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {projects.map((project) => (

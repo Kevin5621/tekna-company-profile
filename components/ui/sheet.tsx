@@ -6,25 +6,29 @@ import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+function Sheet({ ...props }: Readonly<React.ComponentProps<typeof SheetPrimitive.Root>>) {
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => setMounted(true), [])
+
+  type RootProps = React.ComponentProps<typeof SheetPrimitive.Root>
+  const controlledOpen = (props as RootProps & { open?: boolean }).open
+  const rootProps: RootProps = { ...(props as RootProps) }
+  if (controlledOpen !== undefined) {
+    rootProps.open = mounted ? controlledOpen : false
+  }
+
+  return <SheetPrimitive.Root data-slot="sheet" {...rootProps} />
 }
 
-function SheetTrigger({
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
+function SheetTrigger({ ...props }: Readonly<React.ComponentProps<typeof SheetPrimitive.Trigger>>) {
   return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
 }
 
-function SheetClose({
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Close>) {
+function SheetClose({ ...props }: Readonly<React.ComponentProps<typeof SheetPrimitive.Close>>) {
   return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
 }
 
-function SheetPortal({
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+function SheetPortal({ ...props }: Readonly<React.ComponentProps<typeof SheetPrimitive.Portal>>) {
   return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
 }
 

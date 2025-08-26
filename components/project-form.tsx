@@ -162,9 +162,9 @@ export function ProjectForm({ mode, initialData, projectId }: Readonly<ProjectFo
   };
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+    <div className="flex flex-1 flex-col min-h-full">
+      <div className="@container/main flex flex-1 flex-col gap-2 min-h-full">
+        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 min-h-full">
           {/* Header */}
           <div className="px-4 lg:px-6">
             <div className="flex items-center gap-4 mb-4">
@@ -187,16 +187,16 @@ export function ProjectForm({ mode, initialData, projectId }: Readonly<ProjectFo
           </div>
 
           {/* Form */}
-          <div className="px-4 lg:px-6">
-            <Card>
+          <div className="px-4 lg:px-6 flex-1">
+            <Card className="h-full">
               <CardHeader>
                 <CardTitle>Informasi Proyek</CardTitle>
                 <CardDescription>
                   Lengkapi informasi proyek dengan benar
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+              <CardContent className="flex-1">
+                <form onSubmit={handleSubmit} className="space-y-6 h-full">
                   <div className="grid gap-6 md:grid-cols-2">
                     {/* Nama Proyek */}
                     <div className="space-y-2">

@@ -10,8 +10,12 @@ export const metadata: Metadata = {
 
 export default function NewPartnerPage() {
   return (
-    <Suspense fallback={<Skeleton className="w-full h-96" />}>
-      <PartnerForm />
-    </Suspense>
+    <div className="dashboard-form-page">
+      <Suspense fallback={<Skeleton className="w-full h-96" />}>
+        <div className="dashboard-form-container">
+          <PartnerForm />
+        </div>
+      </Suspense>
+    </div>
   );
 }

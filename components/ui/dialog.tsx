@@ -6,27 +6,34 @@ import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-function Dialog({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+function Dialog({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Root>>) {
+  // Prevent dialogs from opening during SSR/hydration which can cause
+  // Radix to add overflow:hidden to the root html/body. If the parent
+  // controls `open`, we override it to false until the component is
+  // mounted on the client.
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => setMounted(true), [])
+
+  // If `open` is a controlled prop, only allow it after mount.
+  type RootProps = React.ComponentProps<typeof DialogPrimitive.Root>
+  const controlledOpen = (props as RootProps & { open?: boolean }).open
+  const rootProps: RootProps = { ...(props as RootProps) }
+  if (controlledOpen !== undefined) {
+    rootProps.open = mounted ? controlledOpen : false
+  }
+
+  return <DialogPrimitive.Root data-slot="dialog" {...rootProps} />
 }
 
-function DialogTrigger({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+function DialogTrigger({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Trigger>>) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
 
-function DialogPortal({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+function DialogPortal({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Portal>>) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
 }
 
-function DialogClose({
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Close>) {
+function DialogClose({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Close>>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
 

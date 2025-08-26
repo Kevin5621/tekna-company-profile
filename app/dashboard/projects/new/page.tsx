@@ -4,7 +4,7 @@ import BackButton from '@/components/ui/back-button';
 
 export default function NewProjectPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-full dashboard-form-page">
       {/* Breadcrumbs */}
       <DashboardBreadcrumb 
         items={[
@@ -18,7 +18,9 @@ export default function NewProjectPage() {
         <BackButton href="/dashboard/projects" label="Kembali ke Projects" />
       </div>
 
-      <ProjectForm mode="create" />
+      <div className="dashboard-form-container">
+        <ProjectForm mode="create" />
+      </div>
     </div>
   );
 }
