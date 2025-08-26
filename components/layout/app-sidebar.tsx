@@ -13,10 +13,10 @@ import {
   FolderOpen, 
   FileText, 
   Settings, 
-  HelpCircle, 
-  Search,
+  
   Mail,
   Shield,
+  User,
   Footprints,
   Briefcase
 } from "lucide-react"
@@ -70,7 +70,7 @@ const navigationItems: NavigationItem[] = [
     href: "/dashboard/newsletter",
     icon: Mail,
     roles: ['admin']
-  }
+  },
 ]
 
 const bottomNavigationItems: NavigationItem[] = [
@@ -81,15 +81,9 @@ const bottomNavigationItems: NavigationItem[] = [
     roles: ['admin']
   },
   {
-    title: "Bantuan",
-    href: "/dashboard/help",
-    icon: HelpCircle,
-    roles: ['admin', 'editor']
-  },
-  {
-    title: "Pencarian",
-    href: "/dashboard/search",
-    icon: Search,
+    title: "Profile",
+    href: "/dashboard/settings/profile",
+    icon: User,
     roles: ['admin', 'editor']
   }
 ]

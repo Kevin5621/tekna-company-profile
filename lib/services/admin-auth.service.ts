@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 export interface UserRole {
   id: string;
@@ -15,7 +15,6 @@ export interface UserProfile {
   first_name?: string;
   last_name?: string;
   avatar_url?: string;
-  bio?: string;
   preferences: Record<string, unknown>;
   created_at: string;
   updated_at: string;
@@ -117,13 +116,23 @@ export class AdminAuthService {
         .single();
 
       const { data: { user } } = await supabase.auth.getUser();
-      
+
+      // For backward compatibility, map auth user metadata.display_name into profile.first_name
+
+      const displayName = user?.user_metadata?.display_name as string | undefined;
+
+      const profile = userProfile || {} as Partial<UserProfile>;
+      if (displayName) {
+        // keep existing shape where UI reads profile.first_name
+        (profile as Partial<UserProfile>).first_name = displayName;
+      }
+
       return {
         id: userId,
         email: user?.email || 'unknown@email.com',
         role: userRole.role,
         is_active: userRole.is_active,
-        profile: userProfile || undefined
+        profile: Object.keys(profile).length ? profile : undefined
       };
     } catch (error) {
       console.error('Error getting user from database:', error);
@@ -155,21 +164,51 @@ export class AdminAuthService {
   /**
    * Update user profile
    */
-  static async updateUserProfile(userId: string, profileData: Partial<UserProfile>) {
+  static async updateUserProfile(userId: string, profileData: Partial<UserProfile> & { display_name?: string }) {
     const supabase = createClient();
-    
     try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: userId,
-          ...profileData,
-        })
-        .select()
-        .single();
+      // If display_name is provided, update the Supabase Auth user metadata for the current user.
+      // This updates the authenticated user's metadata (display_name) rather than storing name in user_profiles.
+      if (profileData.display_name) {
+        const { error: authError } = await supabase.auth.updateUser({ data: { display_name: profileData.display_name } });
+        if (authError) {
+          console.error('Error updating auth user metadata:', authError);
+          throw authError;
+        }
+      }
 
-      if (error) throw error;
-      return data;
+      // Update/insert any additional profile fields (avatar_url, preferences) in user_profiles table.
+      const updatable: Partial<UserProfile> = {};
+      if (profileData.avatar_url) updatable.avatar_url = profileData.avatar_url;
+      if (profileData.preferences) updatable.preferences = profileData.preferences;
+
+      if (Object.keys(updatable).length > 0) {
+        // Try to update existing row
+        const { data, error: updateError } = await supabase
+          .from('user_profiles')
+          .update(updatable)
+          .eq('user_id', userId)
+          .select()
+          .single();
+
+        // If the update fails because the row doesn't exist, insert it instead.
+        if (updateError) {
+          if (updateError.code === 'PGRST116') {
+            const { data: insertData, error: insertError } = await supabase
+              .from('user_profiles')
+              .insert({ user_id: userId, ...updatable })
+              .select()
+              .single();
+            if (insertError) throw insertError;
+            return insertData;
+          }
+          throw updateError;
+        }
+        return data;
+      }
+
+      // Nothing else to update in user_profiles
+      return null;
     } catch (error) {
       console.error('Error updating user profile:', error);
       throw error;
@@ -201,8 +240,7 @@ export class AdminAuthService {
   static async createAdminUser(userData: {
     user_id: string;
     role: 'admin' | 'editor';
-    first_name?: string;
-    last_name?: string;
+  display_name?: string;
   }) {
     const supabase = createClient();
     
@@ -220,14 +258,14 @@ export class AdminAuthService {
 
       if (roleError) throw roleError;
 
-      // Insert user profile if name provided
-      if (userData.first_name || userData.last_name) {
+      // Insert user profile if display_name provided (map to first_name for legacy)
+      if (userData.display_name) {
         await supabase
           .from('user_profiles')
           .insert({
             user_id: userData.user_id,
-            first_name: userData.first_name,
-            last_name: userData.last_name
+            first_name: userData.display_name,
+            last_name: ''
           });
       }
 
@@ -246,8 +284,7 @@ export class AdminAuthService {
     email: string;
     password: string;
     role: 'admin' | 'editor';
-    first_name?: string;
-    last_name?: string;
+    display_name?: string;
   }) {
     try {
       const response = await fetch('/api/admin/users', {

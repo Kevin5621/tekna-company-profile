@@ -17,10 +17,7 @@ CREATE TABLE user_roles (
 CREATE TABLE user_profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL, -- This will reference Supabase Auth users.id
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
     avatar_url TEXT,
-    bio TEXT,
     preferences JSONB DEFAULT '{}',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

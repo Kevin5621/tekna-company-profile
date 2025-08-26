@@ -403,9 +403,8 @@ BEGIN
                    INSERT INTO user_roles (user_id, role, is_active) VALUES 
                      (admin_id, 'admin', true);
     
-    -- Create admin profile
-    INSERT INTO user_profiles (user_id, first_name, last_name) VALUES 
-      (admin_id, 'Super', 'Admin');
+    -- Create admin profile (no display name stored in user_profiles anymore)
+    INSERT INTO user_profiles (user_id) VALUES (admin_id);
   END IF;
   
   -- Check if editor user already exists
@@ -453,19 +452,18 @@ BEGIN
     INSERT INTO user_roles (user_id, role, is_active) VALUES 
       (editor_id, 'editor', true);
     
-    -- Create editor profile
-    INSERT INTO user_profiles (user_id, first_name, last_name) VALUES 
-      (editor_id, 'Content', 'Editor');
+    -- Create editor profile (no display name stored in user_profiles anymore)
+    INSERT INTO user_profiles (user_id) VALUES (editor_id);
   END IF;
 END $$;
 
 -- Verify admin users setup
+-- Verify admin users setup (display name is stored in auth.users raw_user_meta_data -> use COALESCE for safety)
 SELECT 
     u.email,
     ur.role,
     ur.is_active,
-    up.first_name,
-    up.last_name
+    COALESCE((u.raw_user_meta_data->>'display_name')::text, '') AS display_name
 FROM auth.users u
 JOIN user_roles ur ON u.id = ur.user_id
 LEFT JOIN user_profiles up ON u.id = up.user_id

@@ -49,11 +49,13 @@ export async function GET() {
       .map(user => {
         const roleInfo = rolesMap.get(user.id)!; // We filtered, so it must exist
         const profileInfo = profilesMap.get(user.id);
+        const displayName = (user.user_metadata && user.user_metadata.display_name) || null;
         return {
           id: user.id,
           email: user.email,
           role: roleInfo.role,
           is_active: roleInfo.is_active,
+          display_name: displayName,
           profile: profileInfo || null,
         };
       });
@@ -78,8 +80,8 @@ export async function POST(request: NextRequest) {
     console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
     console.log('SUPABASE_SERVICE_ROLE_KEY length:', process.env.SUPABASE_SERVICE_ROLE_KEY?.length);
     
-    const body = await request.json();
-    const { email, password, role, first_name, last_name } = body;
+  const body = await request.json();
+  const { email, password, role, display_name } = body;
 
     // Validate required fields
     if (!email || !password || !role) {
@@ -97,14 +99,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Create user in Supabase Auth
+    // 1. Create user in Supabase Auth, store display_name in metadata
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
       user_metadata: {
-        first_name,
-        last_name,
+        display_name,
         role
       }
     });
@@ -145,30 +146,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Create user profile if name provided
-    if (first_name || last_name) {
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert({
-          user_id: userId,
-          first_name,
-          last_name
-        });
-
-      if (profileError) {
-        console.error('Profile error:', profileError);
-        // Don't fail the whole operation for profile error
-      }
-    }
-
+    // Note: We store display name in user_metadata; user_profiles table is optional
     return NextResponse.json({
       success: true,
       user: {
         id: userId,
         email: authData.user.email,
         role,
-        first_name,
-        last_name
+        display_name: display_name || null
       }
     });
 

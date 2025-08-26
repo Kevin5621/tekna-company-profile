@@ -28,8 +28,7 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    first_name: "",
-    last_name: "",
+  display_name: "",
     role: "editor" as 'admin' | 'editor',
     is_active: true,
   });
@@ -42,8 +41,9 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
       setFormData({
         email: user.email,
         password: "", // Password not needed for edit mode
-        first_name: user.profile?.first_name || "",
-        last_name: user.profile?.last_name || "",
+        display_name: (user.profile?.first_name || user.profile?.last_name)
+          ? `${user.profile?.first_name || ''}${user.profile?.first_name && user.profile?.last_name ? ' ' : ''}${user.profile?.last_name || ''}`
+          : user.email || '',
         role: user.role,
         is_active: user.is_active,
       });
@@ -56,8 +56,7 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
     setFormData({
       email: "",
       password: "",
-      first_name: "",
-      last_name: "",
+  display_name: "",
       role: "editor",
       is_active: true,
     });
@@ -74,24 +73,24 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
         await AdminAuthService.createCompleteAdminUser({
           email: formData.email,
           password: formData.password,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
+          display_name: formData.display_name,
           role: formData.role,
         });
       } else if (user) {
-        await AdminAuthService.updateAdminUser(user.id, {
-          role: formData.role,
-          is_active: formData.is_active,
-          profile: {
-            id: user.profile?.id || '',
-            user_id: user.id,
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            preferences: user.profile?.preferences || {},
-            created_at: user.profile?.created_at || new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }
+        // Use server PATCH endpoint to update auth user metadata (display_name) and role/is_active
+        const res = await fetch(`/api/admin/users/${user.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            display_name: formData.display_name,
+            role: formData.role,
+            is_active: formData.is_active
+          })
         });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err?.error || 'Failed to update user');
+        }
       }
 
       onSuccess();
@@ -178,27 +177,17 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first_name">First Name</Label>
-              <Input
-                id="first_name"
-                type="text"
-                placeholder="John"
-                value={formData.first_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
-                required
-              />
+                <Label htmlFor="display_name">Username / Display Name</Label>
+                <Input
+                  id="display_name"
+                  type="text"
+                  placeholder="John Doe"
+                  value={formData.display_name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
+                  required
+                />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="last_name">Last Name</Label>
-              <Input
-                id="last_name"
-                type="text"
-                placeholder="Doe"
-                value={formData.last_name}
-                onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
-                required
-              />
-            </div>
+              <div className="space-y-2" />
           </div>
 
           <div className="space-y-2">
