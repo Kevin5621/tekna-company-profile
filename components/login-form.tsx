@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { AdminAuthService } from "@/lib/services/admin-auth.service";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,7 +20,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,22 +28,22 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
-      
-      if (data.user) {
+      // identifier can be email or display name
+      const result = await AdminAuthService.authenticateAdmin(identifier, password);
+
+      // AdminAuthService.authenticateAdmin throws on error or returns an object with `user`
+      const hasUser = (res: unknown): res is { user: unknown } => {
+        return typeof res === 'object' && res !== null && 'user' in (res as Record<string, unknown>);
+      };
+
+      if (hasUser(result)) {
         router.push('/dashboard');
       } else {
-        throw new Error('No user data returned');
+        router.push('/dashboard');
       }
     } catch (error: unknown) {
       console.error('Login error:', error);
@@ -66,14 +66,14 @@ export function LoginForm({
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="identifier">Email or Display Name</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="identifier"
+                  type="text"
+                  placeholder="m@example.com or username"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">

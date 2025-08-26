@@ -26,6 +26,8 @@ export interface AdminUser {
   role: 'admin' | 'editor';
   is_active: boolean;
   profile?: UserProfile;
+  // optional display_name is returned from server (auth metadata)
+  display_name?: string;
 }
 
 export interface PaginatedResult<T> {
@@ -40,10 +42,31 @@ export class AdminAuthService {
   /**
    * Authenticate admin user
    */
-  static async authenticateAdmin(email: string, password: string) {
+  static async authenticateAdmin(identifier: string, password: string) {
     const supabase = createClient();
     
     try {
+      // identifier may be an email or a display name (username).
+      let email = identifier;
+
+      // rudimentary check: if there's no @, treat as display name and try to resolve to an email
+      if (!identifier.includes('@')) {
+        const users = await this.getAllAdminUsers();
+        const match = users.find(u => {
+          const display = (u as AdminUser).display_name as string | undefined;
+          const legacy = u.profile?.first_name as string | undefined; // backward compatibility
+          return [display, legacy]
+            .filter(Boolean)
+            .some(d => d?.toLowerCase() === identifier.toLowerCase());
+        });
+
+        if (!match) {
+          throw new Error('User not found for provided display name');
+        }
+
+        email = match.email;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

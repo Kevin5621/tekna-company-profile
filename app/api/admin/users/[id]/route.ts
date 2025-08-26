@@ -9,9 +9,14 @@ const supabase = createClient(
   }
 );
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } | Promise<{ id: string }> }) {
   try {
-    const userId = params.id;
+    // type-guard: detect Promise-like params without using `any`
+    const isThenable = <T,>(v: unknown): v is Promise<T> =>
+      typeof (v as { then?: unknown }).then === 'function';
+
+    const resolvedParams = isThenable<{ id: string }>(params) ? await params : params;
+    const userId = (resolvedParams as { id: string }).id;
     const body = await request.json();
 
     const { display_name, role, is_active, profile } = body;

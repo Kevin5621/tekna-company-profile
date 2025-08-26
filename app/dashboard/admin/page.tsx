@@ -92,20 +92,25 @@ export default function AdminManagementPage() {
           className="flex items-center justify-between p-4 border rounded-lg"
         >
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-              <span className="text-primary font-semibold">
-                {user.profile?.first_name?.[0]}
-                {user.profile?.last_name?.[0]}
-              </span>
-            </div>
-            <div>
-              <div className="font-medium">
-                {user.profile?.first_name} {user.profile?.last_name}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {user.email}
-              </div>
-            </div>
+            {(() => {
+              const display = user.display_name || user.profile?.first_name || user.email;
+              const initials = display
+                .split(" ")
+                .map(s => s[0])
+                .slice(0,2)
+                .join("");
+              return (
+                <>
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-primary font-semibold">{initials}</span>
+                  </div>
+                  <div>
+                    <div className="font-medium">{display}</div>
+                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                  </div>
+                </>
+              );
+            })()}
           </div>
 
           <div className="flex items-center gap-3">
