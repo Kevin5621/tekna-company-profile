@@ -174,12 +174,12 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-64 bg-gray-200 rounded"></div>
-            <div className="h-96 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="h-64 bg-muted rounded"></div>
+            <div className="h-96 bg-muted rounded"></div>
           </div>
         </div>
       </div>
@@ -188,7 +188,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
 
   if (!position) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold">Position not found</h1>
@@ -203,7 +203,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Back Navigation */}
@@ -217,13 +217,13 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
           </div>
 
           {/* Position Header */}
-          <Card className="border-0 shadow-md">
+          <Card className="border shadow-sm">
             <CardHeader className="space-y-4">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 flex-wrap">
                     {position.featured && (
-                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
                         <Star className="w-3 h-3 mr-1 fill-current" />
                         Featured
                       </Badge>
@@ -243,7 +243,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                     </Badge>
                   </div>
                   
-                  <h1 className="text-3xl font-bold text-gray-900">{position.title}</h1>
+                  <h1 className="text-3xl font-bold text-foreground">{position.title}</h1>
                   
                   <div className="flex items-center gap-6 text-muted-foreground">
                     <div className="flex items-center gap-2">
@@ -259,7 +259,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                       <span>{position.type?.name}</span>
                     </div>
                     {position.remote_allowed && (
-                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800">
                         Remote Friendly
                       </Badge>
                     )}
@@ -295,26 +295,26 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Job Description */}
-              <Card className="border-0 shadow-md">
+              <Card className="border shadow-sm">
                 <CardHeader>
                   <CardTitle>Job Description</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="prose max-w-none">
-                    <p className="text-gray-700 whitespace-pre-wrap">{position.description}</p>
+                  <div className="prose max-w-none dark:prose-invert">
+                    <p className="text-foreground whitespace-pre-wrap">{position.description}</p>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Requirements */}
               {position.requirements && (
-                <Card className="border-0 shadow-md">
+                <Card className="border shadow-sm">
                   <CardHeader>
                     <CardTitle>Requirements</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose max-w-none">
-                      <p className="text-gray-700 whitespace-pre-wrap">{position.requirements}</p>
+                    <div className="prose max-w-none dark:prose-invert">
+                      <p className="text-foreground whitespace-pre-wrap">{position.requirements}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -322,13 +322,13 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
 
               {/* Benefits */}
               {position.benefits && (
-                <Card className="border-0 shadow-md">
+                <Card className="border shadow-sm">
                   <CardHeader>
                     <CardTitle>Benefits & Perks</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose max-w-none">
-                      <p className="text-gray-700 whitespace-pre-wrap">{position.benefits}</p>
+                    <div className="prose max-w-none dark:prose-invert">
+                      <p className="text-foreground whitespace-pre-wrap">{position.benefits}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -338,38 +338,38 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Position Details */}
-              <Card className="border-0 shadow-md">
+              <Card className="border shadow-sm">
                 <CardHeader>
                   <CardTitle>Position Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Department</div>
-                    <div className="mt-1">{position.category?.name}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Department</div>
+                    <div className="mt-1 text-foreground">{position.category?.name}</div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Location</div>
-                    <div className="mt-1">{position.location?.name}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Location</div>
+                    <div className="mt-1 text-foreground">{position.location?.name}</div>
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Employment Type</div>
-                    <div className="mt-1">{position.type?.name}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Employment Type</div>
+                    <div className="mt-1 text-foreground">{position.type?.name}</div>
                   </div>
                   {position.level && (
                     <div>
-                      <div className="text-sm font-medium text-gray-500">Experience Level</div>
-                      <div className="mt-1">{position.level.name}</div>
+                      <div className="text-sm font-medium text-muted-foreground">Experience Level</div>
+                      <div className="mt-1 text-foreground">{position.level.name}</div>
                     </div>
                   )}
                   <div>
-                    <div className="text-sm font-medium text-gray-500">Posted</div>
-                    <div className="mt-1">{new Date(position.created_at).toLocaleDateString()}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Posted</div>
+                    <div className="mt-1 text-foreground">{new Date(position.created_at).toLocaleDateString()}</div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Apply Button */}
-              <Card className="border-0 shadow-md">
+              <Card className="border shadow-sm">
                 <CardContent className="pt-6">
                   <Button 
                     onClick={() => setShowApplicationForm(true)}
@@ -407,7 +407,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                   <form onSubmit={handleApplication} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1">First Name *</label>
+                        <label className="block text-sm font-medium mb-1 text-foreground">First Name *</label>
                         <Input
                           value={applicationData.first_name}
                           onChange={(e) => setApplicationData(prev => ({ ...prev, first_name: e.target.value }))}
@@ -415,7 +415,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">Last Name *</label>
+                        <label className="block text-sm font-medium mb-1 text-foreground">Last Name *</label>
                         <Input
                           value={applicationData.last_name}
                           onChange={(e) => setApplicationData(prev => ({ ...prev, last_name: e.target.value }))}
@@ -424,7 +424,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Email *</label>
+                      <label className="block text-sm font-medium mb-1 text-foreground">Email *</label>
                       <Input
                         type="email"
                         value={applicationData.email}
@@ -433,7 +433,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Phone</label>
+                      <label className="block text-sm font-medium mb-1 text-foreground">Phone</label>
                       <Input
                         type="tel"
                         value={applicationData.phone}
@@ -441,7 +441,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Cover Letter</label>
+                      <label className="block text-sm font-medium mb-1 text-foreground">Cover Letter</label>
                       <Textarea
                         value={applicationData.cover_letter}
                         onChange={(e) => setApplicationData(prev => ({ ...prev, cover_letter: e.target.value }))}
@@ -450,7 +450,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Resume URL</label>
+                      <label className="block text-sm font-medium mb-1 text-foreground">Resume URL</label>
                       <Input
                         type="url"
                         value={applicationData.resume_url}
@@ -460,7 +460,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1">Portfolio URL</label>
+                        <label className="block text-sm font-medium mb-1 text-foreground">Portfolio URL</label>
                         <Input
                           type="url"
                           value={applicationData.portfolio_url}
@@ -469,7 +469,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-1">LinkedIn URL</label>
+                        <label className="block text-sm font-medium mb-1 text-foreground">LinkedIn URL</label>
                         <Input
                           type="url"
                           value={applicationData.linkedin_url}
@@ -479,7 +479,7 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">GitHub URL</label>
+                      <label className="block text-sm font-medium mb-1 text-foreground">GitHub URL</label>
                       <Input
                         type="url"
                         value={applicationData.github_url}
@@ -513,16 +513,16 @@ export default function CareerPositionClient({ slug }: CareerPositionClientProps
 
           {/* Related Positions */}
           {relatedPositions.length > 0 && (
-            <Card className="border-0 shadow-md">
+            <Card className="border shadow-sm">
               <CardHeader>
                 <CardTitle>Related Positions</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {relatedPositions.map((relatedPosition) => (
-                    <div key={relatedPosition.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div key={relatedPosition.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow bg-card">
                       <Link href={`/career/${relatedPosition.slug}`} className="block">
-                        <h3 className="font-medium hover:text-primary transition-colors">
+                        <h3 className="font-medium hover:text-primary transition-colors text-foreground">
                           {relatedPosition.title}
                         </h3>
                       </Link>
