@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { IconUserPlus, IconUserEdit } from "@tabler/icons-react";
 import { AdminAuthService, type AdminUser } from "@/lib/services/admin-auth.service";
@@ -28,11 +27,11 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
 }) => {
   const [formData, setFormData] = useState({
     email: "",
+    password: "",
     first_name: "",
     last_name: "",
     role: "editor" as 'admin' | 'editor',
     is_active: true,
-    bio: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -42,11 +41,11 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
     if (user && mode === 'edit') {
       setFormData({
         email: user.email,
+        password: "", // Password not needed for edit mode
         first_name: user.profile?.first_name || "",
         last_name: user.profile?.last_name || "",
         role: user.role,
         is_active: user.is_active,
-        bio: user.profile?.bio || "",
       });
     } else {
       resetForm();
@@ -56,11 +55,11 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
   const resetForm = () => {
     setFormData({
       email: "",
+      password: "",
       first_name: "",
       last_name: "",
       role: "editor",
       is_active: true,
-      bio: "",
     });
     setError(null);
   };
@@ -72,8 +71,9 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
 
     try {
       if (mode === 'create') {
-        await AdminAuthService.createAdminUser({
-          user_id: `new-user-${Date.now()}`,
+        await AdminAuthService.createCompleteAdminUser({
+          email: formData.email,
+          password: formData.password,
           first_name: formData.first_name,
           last_name: formData.last_name,
           role: formData.role,
@@ -87,7 +87,6 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
             user_id: user.id,
             first_name: formData.first_name,
             last_name: formData.last_name,
-            bio: formData.bio,
             preferences: user.profile?.preferences || {},
             created_at: user.profile?.created_at || new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -163,6 +162,20 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
             />
           </div>
 
+          {mode === 'create' && (
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter password"
+                value={formData.password}
+                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                required
+              />
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="first_name">First Name</Label>
@@ -230,16 +243,7 @@ export const AdminUserModal: FC<AdminUserModalProps> = ({
             </div>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="bio">Bio (Optional)</Label>
-            <Textarea
-              id="bio"
-              placeholder="Tell us about this user..."
-              value={formData.bio}
-              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              rows={3}
-            />
-          </div>
+
 
           {error && (
             <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">

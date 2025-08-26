@@ -4,18 +4,19 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconPlus, IconUsers } from "@tabler/icons-react";
 import { AdminAuthService, type AdminUser } from "@/lib/services/admin-auth.service";
 import { AdminUserModal } from "./admin-user-modal";
 import { AdminStats } from "./admin-stats";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
-import BackButton from "@/components/ui/back-button";
 
 export default function AdminManagementPage() {
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
     loadAdminUsers();
@@ -70,6 +71,77 @@ export default function AdminManagementPage() {
     }
   };
 
+  const getFilteredUsers = () => {
+    switch (activeTab) {
+      case "active":
+        return adminUsers.filter(user => user.is_active);
+      case "inactive":
+        return adminUsers.filter(user => !user.is_active);
+      default:
+        return adminUsers;
+    }
+  };
+
+  const filteredUsers = getFilteredUsers();
+
+  const renderUserList = (users: AdminUser[]) => (
+    <div className="space-y-4">
+      {users.map((user) => (
+        <div
+          key={user.id}
+          className="flex items-center justify-between p-4 border rounded-lg"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <span className="text-primary font-semibold">
+                {user.profile?.first_name?.[0]}
+                {user.profile?.last_name?.[0]}
+              </span>
+            </div>
+            <div>
+              <div className="font-medium">
+                {user.profile?.first_name} {user.profile?.last_name}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {user.email}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Badge variant={getRoleBadgeVariant(user.role)}>
+              {getRoleDisplayName(user.role)}
+            </Badge>
+            
+            <div className="text-sm text-muted-foreground">
+              {user.is_active ? (
+                <span className="text-primary">Active</span>
+              ) : (
+                <span className="text-destructive">Inactive</span>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleModalOpen(user)}
+              >
+                Edit
+              </Button>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {users.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          No users found in this category
+        </div>
+      )}
+    </div>
+  );
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -101,7 +173,7 @@ export default function AdminManagementPage() {
         </div>
         <Button onClick={() => handleModalOpen()}>
           <IconPlus className="h-4 w-4 mr-2" />
-          Add Admin User
+          Add User
         </Button>
       </div>
 
@@ -120,61 +192,27 @@ export default function AdminManagementPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {adminUsers.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-semibold">
-                      {user.profile?.first_name?.[0]}
-                      {user.profile?.last_name?.[0]}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="font-medium">
-                      {user.profile?.first_name} {user.profile?.last_name}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {user.email}
-                    </div>
-                  </div>
-                </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="all">All Users ({adminUsers.length})</TabsTrigger>
+              <TabsTrigger value="active">Active ({adminUsers.filter(u => u.is_active).length})</TabsTrigger>
+              <TabsTrigger value="inactive">Inactive ({adminUsers.filter(u => !u.is_active).length})</TabsTrigger>
+            </TabsList>
 
-                <div className="flex items-center gap-3">
-                  <Badge variant={getRoleBadgeVariant(user.role)}>
-                    {getRoleDisplayName(user.role)}
-                  </Badge>
-                  
-                  <div className="text-sm text-muted-foreground">
-                    {user.is_active ? (
-                      <span className="text-primary">Active</span>
-                    ) : (
-                      <span className="text-destructive">Inactive</span>
-                    )}
-                  </div>
+            <TabsContent value="all" className="mt-6">
+              {renderUserList(filteredUsers)}
+            </TabsContent>
 
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleModalOpen(user)}
-                    >
-                      Edit
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <TabsContent value="active" className="mt-6">
+              {renderUserList(adminUsers.filter(u => u.is_active))}
+            </TabsContent>
 
-            {adminUsers.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                No admin users found
-              </div>
-            )}
-          </div>
+            <TabsContent value="inactive" className="mt-6">
+              {renderUserList(adminUsers.filter(u => !u.is_active))}
+            </TabsContent>
+          </Tabs>
+
+
         </CardContent>
       </Card>
 

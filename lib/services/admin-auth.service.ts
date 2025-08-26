@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient, createAdminClient } from "@/lib/supabase/client";
 
 export interface UserRole {
   id: string;
@@ -180,48 +180,14 @@ export class AdminAuthService {
    * Get all admin users (super admin only)
    */
   static async getAllAdminUsers(): Promise<AdminUser[]> {
-    const supabase = createClient();
-    
     try {
-      // 1. Get all active user roles
-      const { data: userRoles, error: roleError } = await supabase
-        .from('user_roles')
-        .select('user_id, role, is_active')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (roleError) throw roleError;
-      if (!userRoles) return [];
-
-      const userIds = userRoles.map(ur => ur.user_id);
-
-      // 2. Get all corresponding user profiles
-      const { data: userProfiles, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .in('user_id', userIds);
-
-      if (profileError) throw profileError;
-
-      // 3. Get user data (like email) from auth.users
-      // This is tricky on the client-side for all users. The original code also had a placeholder.
-      // For now, we'll keep the placeholder and focus on fixing the data fetching.
-      // A server-side call would be needed to get all user emails securely.
-
-      const profilesByUserId = new Map(userProfiles?.map(p => [p.user_id, p]));
-
-      const adminUsers: AdminUser[] = userRoles.map(userRole => {
-        const profile = profilesByUserId.get(userRole.user_id);
-        return {
-          id: userRole.user_id,
-          email: 'user@example.com', // Placeholder, as in original code
-          role: userRole.role,
-          is_active: userRole.is_active,
-          profile: profile || undefined
-        };
-      });
-
-      return adminUsers;
+      const response = await fetch('/api/admin/users');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch admin users');
+      }
+      const users = await response.json();
+      return users;
     } catch (error) {
       console.error('Error getting admin users:', error);
       throw error;
@@ -268,6 +234,39 @@ export class AdminAuthService {
       return userRole;
     } catch (error) {
       console.error('Error creating admin user:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create complete admin user including Supabase Auth user
+   * This is the main method that should be used for creating new admin users
+   */
+  static async createCompleteAdminUser(userData: {
+    email: string;
+    password: string;
+    role: 'admin' | 'editor';
+    first_name?: string;
+    last_name?: string;
+  }) {
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create admin user');
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error creating complete admin user:', error);
       throw error;
     }
   }
