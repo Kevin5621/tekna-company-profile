@@ -11,7 +11,6 @@ import { IconFolder, IconPlus, IconSearch, IconFilter, IconEdit, IconTrash, Icon
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
 import { useToast } from '@/hooks/use-toast'
 import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
 
 interface Project {
   id: string;
