@@ -1,9 +1,20 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 export function HeroSection() {
   const [contentOpacity, setContentOpacity] = useState({
@@ -11,6 +22,45 @@ export function HeroSection() {
     content2: 0,
     content3: 0
   });
+
+  // Form state for the contact dialog
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    message: ''
+  });
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Handle form input changes
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Reset form when dialog closes
+  const handleDialogOpenChange = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open) {
+      setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+      setCurrentStep(1);
+    }
+  };
+
+  // Handle form navigation
+  const handleNext = () => {
+    if (currentStep < 2) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   // Scroll animation handler for sticky hero content transitions
   useEffect(() => {
@@ -124,12 +174,97 @@ export function HeroSection() {
               Building scalable websites, mobile apps, and IoT solutions for the future.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="text-lg px-8 py-6 pointer-events-auto">
-                <Link href="/projects">Portfolio</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 pointer-events-auto">
-                <Link href="/contact">Reach Us</Link>
-              </Button>
+              <Dialog open={dialogOpen} onOpenChange={handleDialogOpenChange}>
+                <DialogTrigger asChild>
+                  <Button size="lg" className="text-lg px-8 py-6 pointer-events-auto">
+                    Reach Us
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Contact Us</DialogTitle>
+                    <DialogDescription>
+                      Fill in your details and we&apos;ll get back to you soon.
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  {currentStep === 1 && (
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => handleInputChange('name', e.target.value)}
+                          placeholder="Your full name"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="email">Work Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          placeholder="your.email@company.com"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                          placeholder="+1 (555) 123-4567"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {currentStep === 2 && (
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="company">Company</Label>
+                        <Input
+                          id="company"
+                          value={formData.company}
+                          onChange={(e) => handleInputChange('company', e.target.value)}
+                          placeholder="Your company name"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="message">Message</Label>
+                        <Textarea
+                          id="message"
+                          value={formData.message}
+                          onChange={(e) => handleInputChange('message', e.target.value)}
+                          placeholder="Tell us about your project..."
+                          className="min-h-[100px]"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <DialogFooter className="flex-row justify-between">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handlePrevious}
+                      disabled={currentStep === 1}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={currentStep === 2}
+                    >
+                      Next
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </motion.div>
 

@@ -45,6 +45,8 @@ import {
   CareerPosition, 
   CareerCategory
 } from '@/lib/services/career'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 export default function CareerManagementPage() {
   const [positions, setPositions] = useState<CareerPosition[]>([])
@@ -137,29 +139,37 @@ export default function CareerManagementPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Karir", href: "/dashboard/career" },
+          { label: "Manajemen Karir", isCurrentPage: true }
+        ]}
+      />
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-2xl font-bold">Career Management</h1>
-          </div>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Career Management</h1>
           <p className="text-muted-foreground">
-            Manage job positions, applications, and career settings
+            Manage job positions, categories, and applications
           </p>
         </div>
-        <Link href="/dashboard/career/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New Position
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/career/categories">
+              <Settings className="h-4 w-4 mr-2" />
+              Categories
+            </Link>
           </Button>
-        </Link>
+          <Button asChild>
+            <Link href="/dashboard/career/new">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Position
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

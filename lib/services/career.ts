@@ -212,21 +212,33 @@ export class CareerService {
 
       // Apply filters
       if (params.filters?.search) {
-        query = query.or(`title.ilike.%${params.filters.search}%,description.ilike.%${params.filters.search}%`);
+        const searchTerm = params.filters.search.trim();
+        if (searchTerm) {
+          query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,summary.ilike.%${searchTerm}%`);
+        }
       }
+      
       if (params.filters?.category) {
+        // Filter by category slug using the joined table
         query = query.eq('category.slug', params.filters.category);
       }
+      
       if (params.filters?.location) {
+        // Filter by location slug using the joined table
         query = query.eq('location.slug', params.filters.location);
       }
+      
       if (params.filters?.type) {
+        // Filter by type slug using the joined table
         query = query.eq('type.slug', params.filters.type);
       }
+      
       if (params.filters?.level) {
+        // Filter by level slug using the joined table
         query = query.eq('level.slug', params.filters.level);
       }
-      if (params.filters?.remote) {
+      
+      if (params.filters?.remote === true) {
         query = query.eq('remote_allowed', true);
       }
 

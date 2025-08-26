@@ -12,6 +12,8 @@ import { ClientDashboardService } from '@/lib/services/client-dashboard.service'
 import { useRealtimeBlogPosts } from '@/lib/hooks/use-realtime-simple';
 import { IconPlus, IconEdit, IconTrash, IconEye, IconCalendar, IconUser, IconSearch, IconSortAscending, IconSortDescending, IconExternalLink } from '@tabler/icons-react';
 import { useToast } from '@/hooks/use-toast'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface BlogPost {
   id: string;
@@ -170,18 +172,25 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Blog", href: "/dashboard/blog" },
+          { label: "Daftar Artikel", isCurrentPage: true }
+        ]}
+      />
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Blog Management</h1>
+          <h1 className="text-3xl font-bold">Blog Posts</h1>
           <p className="text-muted-foreground">
-            Kelola artikel blog, kategori, dan konten website
+            Manage blog posts and articles
           </p>
         </div>
-        
-        <Button onClick={handleAddNew} className="gap-2">
-          <IconPlus size={16} />
-          Tambah Artikel
+        <Button onClick={handleAddNew}>
+          <IconPlus className="h-4 w-4 mr-2" />
+          Add Post
         </Button>
       </div>
 

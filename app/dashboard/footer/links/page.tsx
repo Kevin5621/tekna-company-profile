@@ -10,11 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Plus, Edit, Trash2, ExternalLink, Link as LinkIcon, ArrowLeft } from "lucide-react"
+import { Plus, Edit, Trash2, ExternalLink, Link as LinkIcon } from "lucide-react"
 import Link from "next/link"
 import { FooterService } from "@/lib/services/footer"
 import { FooterLink, FooterSection } from "@/lib/services/footer"
 import { toast } from "sonner"
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 export default function FooterLinksPage() {
   const [links, setLinks] = useState<FooterLink[]>([])
@@ -130,131 +132,143 @@ export default function FooterLinksPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/footer">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Footer Management
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Footer Links</h1>
-            <p className="text-muted-foreground">
-              Manage links within footer sections
-            </p>
-          </div>
-        </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Link
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingLink ? 'Edit Link' : 'Create New Link'}
-              </DialogTitle>
-              <DialogDescription>
-                {editingLink 
-                  ? 'Update the link details below'
-                  : 'Fill in the details to create a new footer link'
-                }
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="footer_section_id">Section</Label>
-                  <Select
-                    value={formData.footer_section_id}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, footer_section_id: value }))}
-                    required
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a section" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {sections.map((section) => (
-                        <SelectItem key={section.id} value={section.id}>
-                          {section.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Enter link title"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="url">URL</Label>
-                  <Input
-                    id="url"
-                    value={formData.url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                    placeholder="Enter URL"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="icon">Icon (optional)</Label>
-                  <Input
-                    id="icon"
-                    value={formData.icon}
-                    onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
-                    placeholder="Enter icon name (lucide-react)"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="sort_order">Sort Order</Label>
-                  <Input
-                    id="sort_order"
-                    type="number"
-                    value={formData.sort_order}
-                    onChange={(e) => setFormData(prev => ({ ...prev, sort_order: parseInt(e.target.value) || 0 }))}
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is_external"
-                    checked={formData.is_external}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_external: checked }))}
-                  />
-                  <Label htmlFor="is_external">External Link</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="is_active"
-                    checked={formData.is_active}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
-                  />
-                  <Label htmlFor="is_active">Active</Label>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">
-                  {editingLink ? 'Update' : 'Create'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Footer", href: "/dashboard/footer" },
+          { label: "Links", href: "/dashboard/footer/links" },
+          { label: "Manajemen Links", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/footer" label="Kembali ke Footer" />
       </div>
+
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Footer Links</h1>
+          <p className="text-muted-foreground">
+            Manage links within footer sections
+          </p>
+        </div>
+        <Button onClick={() => setDialogOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Link
+        </Button>
+      </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogTrigger asChild>
+          <Button onClick={openCreateDialog}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Link
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingLink ? 'Edit Link' : 'Create New Link'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingLink 
+                ? 'Update the link details below'
+                : 'Fill in the details to create a new footer link'
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="footer_section_id">Section</Label>
+                <Select
+                  value={formData.footer_section_id}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, footer_section_id: value }))}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a section" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sections.map((section) => (
+                      <SelectItem key={section.id} value={section.id}>
+                        {section.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Enter link title"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="url">URL</Label>
+                <Input
+                  id="url"
+                  value={formData.url}
+                  onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder="Enter URL"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="icon">Icon (optional)</Label>
+                <Input
+                  id="icon"
+                  value={formData.icon}
+                  onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
+                  placeholder="Enter icon name (lucide-react)"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="sort_order">Sort Order</Label>
+                <Input
+                  id="sort_order"
+                  type="number"
+                  value={formData.sort_order}
+                  onChange={(e) => setFormData(prev => ({ ...prev, sort_order: parseInt(e.target.value) || 0 }))}
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_external"
+                  checked={formData.is_external}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_external: checked }))}
+                />
+                <Label htmlFor="is_external">External Link</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_active"
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+                />
+                <Label htmlFor="is_active">Active</Label>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                {editingLink ? 'Update' : 'Create'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-4">
         {links.map((link) => (

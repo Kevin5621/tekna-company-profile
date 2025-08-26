@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { AuthorForm } from '@/components/author-form';
 import { ClientDashboardService } from '@/lib/services/client-dashboard.service';
 import Link from 'next/link';
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 export default function EditAuthorPage() {
   const params = useParams();
@@ -90,7 +92,21 @@ export default function EditAuthorPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Penulis", href: "/dashboard/authors" },
+          { label: "Edit Penulis", href: `/dashboard/authors/edit/${authorId}` },
+          { label: "Form Edit", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/authors" label="Kembali ke Authors" />
+      </div>
+
       {initialData && (
         <AuthorForm 
           authorId={authorId}

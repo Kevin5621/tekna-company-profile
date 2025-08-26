@@ -8,6 +8,8 @@ import { IconDownload, IconMail, IconUsers, IconActivity } from "@tabler/icons-r
 import { PaginationService, type PaginatedResult } from "@/lib/services/pagination.service";
 import { SearchFilter } from "@/components/ui/search-filter";
 import { Pagination } from "@/components/ui/pagination";
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface NewsletterSubscription {
   id: string;
@@ -105,15 +107,23 @@ export default function NewsletterPage() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Newsletter", href: "/dashboard/newsletter" },
+          { label: "Manajemen Newsletter", isCurrentPage: true }
+        ]}
+      />
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Newsletter Management</h1>
           <p className="text-muted-foreground">
-            Manage newsletter subscriptions and export subscriber data
+            Manage newsletter subscriptions and settings
           </p>
         </div>
-        <Button onClick={handleExportCSV} disabled={!subscriptions?.data.length}>
+        <Button onClick={handleExportCSV} variant="outline">
           <IconDownload className="h-4 w-4 mr-2" />
           Export CSV
         </Button>

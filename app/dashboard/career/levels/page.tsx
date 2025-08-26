@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Pencil, Trash2, Plus, Save, X, TrendingUp } from 'lucide-react'
 import { toast } from 'sonner'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface Level extends CareerLevel {
   positions_count?: number
@@ -195,13 +197,30 @@ export default function LevelsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Karir", href: "/dashboard/career" },
+          { label: "Level Karir", href: "/dashboard/career/levels" },
+          { label: "Manajemen Level", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+      </div>
+
+      {/* Header */}
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Career Levels</h1>
-          <p className="text-muted-foreground">Manage job position levels (Entry, Mid, Senior, etc.)</p>
+          <h1 className="text-3xl font-bold tracking-tight">Career Levels</h1>
+          <p className="text-muted-foreground">
+            Manage job experience levels and seniority
+          </p>
         </div>
-        <Button onClick={startAdd} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+        <Button onClick={() => setShowAddForm(true)}>
+          <Plus className="h-4 w-4 mr-2" />
           Add Level
         </Button>
       </div>

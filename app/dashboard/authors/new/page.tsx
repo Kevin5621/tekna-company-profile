@@ -1,8 +1,23 @@
 import { AuthorForm } from '@/components/author-form';
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 export default function NewAuthorPage() {
   return (
-    <div className="container mx-auto p-6">
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Penulis", href: "/dashboard/authors" },
+          { label: "Tambah Penulis Baru", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/authors" label="Kembali ke Authors" />
+      </div>
+
       <AuthorForm />
     </div>
   );

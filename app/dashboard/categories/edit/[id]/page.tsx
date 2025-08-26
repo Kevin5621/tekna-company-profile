@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { CategoryForm } from '@/components/category-form';
 import { ClientDashboardService } from '@/lib/services/client-dashboard.service';
 import Link from 'next/link';
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 export default function EditCategoryPage() {
   const params = useParams();
@@ -76,7 +78,21 @@ export default function EditCategoryPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Kategori", href: "/dashboard/categories" },
+          { label: "Edit Kategori", href: `/dashboard/categories/edit/${categoryId}` },
+          { label: "Form Edit", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/categories" label="Kembali ke Categories" />
+      </div>
+
       {initialData && (
         <CategoryForm 
           categoryId={categoryId}

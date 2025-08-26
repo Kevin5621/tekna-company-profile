@@ -8,6 +8,8 @@ import { IconPlus, IconUsers } from "@tabler/icons-react";
 import { AdminAuthService, type AdminUser } from "@/lib/services/admin-auth.service";
 import { AdminUserModal } from "./admin-user-modal";
 import { AdminStats } from "./admin-stats";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 export default function AdminManagementPage() {
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
@@ -81,6 +83,14 @@ export default function AdminManagementPage() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Admin", href: "/dashboard/admin" },
+          { label: "Manajemen Admin", isCurrentPage: true }
+        ]}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

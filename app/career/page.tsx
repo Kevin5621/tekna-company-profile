@@ -14,6 +14,7 @@ import {
   Star,
   Grid3x3,
   List,
+  X,
 } from "lucide-react"
 import Link from "next/link"
 import { CareerService, CareerPosition, CareerCategory, CareerLocation, CareerType, CareerLevel, CareerSearchParams } from "@/lib/services/career"
@@ -35,8 +36,31 @@ export default function CareerPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
 
   const careerService = useMemo(() => new CareerService(), [])
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // Update search params when debounced query changes
+  useEffect(() => {
+    setSearchParams(prev => ({
+      ...prev,
+      filters: { 
+        ...prev.filters, 
+        search: debouncedSearchQuery || undefined 
+      },
+      page: 1
+    }))
+  }, [debouncedSearchQuery])
 
   const loadInitialData = useCallback(async () => {
     try {
@@ -61,7 +85,9 @@ export default function CareerPage() {
   const loadPositions = useCallback(async () => {
     setLoading(true)
     try {
+      console.log('Loading positions with params:', searchParams)
       const result = await careerService.getPublicPositions(searchParams)
+      console.log('Positions result:', result)
       setPositions(result.positions)
       setTotalCount(result.total)
       setTotalPages(result.totalPages)
@@ -81,11 +107,7 @@ export default function CareerPage() {
   }, [loadPositions])
 
   const handleSearch = (search: string) => {
-    setSearchParams(prev => ({
-      ...prev,
-      filters: { ...prev.filters, search },
-      page: 1
-    }))
+    setSearchQuery(search)
   }
 
   const handleFilterChange = (key: string, value: string) => {
@@ -112,11 +134,23 @@ export default function CareerPage() {
   }
 
   const clearFilters = () => {
+    setSearchQuery('')
     setSearchParams({
       page: 1,
       limit: 12,
       sort: 'newest'
     })
+  }
+
+  const hasActiveFilters = () => {
+    return !!(
+      searchQuery ||
+      searchParams.filters?.category ||
+      searchParams.filters?.location ||
+      searchParams.filters?.type ||
+      searchParams.filters?.level ||
+      searchParams.filters?.remote
+    )
   }
 
   const formatSalary = (min?: number, max?: number, currency = 'IDR') => {
@@ -156,6 +190,7 @@ export default function CareerPage() {
                   <Input
                     placeholder="Search jobs, skills, or companies..."
                     className="pl-10 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/30"
+                    value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
                   />
                 </div>
@@ -212,15 +247,21 @@ export default function CareerPage() {
             <div className="lg:w-80 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Filters</h3>
-                <Button variant="outline" size="sm" onClick={clearFilters}>
-                  Clear All
-                </Button>
+                {hasActiveFilters() && (
+                  <Button variant="outline" size="sm" onClick={clearFilters}>
+                    <X className="w-4 h-4 mr-2" />
+                    Clear All
+                  </Button>
+                )}
               </div>
 
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Category</label>
-                  <Select onValueChange={(value) => handleFilterChange('category', value)}>
+                  <Select 
+                    value={searchParams.filters?.category || 'all'} 
+                    onValueChange={(value) => handleFilterChange('category', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
@@ -237,7 +278,10 @@ export default function CareerPage() {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Location</label>
-                  <Select onValueChange={(value) => handleFilterChange('location', value)}>
+                  <Select 
+                    value={searchParams.filters?.location || 'all'} 
+                    onValueChange={(value) => handleFilterChange('location', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All Locations" />
                     </SelectTrigger>
@@ -254,7 +298,10 @@ export default function CareerPage() {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Job Type</label>
-                  <Select onValueChange={(value) => handleFilterChange('type', value)}>
+                  <Select 
+                    value={searchParams.filters?.type || 'all'} 
+                    onValueChange={(value) => handleFilterChange('type', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
@@ -271,7 +318,10 @@ export default function CareerPage() {
 
                 <div>
                   <label className="text-sm font-medium mb-2 block">Experience Level</label>
-                  <Select onValueChange={(value) => handleFilterChange('level', value)}>
+                  <Select 
+                    value={searchParams.filters?.level || 'all'} 
+                    onValueChange={(value) => handleFilterChange('level', value)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All Levels" />
                     </SelectTrigger>
@@ -285,6 +335,22 @@ export default function CareerPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Remote Work</label>
+                  <Select 
+                    value={searchParams.filters?.remote ? 'true' : 'all'} 
+                    onValueChange={(value) => handleFilterChange('remote', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="All Work Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Work Types</SelectItem>
+                      <SelectItem value="true">Remote Only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
@@ -295,11 +361,19 @@ export default function CareerPage() {
                 <div>
                   <p className="text-muted-foreground">
                     {totalCount} positions found
+                    {hasActiveFilters() && (
+                      <span className="ml-2 text-sm text-primary">
+                        (filtered results)
+                      </span>
+                    )}
                   </p>
                 </div>
                 
                 <div className="flex items-center gap-4 mt-4 sm:mt-0">
-                  <Select onValueChange={handleSortChange} defaultValue="newest">
+                  <Select 
+                    value={searchParams.sort || 'newest'} 
+                    onValueChange={handleSortChange}
+                  >
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
@@ -336,7 +410,9 @@ export default function CareerPage() {
               {loading ? (
                 <div className="text-center py-16">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-4 text-muted-foreground">Loading positions...</p>
+                  <p className="mt-4 text-muted-foreground">
+                    {hasActiveFilters() ? 'Applying filters...' : 'Loading positions...'}
+                  </p>
                 </div>
               ) : positions.length === 0 ? (
                 <div className="text-center py-16">
@@ -347,18 +423,19 @@ export default function CareerPage() {
                     <div className="space-y-2">
                       <h3 className="text-lg font-semibold">No positions found</h3>
                       <p className="text-muted-foreground">
-                        {searchParams.filters?.search || searchParams.filters?.category || searchParams.filters?.featured
+                        {hasActiveFilters()
                           ? "Try adjusting your filters to see more results."
                           : "No positions have been published yet. Please check back later!"
                         }
                       </p>
                     </div>
-                    {(searchParams.filters?.search || searchParams.filters?.category || searchParams.filters?.featured) && (
+                    {hasActiveFilters() && (
                       <Button
                         variant="outline"
                         onClick={clearFilters}
                         className="gap-2"
                       >
+                        <X className="h-4 w-4" />
                         Clear Filters
                       </Button>
                     )}

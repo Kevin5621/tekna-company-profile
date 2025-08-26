@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { IconSettings, IconDeviceFloppy, IconRefresh, IconBuilding, IconGlobe } from "@tabler/icons-react";
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface CompanySettings {
   name: string;
@@ -120,20 +122,28 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Pengaturan", href: "/dashboard/settings" },
+          { label: "Konfigurasi Sistem", isCurrentPage: true }
+        ]}
+      />
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight">System Settings</h1>
           <p className="text-muted-foreground">
-            Manage company settings and system configuration
+            Configure company settings and system preferences
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleReset}>
+          <Button variant="outline" onClick={handleReset} disabled={isLoading}>
             <IconRefresh className="h-4 w-4 mr-2" />
             Reset
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button onClick={handleSave} disabled={isLoading || isSaving}>
             <IconDeviceFloppy className="h-4 w-4 mr-2" />
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>

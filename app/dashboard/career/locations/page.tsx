@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Pencil, Trash2, Plus, Save, X, MapPin, Wifi } from 'lucide-react'
 import { toast } from 'sonner'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface Location extends CareerLocation {
   positions_count?: number
@@ -207,13 +209,30 @@ export default function LocationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Karir", href: "/dashboard/career" },
+          { label: "Lokasi Karir", href: "/dashboard/career/locations" },
+          { label: "Manajemen Lokasi", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+      </div>
+
+      {/* Header */}
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Career Locations</h1>
-          <p className="text-muted-foreground">Manage job position locations</p>
+          <h1 className="text-3xl font-bold tracking-tight">Career Locations</h1>
+          <p className="text-muted-foreground">
+            Manage job locations and remote work settings
+          </p>
         </div>
-        <Button onClick={startAdd} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+        <Button onClick={() => setShowAddForm(true)}>
+          <Plus className="h-4 w-4 mr-2" />
           Add Location
         </Button>
       </div>

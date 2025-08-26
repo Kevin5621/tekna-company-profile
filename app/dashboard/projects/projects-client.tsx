@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { IconFolder, IconPlus, IconSearch, IconFilter, IconEdit, IconTrash, IconLoader2 } from "@tabler/icons-react";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
 import { useToast } from '@/hooks/use-toast'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface Project {
   id: string;
@@ -67,7 +69,17 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+        <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
+          {/* Breadcrumbs */}
+          <div className="px-4 lg:px-6">
+            <DashboardBreadcrumb 
+              items={[
+                { label: "Proyek", href: "/dashboard/projects" },
+                { label: "Daftar Proyek", isCurrentPage: true }
+              ]}
+            />
+          </div>
+
           {/* Header */}
           <div className="px-4 lg:px-6">
             <div className="flex flex-col gap-2">

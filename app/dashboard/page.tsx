@@ -8,6 +8,8 @@ import {
 } from "@tabler/icons-react";
 import { DashboardService } from "@/lib/services/dashboard.service";
 import type { DashboardData } from "@/lib/types/dashboard";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 // Utility functions for status mapping
 const getProjectStatusBadge = (status: string) => {
@@ -95,6 +97,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Beranda", isCurrentPage: true }
+        ]}
+      />
+
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Selamat Datang di Dashboard</h1>

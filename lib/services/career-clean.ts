@@ -212,21 +212,33 @@ export class CareerService {
 
       // Apply filters
       if (params.filters?.search) {
-        query = query.or(`title.ilike.%${params.filters.search}%,description.ilike.%${params.filters.search}%`);
+        const searchTerm = params.filters.search.trim();
+        if (searchTerm) {
+          query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,summary.ilike.%${searchTerm}%`);
+        }
       }
+      
       if (params.filters?.category) {
+        // Filter by category slug using the joined table
         query = query.eq('category.slug', params.filters.category);
       }
+      
       if (params.filters?.location) {
+        // Filter by location slug using the joined table
         query = query.eq('location.slug', params.filters.location);
       }
+      
       if (params.filters?.type) {
+        // Filter by type slug using the joined table
         query = query.eq('type.slug', params.filters.type);
       }
+      
       if (params.filters?.level) {
+        // Filter by level slug using the joined table
         query = query.eq('level.slug', params.filters.level);
       }
-      if (params.filters?.remote) {
+      
+      if (params.filters?.remote === true) {
         query = query.eq('remote_allowed', true);
       }
 
@@ -458,26 +470,83 @@ export class CareerService {
     }
   }
 
-  async submitApplication(application: Omit<CareerApplication, 'id' | 'status' | 'applied_at' | 'last_activity_at' | 'created_at' | 'updated_at'>): Promise<boolean> {
+  async submitApplication(application: Omit<CareerApplication, 'id' | 'status' | 'applied_at' | 'last_activity_at' | 'created_at' | 'updated_at'>): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
+      // Validate required fields
+      if (!application.first_name || !application.last_name || !application.email || !application.position_id) {
+        return { 
+          success: false, 
+          error: 'Missing required fields: first_name, last_name, email, position_id' 
+        };
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(application.email)) {
+        return { 
+          success: false, 
+          error: 'Invalid email format' 
+        };
+      }
+
+      const { data, error } = await this.supabase
         .from('career_applications')
         .insert({
           ...application,
           status: 'submitted',
           applied_at: new Date().toISOString(),
           last_activity_at: new Date().toISOString()
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) {
         console.error('Error submitting application:', error);
-        return false;
+        // Provide more detailed error information
+        let errorMessage = 'Failed to submit application';
+        if (error.code) {
+          errorMessage += ` (Code: ${error.code})`;
+        }
+        if (error.message) {
+          errorMessage += `: ${error.message}`;
+        }
+        if (error.details) {
+          errorMessage += ` - ${error.details}`;
+        }
+        if (error.hint) {
+          errorMessage += ` - Hint: ${error.hint}`;
+        }
+        
+        return { 
+          success: false, 
+          error: errorMessage
+        };
       }
 
-      return true;
+      if (!data) {
+        return { 
+          success: false, 
+          error: 'Application submitted but no confirmation received' 
+        };
+      }
+
+      return { success: true };
     } catch (error) {
       console.error('Error in submitApplication:', error);
-      return false;
+      let errorMessage = 'Unknown error occurred';
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = String(error.message);
+      }
+      
+      return { 
+        success: false, 
+        error: errorMessage
+      };
     }
   }
 }

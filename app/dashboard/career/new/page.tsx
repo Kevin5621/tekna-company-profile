@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Save, Eye } from 'lucide-react'
+import { Save, Eye } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,6 +16,8 @@ import { Separator } from '@/components/ui/separator'
 
 import { CareerService, CareerCategory, CareerLocation, CareerType, CareerLevel } from '@/lib/services/career'
 import { useToast } from '@/hooks/use-toast'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 export default function NewCareerPositionPage() {
   const router = useRouter()
@@ -131,22 +133,17 @@ export default function NewCareerPositionPage() {
   return (
     <div className="container mx-auto py-6 max-w-4xl">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard/career">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Career
-                </Button>
-              </Link>
-              <h1 className="text-2xl font-bold">New Position</h1>
-            </div>
-            <p className="text-muted-foreground">
-              Create a new job position
-            </p>
-          </div>
+        {/* Breadcrumbs */}
+        <DashboardBreadcrumb 
+          items={[
+            { label: "Karir", href: "/dashboard/career" },
+            { label: "Tambah Posisi Baru", isCurrentPage: true }
+          ]}
+        />
+
+        {/* Back Button */}
+        <div className="flex items-center gap-4">
+          <BackButton href="/dashboard/career" label="Kembali ke Career" />
         </div>
 
         <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">

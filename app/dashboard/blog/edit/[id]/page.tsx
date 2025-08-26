@@ -1,6 +1,8 @@
 import { DashboardService } from '@/lib/services/dashboard.service';
 import { PostForm } from '@/components/post-form';
 import { notFound } from 'next/navigation';
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface EditPostPageProps {
   params: Promise<{
@@ -34,7 +36,25 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
       meta_keywords: post.meta_keywords || '',
     };
 
-    return <PostForm postId={id} initialData={initialData} />;
+    return (
+      <div className="space-y-6">
+        {/* Breadcrumbs */}
+        <DashboardBreadcrumb 
+          items={[
+            { label: "Blog", href: "/dashboard/blog" },
+            { label: "Edit Artikel", href: `/dashboard/blog/edit/${id}` },
+            { label: "Form Edit", isCurrentPage: true }
+          ]}
+        />
+
+        {/* Back Button */}
+        <div className="flex items-center gap-4">
+          <BackButton href="/dashboard/blog" label="Kembali ke Blog" />
+        </div>
+
+        <PostForm postId={id} initialData={initialData} />
+      </div>
+    );
   } catch (error) {
     console.error('Error loading post:', error);
     notFound();

@@ -10,6 +10,8 @@ import { ClientDashboardService } from '@/lib/services/client-dashboard.service'
 import { useRealtimeAuthors } from '@/lib/hooks/use-realtime-simple';
 import { IconPlus, IconEdit, IconTrash, IconMail } from '@tabler/icons-react';
 import { useToast } from '@/hooks/use-toast'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface Author {
   id: string;
@@ -87,6 +89,14 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Penulis", href: "/dashboard/authors" },
+          { label: "Daftar Penulis", isCurrentPage: true }
+        ]}
+      />
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

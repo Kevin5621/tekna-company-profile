@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { ProjectForm } from "@/components/project-form";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface EditProjectPageProps {
   params: Promise<{
@@ -58,17 +60,33 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
   }
 
   return (
-    <ProjectForm 
-      mode="edit" 
-      projectId={project.id}
-      initialData={{
-        name: project.name,
-        slug: project.slug,
-        project_url: project.project_url || '',
-        description: project.description || '',
-        featured_image_url: project.featured_image_url || '',
-        is_featured: project.is_featured || false,
-      }}
-    />
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Proyek", href: "/dashboard/projects" },
+          { label: "Edit Proyek", href: `/dashboard/projects/edit/${project.id}` },
+          { label: "Form Edit", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/projects" label="Kembali ke Projects" />
+      </div>
+
+      <ProjectForm 
+        mode="edit" 
+        projectId={project.id}
+        initialData={{
+          name: project.name,
+          slug: project.slug,
+          project_url: project.project_url || '',
+          description: project.description || '',
+          featured_image_url: project.featured_image_url || '',
+          is_featured: project.is_featured || false,
+        }}
+      />
+    </div>
   );
 }

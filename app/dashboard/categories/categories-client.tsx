@@ -9,6 +9,8 @@ import { ClientDashboardService } from '@/lib/services/client-dashboard.service'
 import { useRealtimeCategories } from '@/lib/hooks/use-realtime-simple';
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useToast } from '@/hooks/use-toast'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 interface Category {
   id: string;
@@ -90,6 +92,14 @@ export function CategoriesPageClient({ initialCategories }: CategoriesPageClient
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Kategori", href: "/dashboard/categories" },
+          { label: "Daftar Kategori", isCurrentPage: true }
+        ]}
+      />
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

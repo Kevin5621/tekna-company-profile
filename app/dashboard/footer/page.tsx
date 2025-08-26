@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Plus, Settings, Link as LinkIcon, Share2, Phone, Mail } from "lucide-react"
 import Link from "next/link"
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 export default function FooterManagementPage() {
   const managementSections = [
@@ -50,7 +52,15 @@ export default function FooterManagementPage() {
   ]
 
   return (
-    <div className="container mx-auto py-6">
+    <div className="space-y-6">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Footer", href: "/dashboard/footer" },
+          { label: "Manajemen Footer", isCurrentPage: true }
+        ]}
+      />
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Footer Management</h1>
