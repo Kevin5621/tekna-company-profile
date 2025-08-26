@@ -5,16 +5,17 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import {
   Dialog,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { XIcon } from "lucide-react";
 
 export function HeroSection() {
   const [contentOpacity, setContentOpacity] = useState({
@@ -32,7 +33,6 @@ export function HeroSection() {
     message: ''
   });
 
-  const [currentStep, setCurrentStep] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // Handle form input changes
@@ -45,21 +45,17 @@ export function HeroSection() {
     setDialogOpen(open);
     if (!open) {
       setFormData({ name: '', email: '', phone: '', company: '', message: '' });
-      setCurrentStep(1);
     }
   };
 
-  // Handle form navigation
-  const handleNext = () => {
-    if (currentStep < 2) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you can add your form submission logic
+    console.log('Form submitted:', formData);
+    // Close dialog after submission
+    setDialogOpen(false);
+    setFormData({ name: '', email: '', phone: '', company: '', message: '' });
   };
 
   // Scroll animation handler for sticky hero content transitions
@@ -180,90 +176,86 @@ export function HeroSection() {
                     Reach Us
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Contact Us</DialogTitle>
-                    <DialogDescription>
-                      Fill in your details and we&apos;ll get back to you soon.
-                    </DialogDescription>
-                  </DialogHeader>
-                  
-                  {currentStep === 1 && (
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="name">Name</Label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => handleInputChange('name', e.target.value)}
-                          placeholder="Your full name"
-                        />
+                <DialogPrimitive.Portal>
+                  <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 transition-opacity duration-200 data-[state=open]:opacity-100 data-[state=closed]:opacity-0" />
+                  <DialogPrimitive.Content className="fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6 shadow-lg sm:max-w-md transition-opacity duration-200 data-[state=open]:opacity-100 data-[state=closed]:opacity-0">
+                    <DialogHeader>
+                      <DialogTitle>Contact Us</DialogTitle>
+                      <DialogDescription>
+                        Fill in your details and we&apos;ll get back to you soon.
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <form onSubmit={handleSubmit}>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="name">Name</Label>
+                          <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => handleInputChange('name', e.target.value)}
+                            placeholder="Your full name"
+                            required
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="email">Work Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            placeholder="your.email@company.com"
+                            required
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input
+                            id="phone"
+                            type="tel"
+                            value={formData.phone}
+                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            placeholder="+1 (555) 123-4567"
+                            required
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="company">Company</Label>
+                          <Input
+                            id="company"
+                            value={formData.company}
+                            onChange={(e) => handleInputChange('company', e.target.value)}
+                            placeholder="Your company name"
+                            required
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="message">Message</Label>
+                          <Textarea
+                            id="message"
+                            value={formData.message}
+                            onChange={(e) => handleInputChange('message', e.target.value)}
+                            placeholder="Tell us about your project..."
+                            className="min-h-[100px]"
+                            required
+                          />
+                        </div>
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="email">Work Email</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
-                          placeholder="your.email@company.com"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          placeholder="+1 (555) 123-4567"
-                        />
-                      </div>
-                    </div>
-                  )}
 
-                  {currentStep === 2 && (
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="company">Company</Label>
-                        <Input
-                          id="company"
-                          value={formData.company}
-                          onChange={(e) => handleInputChange('company', e.target.value)}
-                          placeholder="Your company name"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="message">Message</Label>
-                        <Textarea
-                          id="message"
-                          value={formData.message}
-                          onChange={(e) => handleInputChange('message', e.target.value)}
-                          placeholder="Tell us about your project..."
-                          className="min-h-[100px]"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <DialogFooter className="flex-row justify-between">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePrevious}
-                      disabled={currentStep === 1}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={handleNext}
-                      disabled={currentStep === 2}
-                    >
-                      Next
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
+                      <DialogFooter>
+                        <Button type="submit" className="w-full">
+                          Send Message
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                    
+                    <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                      <XIcon className="h-4 w-4" />
+                      <span className="sr-only">Close</span>
+                    </DialogPrimitive.Close>
+                  </DialogPrimitive.Content>
+                </DialogPrimitive.Portal>
               </Dialog>
             </div>
           </motion.div>
