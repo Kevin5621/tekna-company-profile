@@ -1,76 +1,95 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: { autoRefreshToken: false, persistSession: false }
-  }
-);
-
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } | Promise<{ id: string }> }) {
+// PATCH /api/admin/users/[id] - Update a specific user
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    // type-guard: detect Promise-like params without using `any`
-    const isThenable = <T,>(v: unknown): v is Promise<T> =>
-      typeof (v as { then?: unknown }).then === 'function';
+    const supabase = await createClient();
 
-    const resolvedParams = isThenable<{ id: string }>(params) ? await params : params;
-    const userId = (resolvedParams as { id: string }).id;
+    // Check user permissions
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Get user role
+    const { data: roleData, error: roleError } = await supabase.rpc('get_user_role', {
+      p_user_id: user.id
+    });
+
+    if (roleError || !roleData || !['admin', 'editor'].includes(roleData)) {
+      return NextResponse.json(
+        { error: 'Insufficient permissions' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
+    const {
+      name,
+      slug,
+      logo_url,
+      website,
+      email,
+      phone,
+      industry,
+      partnership_type,
+      partnership_since,
+      is_featured,
+      sort_order,
+      translations
+    } = body;
 
-    const { display_name, role, is_active, profile } = body;
-
-    // Update auth user metadata (display_name)
-    if (typeof display_name === 'string') {
-      const { error } = await supabase.auth.admin.updateUserById(userId, {
-        user_metadata: { display_name }
-      });
-      if (error) {
-        console.error('Error updating auth user metadata:', error);
-        return NextResponse.json({ error: error.message }, { status: 400 });
-      }
+    // Validate required fields
+    if (!name || !slug) {
+      return NextResponse.json(
+        { error: 'Name and slug are required' },
+        { status: 400 }
+      );
     }
 
-    // Update role if provided
-    if (role || typeof is_active === 'boolean') {
-  const updates: Record<string, unknown> = {};
-      if (role) updates.role = role;
-      if (typeof is_active === 'boolean') updates.is_active = is_active;
+    // Use the database function to update partner with translations
+    const { data: partnerId, error } = await supabase.rpc('update_partner_with_translations', {
+      p_partner_id: params.id,
+      p_name: name,
+      p_slug: slug,
+      p_logo_url: logo_url,
+      p_website: website,
+      p_email: email,
+      p_phone: phone,
+      p_industry: industry,
+      p_partnership_type: partnership_type,
+      p_partnership_since: partnership_since,
+      p_is_featured: is_featured,
+      p_sort_order: sort_order,
+      p_translations: translations || null
+    });
 
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .update(updates)
-        .eq('user_id', userId);
-
-      if (roleError) {
-        console.error('Error updating user role:', roleError);
-        return NextResponse.json({ error: roleError.message }, { status: 400 });
-      }
+    if (error) {
+      console.error('Error updating partner:', error);
+      return NextResponse.json(
+        { error: 'Failed to update partner' },
+        { status: 500 }
+      );
     }
 
-    // Update profile fields (only non-name fields like avatar_url or preferences)
-    if (profile && (profile.avatar_url || profile.preferences)) {
-  const updatable: Record<string, unknown> = {};
-      if (profile.avatar_url) updatable.avatar_url = profile.avatar_url;
-      if (profile.preferences) updatable.preferences = profile.preferences;
+    return NextResponse.json({
+      id: partnerId,
+      message: 'Partner updated successfully',
+      success: true
+    });
 
-  const { error: profileError } = await supabase
-        .from('user_profiles')
-        .upsert({ user_id: userId, ...updatable })
-        .select()
-        .single();
-
-      if (profileError) {
-        console.error('Error upserting user_profiles:', profileError);
-        return NextResponse.json({ error: profileError.message }, { status: 400 });
-      }
-    }
-
-    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error in PATCH /api/admin/users/[id]:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Unexpected error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

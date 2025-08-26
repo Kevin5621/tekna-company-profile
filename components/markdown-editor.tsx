@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +20,7 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Markdown toolbar actions
-  const insertMarkdown = (before: string, after: string = '', placeholder: string = '') => {
+  const insertMarkdown = useCallback((before: string, after: string = '', placeholder: string = '') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
@@ -37,7 +37,7 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
       const newCursorPos = start + before.length + (selectedText || placeholder).length + after.length;
       textarea.setSelectionRange(newCursorPos, newCursorPos);
     }, 0);
-  };
+  }, [value, onChange]);
 
   const toolbarActions = useMemo(() => [
     {
@@ -218,7 +218,7 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
                 <span className="text-muted-foreground">Inline code</span>
               </div>
               <div className="flex justify-between">
-                <code className="bg-muted px-1 rounded"> Quote</code>
+                <code className="bg-muted px-1 rounded">{'>'} Quote</code>
                 <span className="text-muted-foreground">Blockquote</span>
               </div>
             </div>
