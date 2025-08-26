@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { IconSettings, IconDeviceFloppy, IconRefresh, IconBuilding, IconGlobe } from "@tabler/icons-react";
 import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
 
 interface CompanySettings {
   name: string;

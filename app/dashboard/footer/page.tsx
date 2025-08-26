@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Plus, Settings, Link as LinkIcon, Share2, Phone, Mail } from "lucide-react"
 import Link from "next/link"
 import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
 
 export default function FooterManagementPage() {
   const managementSections = [

@@ -10,7 +10,6 @@ import { useRealtimeCategories } from '@/lib/hooks/use-realtime-simple';
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useToast } from '@/hooks/use-toast'
 import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
 
 interface Category {
   id: string;

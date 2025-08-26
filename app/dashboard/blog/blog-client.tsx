@@ -13,7 +13,6 @@ import { useRealtimeBlogPosts } from '@/lib/hooks/use-realtime-simple';
 import { IconPlus, IconEdit, IconTrash, IconEye, IconCalendar, IconUser, IconSearch, IconSortAscending, IconSortDescending, IconExternalLink } from '@tabler/icons-react';
 import { useToast } from '@/hooks/use-toast'
 import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
 
 interface BlogPost {
   id: string;

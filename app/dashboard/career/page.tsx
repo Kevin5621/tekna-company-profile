@@ -17,7 +17,6 @@ import {
   Settings,
   TrendingUp,
   FileText,
-  ArrowLeft
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -46,7 +45,6 @@ import {
   CareerCategory
 } from '@/lib/services/career'
 import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
 
 export default function CareerManagementPage() {
   const [positions, setPositions] = useState<CareerPosition[]>([])

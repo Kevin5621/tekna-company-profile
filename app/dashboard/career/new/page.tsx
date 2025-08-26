@@ -74,7 +74,7 @@ export default function NewCareerPositionPage() {
       }
     }
     loadData()
-  }, [careerService])
+  }, [careerService, toast])
 
   const generateSlug = (title: string) => {
     return title

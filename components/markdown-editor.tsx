@@ -15,7 +15,7 @@ interface MarkdownEditorProps {
   className?: string;
 }
 
-export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten artikel Anda di sini...", className = '' }: MarkdownEditorProps) {
+export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten artikel Anda di sini...", className = '' }: Readonly<MarkdownEditorProps>) {
   const [showPreview, setShowPreview] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

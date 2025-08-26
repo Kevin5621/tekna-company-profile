@@ -9,7 +9,6 @@ import { PaginationService, type PaginatedResult } from "@/lib/services/paginati
 import { SearchFilter } from "@/components/ui/search-filter";
 import { Pagination } from "@/components/ui/pagination";
 import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
 
 interface NewsletterSubscription {
   id: string;
