@@ -4,33 +4,17 @@ import {
   IconUsers, 
   IconFolder, 
   IconArticle, 
-  IconMessageCircle
+  IconMessageCircle,
+  IconTrendingUp,
+  IconEye,
+  IconCalendar
 } from "@tabler/icons-react";
 import { DashboardService } from "@/lib/services/dashboard.service";
 import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
-import BackButton from "@/components/ui/back-button";
+import { DashboardChart } from "@/components/dashboard-chart";
 
-// Utility functions for status mapping
-const getProjectStatusBadge = (status: string) => {
-  switch (status) {
-    case 'completed': return 'default';
-    case 'in-progress': return 'secondary';
-    case 'planning': return 'outline';
-    case 'on-hold': return 'secondary';
-    default: return 'outline';
-  }
-};
 
-const getProjectStatusText = (status: string) => {
-  switch (status) {
-    case 'completed': return 'Selesai';
-    case 'in-progress': return 'Berjalan';
-    case 'planning': return 'Perencanaan';
-    case 'on-hold': return 'Ditahan';
-    default: return 'Perencanaan';
-  }
-};
 
 // Function to get dashboard data using service
 async function getDashboardData(): Promise<DashboardData> {
@@ -92,8 +76,21 @@ async function getDashboardData(): Promise<DashboardData> {
   }
 }
 
+// Function to get chart data
+async function getChartData() {
+  try {
+    return await DashboardService.getChartData(30); // Get last 30 days by default
+  } catch (error) {
+    console.error('Error fetching chart data:', error);
+    return [];
+  }
+}
+
 export default async function DashboardPage() {
-  const dashboardData = await getDashboardData();
+  const [dashboardData, chartData] = await Promise.all([
+    getDashboardData(),
+    getChartData()
+  ]);
 
   return (
     <div className="space-y-6">
@@ -140,46 +137,11 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Recent Projects & Posts */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Recent Projects */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Proyek Terbaru</CardTitle>
-            <CardDescription>
-              Proyek yang sedang berjalan dan baru selesai
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {dashboardData.recentProjects.length > 0 ? (
-              <div className="space-y-4">
-                {dashboardData.recentProjects.map((project) => (
-                  <div key={project.id} className="flex items-center space-x-4">
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium leading-none">{project.name}</p>
-                      {project.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">
-                          {project.description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge variant={getProjectStatusBadge(project.status)}>
-                        {getProjectStatusText(project.status)}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <IconFolder className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>Belum ada proyek</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Analytics Chart */}
+      <DashboardChart initialData={chartData} />
 
+      {/* Recent Posts & Quick Actions */}
+      <div className="grid gap-6 md:grid-cols-2">
         {/* Recent Posts */}
         <Card>
           <CardHeader>
@@ -215,29 +177,86 @@ export default async function DashboardPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Aksi Cepat</CardTitle>
+            <CardDescription>
+              Akses cepat ke fitur-fitur utama
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <a href="/dashboard/projects" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+                <IconFolder className="h-6 w-6" />
+                <span className="text-sm font-medium">Kelola Proyek</span>
+              </a>
+              <a href="/dashboard/blog" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+                <IconArticle className="h-6 w-6" />
+                <span className="text-sm font-medium">Kelola Blog</span>
+              </a>
+              <a href="/dashboard/career" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+                <IconUsers className="h-6 w-6" />
+                <span className="text-sm font-medium">Kelola Karir</span>
+              </a>
+              <a href="/dashboard/settings" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+                <IconTrendingUp className="h-6 w-6" />
+                <span className="text-sm font-medium">Pengaturan</span>
+              </a>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Aksi Cepat</CardTitle>
-          <CardDescription>
-            Akses cepat ke fitur-fitur utama
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
-            <a href="/dashboard/projects" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
-              <IconFolder className="h-6 w-6" />
-              <span className="text-sm font-medium">Kelola Proyek</span>
-            </a>
-            <a href="/dashboard/blog" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
-              <IconArticle className="h-6 w-6" />
-              <span className="text-sm font-medium">Kelola Blog</span>
-            </a>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Additional Stats */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Layanan</CardTitle>
+            <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{dashboardData.servicesCount}</div>
+            <p className="text-xs text-muted-foreground">
+              Layanan yang tersedia
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+            <IconEye className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {dashboardData.recentPosts.reduce((total, post) => total + post.views, 0).toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Total views artikel
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Update Terakhir</CardTitle>
+            <IconCalendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {new Date().toLocaleDateString('id-ID', { 
+                day: 'numeric', 
+                month: 'short' 
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Hari ini
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

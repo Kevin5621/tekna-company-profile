@@ -192,6 +192,7 @@ export class CareerService {
     totalPages: number;
   }> {
     try {
+      // Build base query
       let query = this.supabase
         .from('career_positions')
         .select(`
@@ -210,35 +211,93 @@ export class CareerService {
         .eq('status', 'open')
         .eq('is_active', true);
 
-      // Apply filters
+      // Apply search filter
       if (params.filters?.search) {
         const searchTerm = params.filters.search.trim();
         if (searchTerm) {
+          console.log('Applying search filter:', searchTerm)
           query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,summary.ilike.%${searchTerm}%`);
         }
       }
       
-      if (params.filters?.category) {
-        // Filter by category slug using the joined table
-        query = query.eq('category.slug', params.filters.category);
+      // Apply category filter
+      if (params.filters?.category && params.filters.category !== 'all') {
+        // Use subquery to get category ID first
+        const { data: categoryData } = await this.supabase
+          .from('career_categories')
+          .select('id')
+          .eq('slug', params.filters.category)
+          .eq('is_active', true)
+          .single();
+        
+        if (categoryData) {
+          query = query.eq('category_id', categoryData.id);
+          console.log('Category filter applied with ID:', categoryData.id);
+        } else {
+          console.log('Category not found, skipping filter');
+        }
       }
       
-      if (params.filters?.location) {
-        // Filter by location slug using the joined table
-        query = query.eq('location.slug', params.filters.location);
+      // Apply location filter
+      if (params.filters?.location && params.filters.location !== 'all') {
+        console.log('Applying location filter:', params.filters.location)
+        // Use subquery to get location ID first
+        const { data: locationData } = await this.supabase
+          .from('career_locations')
+          .select('id')
+          .eq('slug', params.filters.location)
+          .eq('is_active', true)
+          .single();
+        
+        if (locationData) {
+          query = query.eq('location_id', locationData.id);
+          console.log('Location filter applied with ID:', locationData.id);
+        } else {
+          console.log('Location not found, skipping filter');
+        }
       }
       
-      if (params.filters?.type) {
-        // Filter by type slug using the joined table
-        query = query.eq('type.slug', params.filters.type);
+      // Apply type filter
+      if (params.filters?.type && params.filters.type !== 'all') {
+        console.log('Applying type filter:', params.filters.type)
+        // Use subquery to get type ID first
+        const { data: typeData } = await this.supabase
+          .from('career_types')
+          .select('id')
+          .eq('slug', params.filters.type)
+          .eq('is_active', true)
+          .single();
+        
+        if (typeData) {
+          query = query.eq('type_id', typeData.id);
+          console.log('Type filter applied with ID:', typeData.id);
+        } else {
+          console.log('Type not found, skipping filter');
+        }
       }
       
-      if (params.filters?.level) {
-        // Filter by level slug using the joined table
-        query = query.eq('level.slug', params.filters.level);
+      // Apply level filter
+      if (params.filters?.level && params.filters.level !== 'all') {
+        console.log('Applying level filter:', params.filters.level)
+        // Use subquery to get level ID first
+        const { data: levelData } = await this.supabase
+          .from('career_levels')
+          .select('id')
+          .eq('slug', params.filters.level)
+          .eq('is_active', true)
+          .single();
+        
+        if (levelData) {
+          query = query.eq('level_id', levelData.id);
+          console.log('Level filter applied with ID:', levelData.id);
+        } else {
+          console.log('Level not found, skipping filter');
+        }
       }
       
-      if (params.filters?.remote === true) {
+      // Apply remote filter
+      if (params.filters?.remote === true || String(params.filters?.remote) === 'true') {
+        console.log('Applying remote filter: true')
         query = query.eq('remote_allowed', true);
       }
 
@@ -269,6 +328,21 @@ export class CareerService {
       const limit = params.limit || 10;
       const offset = ((params.page || 1) - 1) * limit;
       query = query.range(offset, offset + limit - 1);
+
+      console.log('CareerService: Final query structure:', {
+        table: 'career_positions',
+        filters: {
+          status: 'open',
+          is_active: true,
+          category_id: params.filters?.category ? 'will be applied' : 'not applied',
+          location_id: params.filters?.location ? 'will be applied' : 'not applied',
+          type_id: params.filters?.type ? 'will be applied' : 'not applied',
+          level_id: params.filters?.level ? 'will be applied' : 'not applied',
+          remote_allowed: params.filters?.remote ? 'will be applied' : 'not applied'
+        },
+        sort: params.sort,
+        pagination: { limit, offset, page: params.page }
+      })
 
       const { data, error, count } = await query;
 

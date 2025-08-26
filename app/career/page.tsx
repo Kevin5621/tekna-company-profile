@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import { BackgroundPaths } from "@/components/ui/shadcn-io/background-paths"
 import { 
   Search, 
   MapPin, 
@@ -15,6 +16,10 @@ import {
   Grid3x3,
   List,
   X,
+  Filter,
+  Building2,
+  Users,
+  TrendingUp
 } from "lucide-react"
 import Link from "next/link"
 import { CareerService, CareerPosition, CareerCategory, CareerLocation, CareerType, CareerLevel, CareerSearchParams } from "@/lib/services/career"
@@ -38,8 +43,22 @@ export default function CareerPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
+  const [showFilters, setShowFilters] = useState(false)
 
   const careerService = useMemo(() => new CareerService(), [])
+
+  // Debug: Log current filter state
+  useEffect(() => {
+    console.log('Current search params state:', searchParams)
+    console.log('Current filter state:', {
+      search: searchParams.filters?.search,
+      category: searchParams.filters?.category,
+      location: searchParams.filters?.location,
+      type: searchParams.filters?.type,
+      level: searchParams.filters?.level,
+      remote: searchParams.filters?.remote
+    })
+  }, [searchParams])
 
   // Debounce search query
   useEffect(() => {
@@ -86,8 +105,30 @@ export default function CareerPage() {
     setLoading(true)
     try {
       console.log('Loading positions with params:', searchParams)
+      console.log('Active filters:', {
+        search: searchParams.filters?.search,
+        category: searchParams.filters?.category,
+        location: searchParams.filters?.location,
+        type: searchParams.filters?.type,
+        level: searchParams.filters?.level,
+        remote: searchParams.filters?.remote
+      })
+      
       const result = await careerService.getPublicPositions(searchParams)
       console.log('Positions result:', result)
+      console.log('Positions data:', result.positions)
+      
+      if (result.positions.length > 0) {
+        console.log('First position sample:', {
+          id: result.positions[0].id,
+          title: result.positions[0].title,
+          category: result.positions[0].category,
+          location: result.positions[0].location,
+          type: result.positions[0].type,
+          level: result.positions[0].level
+        })
+      }
+      
       setPositions(result.positions)
       setTotalCount(result.total)
       setTotalPages(result.totalPages)
@@ -111,14 +152,37 @@ export default function CareerPage() {
   }
 
   const handleFilterChange = (key: string, value: string) => {
-    setSearchParams(prev => ({
-      ...prev,
-      filters: { 
-        ...prev.filters, 
-        [key]: value === 'all' ? undefined : value 
-      },
-      page: 1
-    }))
+    console.log(`Filter changed: ${key} = ${value}`)
+    
+    // Don't process 'all' values
+    if (value === 'all') {
+      setSearchParams(prev => {
+        const newParams = {
+          ...prev,
+          filters: { 
+            ...prev.filters, 
+            [key]: undefined 
+          },
+          page: 1
+        }
+        console.log('New search params (cleared filter):', newParams)
+        return newParams
+      })
+      return
+    }
+    
+    setSearchParams(prev => {
+      const newParams = {
+        ...prev,
+        filters: { 
+          ...prev.filters, 
+          [key]: value 
+        },
+        page: 1
+      }
+      console.log('New search params (set filter):', newParams)
+      return newParams
+    })
   }
 
   const handleSortChange = (sort: string) => {
@@ -171,9 +235,11 @@ export default function CareerPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground">
-        <div className="container mx-auto px-4 py-12 md:px-6 lg:py-16">
+      {/* Hero Section with Background Paths */}
+      <section className="relative bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground overflow-hidden">
+        <BackgroundPaths />
+        
+        <div className="relative z-10 container mx-auto px-4 py-12 md:px-6 lg:py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl bg-gradient-to-r from-primary-foreground to-primary-foreground/80 bg-clip-text text-transparent mb-6">
               Find Your Dream Career
@@ -182,45 +248,45 @@ export default function CareerPage() {
               Join our innovative team and shape the future of technology. Discover opportunities that match your passion and skills.
             </p>
             
-            {/* Quick Search */}
-            <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-2xl p-6 max-w-2xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-4">
+            {/* Enhanced Search Section */}
+            <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-3xl p-6 md:p-8 max-w-4xl mx-auto border border-primary-foreground/20">
+              <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-foreground/60 h-5 w-5" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-foreground/60 h-5 w-5" />
                   <Input
                     placeholder="Search jobs, skills, or companies..."
-                    className="pl-10 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/30"
+                    className="pl-12 pr-4 h-12 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/30 focus:ring-2 focus:ring-primary-foreground/50"
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
                   />
                 </div>
                 <Button 
                   size="lg" 
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-12 px-8"
                   onClick={() => document.getElementById('jobs-section')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                  <Search className="mr-2 h-4 w-4" />
+                  <Search className="mr-2 h-5 w-5" />
                   Search Jobs
                 </Button>
               </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="flex flex-wrap items-center justify-center gap-8 pt-8 text-sm text-primary-foreground/80">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary-foreground rounded-full"></div>
+            {/* Enhanced Stats */}
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-8 text-sm text-primary-foreground/80">
+              <div className="flex items-center gap-2 bg-primary-foreground/10 px-4 py-2 rounded-full">
+                <Building2 className="w-4 h-4" />
                 <span>{totalCount} Open Positions</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary-foreground/80 rounded-full"></div>
+              <div className="flex items-center gap-2 bg-primary-foreground/10 px-4 py-2 rounded-full">
+                <Users className="w-4 h-4" />
                 <span>{categories.length} Departments</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary-foreground/60 rounded-full"></div>
+              <div className="flex items-center gap-2 bg-primary-foreground/10 px-4 py-2 rounded-full">
+                <MapPin className="w-4 h-4" />
                 <span>{locations.length} Locations</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-primary-foreground/40 rounded-full"></div>
+              <div className="flex items-center gap-2 bg-primary-foreground/10 px-4 py-2 rounded-full">
+                <TrendingUp className="w-4 h-4" />
                 <span>{featuredPositions.length} Featured Jobs</span>
               </div>
             </div>
@@ -242,13 +308,33 @@ export default function CareerPage() {
             </div>
           </div>
           
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col xl:flex-row gap-8">
+            {/* Mobile Filter Toggle */}
+            <div className="xl:hidden">
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className={cn(
+                  "w-full transition-all duration-200",
+                  showFilters 
+                    ? "bg-primary text-primary-foreground border-primary" 
+                    : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
+                )}
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </Button>
+            </div>
+
             {/* Filters Sidebar */}
-            <div className="lg:w-80 space-y-6">
+            <div className={cn(
+              "xl:w-80 space-y-6 transition-all duration-300",
+              showFilters ? "block" : "hidden xl:block"
+            )}>
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Filters</h3>
                 {hasActiveFilters() && (
-                  <Button variant="outline" size="sm" onClick={clearFilters}>
+                  <Button variant="outline" size="sm" onClick={clearFilters} className="border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground">
                     <X className="w-4 h-4 mr-2" />
                     Clear All
                   </Button>
@@ -262,7 +348,12 @@ export default function CareerPage() {
                     value={searchParams.filters?.category || 'all'} 
                     onValueChange={(value) => handleFilterChange('category', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={cn(
+                      "transition-all duration-200",
+                      searchParams.filters?.category && searchParams.filters.category !== 'all'
+                        ? "border-primary ring-1 ring-primary/20" 
+                        : "border-border hover:border-primary/50"
+                    )}>
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
@@ -282,7 +373,12 @@ export default function CareerPage() {
                     value={searchParams.filters?.location || 'all'} 
                     onValueChange={(value) => handleFilterChange('location', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={cn(
+                      "transition-all duration-200",
+                      searchParams.filters?.location && searchParams.filters.location !== 'all'
+                        ? "border-primary ring-1 ring-primary/20" 
+                        : "border-border hover:border-primary/50"
+                    )}>
                       <SelectValue placeholder="All Locations" />
                     </SelectTrigger>
                     <SelectContent>
@@ -302,7 +398,12 @@ export default function CareerPage() {
                     value={searchParams.filters?.type || 'all'} 
                     onValueChange={(value) => handleFilterChange('type', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={cn(
+                      "transition-all duration-200",
+                      searchParams.filters?.type && searchParams.filters.type !== 'all'
+                        ? "border-primary ring-1 ring-primary/20" 
+                        : "border-border hover:border-primary/50"
+                    )}>
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent>
@@ -322,7 +423,12 @@ export default function CareerPage() {
                     value={searchParams.filters?.level || 'all'} 
                     onValueChange={(value) => handleFilterChange('level', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={cn(
+                      "transition-all duration-200",
+                      searchParams.filters?.level && searchParams.filters.level !== 'all'
+                        ? "border-primary ring-1 ring-primary/20" 
+                        : "border-border hover:border-primary/50"
+                    )}>
                       <SelectValue placeholder="All Levels" />
                     </SelectTrigger>
                     <SelectContent>
@@ -342,7 +448,12 @@ export default function CareerPage() {
                     value={searchParams.filters?.remote ? 'true' : 'all'} 
                     onValueChange={(value) => handleFilterChange('remote', value)}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={cn(
+                      "transition-all duration-200",
+                      searchParams.filters?.remote === true || String(searchParams.filters?.remote) === 'true'
+                        ? "border-primary ring-1 ring-primary/20" 
+                        : "border-border hover:border-primary/50"
+                    )}>
                       <SelectValue placeholder="All Work Types" />
                     </SelectTrigger>
                     <SelectContent>
@@ -357,7 +468,7 @@ export default function CareerPage() {
             {/* Main Content */}
             <main role="main" aria-label="Career positions" className="flex-1">
               {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                 <div>
                   <p className="text-muted-foreground">
                     {totalCount} positions found
@@ -369,12 +480,17 @@ export default function CareerPage() {
                   </p>
                 </div>
                 
-                <div className="flex items-center gap-4 mt-4 sm:mt-0">
+                <div className="flex items-center gap-4">
                   <Select 
                     value={searchParams.sort || 'newest'} 
                     onValueChange={handleSortChange}
                   >
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className={cn(
+                      "w-40 transition-all duration-200",
+                      searchParams.sort && searchParams.sort !== 'newest'
+                        ? "border-primary ring-1 ring-primary/20" 
+                        : "border-border hover:border-primary/50"
+                    )}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -387,11 +503,17 @@ export default function CareerPage() {
                     </SelectContent>
                   </Select>
                   
-                  <div className="flex border rounded-lg">
+                  <div className="flex border rounded-lg overflow-hidden">
                     <Button
                       variant={viewMode === 'grid' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setViewMode('grid')}
+                      className={cn(
+                        "rounded-none border-r transition-all duration-200",
+                        viewMode === 'grid' 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                      )}
                     >
                       <Grid3x3 className="h-4 w-4" />
                     </Button>
@@ -399,6 +521,12 @@ export default function CareerPage() {
                       variant={viewMode === 'list' ? 'default' : 'ghost'}
                       size="sm"
                       onClick={() => setViewMode('list')}
+                      className={cn(
+                        "rounded-none transition-all duration-200",
+                        viewMode === 'list' 
+                          ? "bg-primary text-primary-foreground" 
+                          : "bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                      )}
                     >
                       <List className="h-4 w-4" />
                     </Button>
@@ -445,56 +573,54 @@ export default function CareerPage() {
                 <>
                   <div className={cn(
                     viewMode === 'grid' 
-                      ? "grid gap-8 md:grid-cols-2 lg:grid-cols-3" 
+                      ? "grid gap-6 sm:gap-8 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4" 
                       : "space-y-4"
                   )} aria-label="Career positions">
                     {positions.map((position) => (
-                      <Card key={position.id} className="group hover:shadow-lg transition-all duration-300 ease-in-out group-hover:-translate-y-1 group-focus-visible:ring-2 group-focus-visible:ring-primary group-focus-visible:ring-offset-2">
-                        <CardHeader>
+                      <Card key={position.id} className="group hover:shadow-xl transition-all duration-300 ease-in-out group-hover:-translate-y-1 group-focus-visible:ring-2 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                        <CardHeader className="pb-3">
                           <div className="flex items-start justify-between">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
+                            <div className="space-y-3 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 {position.featured && (
-                                  <Badge variant="secondary" className="bg-primary/10 text-primary gap-1">
+                                  <Badge variant="secondary" className="bg-primary/10 text-primary gap-1 px-2 py-1">
                                     <Star className="h-3 w-3" />
-                                    <span>Featured</span>
+                                    <span className="text-xs">Featured</span>
                                   </Badge>
                                 )}
                                 {position.urgent && (
-                                  <Badge variant="destructive" className="gap-1">
-                                    <span>Urgent</span>
+                                  <Badge variant="destructive" className="gap-1 px-2 py-1">
+                                    <span className="text-xs">Urgent</span>
                                   </Badge>
                                 )}
                               </div>
-                              <CardTitle className="group-hover:text-primary transition-colors">
+                              <CardTitle className="group-hover:text-primary transition-colors text-lg leading-tight line-clamp-2">
                                 {position.title}
                               </CardTitle>
-                              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                  {position.category && (
-                                    <Badge 
-                                      variant="secondary" 
-                                      className="text-xs text-primary-foreground border-0"
-                                      style={{ backgroundColor: position.category.color || 'hsl(var(--primary))' }}
-                                    >
-                                      {position.category.name}
-                                    </Badge>
-                                  )}
-                                </div>
+                              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                                {position.category && (
+                                  <Badge 
+                                    variant="secondary" 
+                                    className="text-xs text-primary-foreground border-0 px-2 py-1"
+                                    style={{ backgroundColor: position.category.color || 'hsl(var(--primary))' }}
+                                  >
+                                    {position.category.name}
+                                  </Badge>
+                                )}
                                 <div className="flex items-center gap-1">
                                   <MapPin className="h-3 w-3" />
-                                  {position.location?.name}
+                                  <span className="text-xs">{position.location?.name}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3" />
-                                  {position.type?.name}
+                                  <span className="text-xs">{position.type?.name}</span>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                        <CardContent className="pt-0">
+                          <p className="text-sm text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
                             {position.summary}
                           </p>
                           
@@ -503,9 +629,9 @@ export default function CareerPage() {
                               <span className="font-medium text-primary">
                                 {formatSalary(position.salary_min, position.salary_max, position.salary_currency)}
                               </span>
-                              <span className="text-muted-foreground ml-1">/{position.salary_type}</span>
+                              <span className="text-muted-foreground ml-1 text-xs">/{position.salary_type}</span>
                             </div>
-                            <Badge variant="outline">{position.level?.name}</Badge>
+                            <Badge variant="outline" className="text-xs px-2 py-1">{position.level?.name}</Badge>
                           </div>
 
                           {position.skills && position.skills.length > 0 && (
@@ -516,7 +642,7 @@ export default function CareerPage() {
                                     key={skillItem.id} 
                                     variant={skillItem.level === 'required' ? "default" : "secondary"}
                                     className={cn(
-                                      "text-xs",
+                                      "text-xs px-2 py-1",
                                       skillItem.level === 'required' && "bg-primary hover:bg-primary/90"
                                     )}
                                   >
@@ -525,7 +651,7 @@ export default function CareerPage() {
                                   </Badge>
                                 ))}
                                 {position.skills.length > 3 && (
-                                  <Badge variant="secondary" className="text-xs">
+                                  <Badge variant="secondary" className="text-xs px-2 py-1">
                                     +{position.skills.length - 3} more
                                   </Badge>
                                 )}
@@ -538,7 +664,7 @@ export default function CareerPage() {
                               {position.views_count} views • {position.applications_count} applications
                             </div>
                             <Link href={`/career/${position.slug}`}>
-                              <Button variant="outline" className="group-hover:bg-primary group-hover:text-primary-foreground">
+                              <Button variant="outline" className="group-hover:bg-primary group-hover:text-primary-foreground text-xs px-3 py-2">
                                 View Details
                               </Button>
                             </Link>

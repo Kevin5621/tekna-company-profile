@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Eye, FileText, ExternalLink, MessageSquare, Calendar, User, Filter, Search } from 'lucide-react'
 import { toast } from 'sonner'
+import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import BackButton from '@/components/ui/back-button';
 
 const statusColors = {
   submitted: 'bg-blue-100 text-blue-800',
@@ -150,10 +152,27 @@ export default function ApplicationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Breadcrumbs */}
+      <DashboardBreadcrumb 
+        items={[
+          { label: "Karir", href: "/dashboard/career" },
+          { label: "Applications", href: "/dashboard/career/applications" },
+          { label: "Daftar Lamaran", isCurrentPage: true }
+        ]}
+      />
+
+      {/* Back Button */}
+      <div className="flex items-center gap-4">
+        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+      </div>
+
+      {/* Header */}
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Job Applications</h1>
-          <p className="text-muted-foreground">Manage and track job applications</p>
+          <h1 className="text-3xl font-bold tracking-tight">Career Applications</h1>
+          <p className="text-muted-foreground">
+            Manage and review job applications
+          </p>
         </div>
       </div>
 

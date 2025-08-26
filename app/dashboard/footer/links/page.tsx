@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Plus, Edit, Trash2, ExternalLink, Link as LinkIcon } from "lucide-react"
-import Link from "next/link"
 import { FooterService } from "@/lib/services/footer"
 import { FooterLink, FooterSection } from "@/lib/services/footer"
 import { toast } from "sonner"
