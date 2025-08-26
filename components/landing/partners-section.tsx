@@ -3,44 +3,59 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
-const partners = [
-  { 
-    name: 'TechCorp Solutions', 
-    logo: '/logo.webp',
-    description: 'Leading technology solutions provider'
-  },
-  { 
-    name: 'InnovateTech', 
-    logo: '/logo.webp',
-    description: 'Innovation-driven software company'
-  },
-  { 
-    name: 'Global Manufacturing', 
-    logo: '/logo.webp',
-    description: 'International manufacturing leader'
-  },
-  { 
-    name: 'Digital Dynamics', 
-    logo: '/logo.webp',
-    description: 'Digital transformation experts'
-  },
-  { 
-    name: 'Cloud Systems', 
-    logo: '/logo.webp',
-    description: 'Cloud infrastructure specialists'
-  },
-  { 
-    name: 'Smart Solutions', 
-    logo: '/logo.webp',
-    description: 'AI-powered business solutions'
-  }
-];
+interface Partner {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  description: string | null;
+  website: string | null;
+  is_active: boolean;
+  sort_order: number;
+}
 
 export function PartnersSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisible = useInView(containerRef, { once: true, margin: "-100px" });
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPartners = async () => {
+      try {
+        console.log('Fetching partners...');
+        const response = await fetch('/api/partners');
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Partners data:', data);
+        
+        if (data.success) {
+          // Filter active partners and remove duplicates
+          const activePartners = data.partners.filter((partner: Partner) => partner.is_active);
+          console.log('Active partners:', activePartners);
+          const uniquePartners: Partner[] = [];
+          const seenIds = new Set<string>();
+          
+          for (const partner of activePartners) {
+            if (!seenIds.has(partner.id)) {
+              seenIds.add(partner.id);
+              uniquePartners.push(partner);
+            }
+          }
+          
+          console.log('Unique partners:', uniquePartners);
+          setPartners(uniquePartners.slice(0, 6)); // Limit to 6 partners
+        }
+      } catch (error) {
+        console.error('Error fetching partners:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPartners();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -63,8 +78,39 @@ export function PartnersSection() {
     }
   };
 
+  if (loading) {
+    return (
+      <section className="w-full py-24 md:py-32 bg-background relative z-20 pointer-events-auto">
+        <div className="container mx-auto px-4 md:px-6">
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+              Trusted by Industry Leaders
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground">
+              We collaborate with innovative companies worldwide to deliver exceptional digital solutions.
+            </p>
+          </div>
+
+          {/* Loading Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-12">
+            {[...Array(6)].map((_, i) => (
+              <div key={`loading-${i}`} className="flex flex-col items-center text-center space-y-4 animate-pulse">
+                <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-200 rounded-2xl"></div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-20"></div>
+                  <div className="h-3 bg-gray-200 rounded w-16"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="w-full py-24 md:py-32 bg-background relative z-20">
+    <section className="w-full py-24 md:py-32 bg-background relative z-20 pointer-events-auto">
       <motion.div
         ref={containerRef}
         variants={containerVariants}
@@ -92,7 +138,7 @@ export function PartnersSection() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-12">
           {partners.map((partner) => (
             <motion.div
-              key={partner.name}
+              key={partner.id}
               variants={itemVariants}
               className="group"
             >
@@ -105,13 +151,19 @@ export function PartnersSection() {
                     transition: { duration: 0.2 }
                   }}
                 >
-                  <Image
-                    src={partner.logo}
-                    alt={partner.name}
-                    fill
-                    className="object-contain p-2"
-                    sizes="(max-width: 768px) 96px, 128px"
-                  />
+                  {partner.logo_url ? (
+                    <Image
+                      src={partner.logo_url}
+                      alt={partner.name}
+                      fill
+                      className="object-contain p-2"
+                      sizes="(max-width: 768px) 96px, 128px"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
+                      {partner.name.charAt(0)}
+                    </div>
+                  )}
                 </motion.div>
 
                 {/* Partner Name */}

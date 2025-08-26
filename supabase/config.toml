@@ -58,7 +58,8 @@ sql_paths = [
   "./seeds/01_initial.sql", 
   "./seeds/02_blog.sql",
   "./seeds/04_footer_data.sql",
-  "./seeds/05_career_data.sql"
+  "./seeds/05_career_data.sql",
+  "./seeds/06_partners_data.sql"
 ]
 
 [realtime]

@@ -19,7 +19,8 @@ import {
   Shield,
   User,
   Footprints,
-  Briefcase
+  Briefcase,
+  Handshake
 } from "lucide-react"
 
 interface NavigationItem {
@@ -46,6 +47,12 @@ const navigationItems: NavigationItem[] = [
     title: "Blog",
     href: "/dashboard/blog",
     icon: FileText,
+    roles: ['admin', 'editor']
+  },
+  {
+    title: "Partners",
+    href: "/dashboard/partners",
+    icon: Handshake,
     roles: ['admin', 'editor']
   },
   {
