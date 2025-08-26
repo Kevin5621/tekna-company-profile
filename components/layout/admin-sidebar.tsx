@@ -191,7 +191,7 @@ export function AdminSidebar() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-16 flex-col items-center justify-center border-r bg-background">
+      <div className="flex w-16 flex-col items-center justify-center border-r bg-background h-full min-h-0">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
       </div>
     );
@@ -199,7 +199,7 @@ export function AdminSidebar() {
 
   return (
     <div className={cn(
-      "flex h-screen flex-col border-r bg-background transition-all duration-300",
+      "flex flex-col border-r bg-background transition-all duration-300 h-full min-h-0",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}

@@ -17,10 +17,10 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
   const isMobile = useIsMobile()
 
   return (
-    <div className="flex h-screen bg-background">
+  <div className="min-h-screen flex bg-background">
       {/* Desktop Sidebar */}
       {!isMobile && (
-        <div className="hidden md:flex md:w-64 md:flex-col">
+        <div className="hidden md:flex md:flex-col">
           <div className="flex flex-col flex-grow bg-sidebar border-r border-sidebar-border">
             {sidebar}
           </div>
@@ -59,7 +59,7 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
       )}
 
       {/* Main Content */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+  <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
         {/* Header */}
         {header && (
           <div className="border-b border-border bg-background">
