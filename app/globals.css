@@ -107,6 +107,11 @@
     color: hsl(var(--sidebar-foreground));
     fill: hsl(var(--sidebar-foreground));
     stroke: hsl(var(--sidebar-foreground));
+    /* Make sidebar icons visually lighter */
+    stroke-width: 1 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+    fill: none !important;
   }
 
   .bg-sidebar a:hover,
@@ -117,6 +122,18 @@
     color: hsl(var(--sidebar-accent));
     fill: hsl(var(--sidebar-accent));
     stroke: hsl(var(--sidebar-accent));
+  }
+
+  /* Force lighter stroke visuals for sidebar icons to avoid a "bulky" look.
+     We use a specific selector with !important to override SVG/path presentation
+     attributes that may be set by icon components. This targets only sidebar
+     icons (container has .bg-sidebar). */
+  .bg-sidebar svg,
+  .bg-sidebar svg * {
+    stroke-width: 1 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+    fill: none !important;
   }
 
   body {

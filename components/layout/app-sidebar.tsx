@@ -28,7 +28,8 @@ import {
 interface NavigationItem {
   title: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  // allow passing SVG props (e.g. strokeWidth) to Lucide icons
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement> & { className?: string }>;
   roles: ("admin" | "editor" | "hr")[];
 }
 
@@ -125,7 +126,7 @@ function NavigationItems() {
         const Icon = item.icon;
         const isActive = pathname === item.href;
 
-        return (
+  return (
           <Link
             key={item.href}
             href={item.href}
@@ -139,6 +140,10 @@ function NavigationItems() {
             )}
           >
             <Icon
+              strokeWidth={1}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
               className={cn(
                 "w-4 h-4 transition-colors duration-200",
                 isActive ? "text-white" : "text-white group-hover:text-white"
@@ -179,7 +184,7 @@ function BottomNavigationItems() {
         const Icon = item.icon;
         const isActive = pathname === item.href;
 
-        return (
+  return (
           <Link
             key={item.href}
             href={item.href}
@@ -193,6 +198,10 @@ function BottomNavigationItems() {
             )}
           >
             <Icon
+              strokeWidth={1}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
               className={cn(
                 "w-4 h-4 transition-colors duration-200",
                 isActive ? "text-white" : "text-white group-hover:text-white"
