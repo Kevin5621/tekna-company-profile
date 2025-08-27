@@ -64,7 +64,7 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
 
   return (
     <DashboardPageTemplate
-      breadcrumbs={[{ label: "Karir", href: "/dashboard/career" }, { label: "Manajemen Karir", isCurrentPage: true }]}
+      breadcrumbs={[{ label: "Career", href: "/dashboard/career" }, { label: "Career Management", isCurrentPage: true }]}
       title="Career Management"
       description="Manage job positions, categories, and applications"
       actions={actions}

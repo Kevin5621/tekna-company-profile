@@ -230,15 +230,15 @@ export default function LocationsPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Karir", href: "/dashboard/career" },
-          { label: "Lokasi Karir", href: "/dashboard/career/locations" },
-          { label: "Manajemen Lokasi", isCurrentPage: true },
+          { label: "Career", href: "/dashboard/career" },
+          { label: "Career Locations", href: "/dashboard/career/locations" },
+          { label: "Location Management", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+        <BackButton href="/dashboard/career" label="Back to Career" />
       </div>
 
       {/* Header */}

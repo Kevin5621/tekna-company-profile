@@ -8,8 +8,8 @@ export default function NewCategoryPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Kategori", href: "/dashboard/categories" },
-          { label: "Tambah Kategori Baru", isCurrentPage: true },
+          { label: "Categories", href: "/dashboard/categories" },
+          { label: "Add New Category", isCurrentPage: true },
         ]}
       />
 
@@ -17,7 +17,7 @@ export default function NewCategoryPage() {
       <div className="flex items-center gap-4">
         <BackButton
           href="/dashboard/categories"
-          label="Kembali ke Categories"
+          label="Back to Categories"
         />
       </div>
 

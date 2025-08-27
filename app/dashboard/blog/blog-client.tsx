@@ -217,7 +217,7 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
       <DashboardPageTemplate
         breadcrumbs={[
           { label: "Blog", href: "/dashboard/blog" },
-          { label: "Daftar Artikel", isCurrentPage: true },
+          { label: "Article List", isCurrentPage: true },
         ]}
         title="Blog Posts"
         description="Manage blog posts and articles"
@@ -230,7 +230,7 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    Total Artikel
+                    Total Articles
                   </p>
                   <p className="text-2xl font-bold">{posts.length}</p>
                 </div>
@@ -308,7 +308,7 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
                     className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                   />
                   <Input
-                    placeholder="Cari artikel..."
+                    placeholder="Search articles..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -322,7 +322,7 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
                   <SelectValue placeholder="Filter Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="draft">Draft</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
                   <SelectItem value="archived">Archived</SelectItem>
@@ -337,11 +337,11 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
                 }
               >
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Urutkan" />
+                  <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="created_at">Tanggal Dibuat</SelectItem>
-                  <SelectItem value="title">Judul</SelectItem>
+                  <SelectItem value="created_at">Created Date</SelectItem>
+                  <SelectItem value="title">Title</SelectItem>
                   <SelectItem value="status">Status</SelectItem>
                 </SelectContent>
               </Select>
@@ -469,7 +469,7 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
                         onClick={() => toggleExpanded(post.id)}
                         className="text-xs"
                       >
-                        {expandedPost === post.id ? "Sembunyikan" : "Detail"}
+                        {expandedPost === post.id ? "Hide" : "Details"}
                       </Button>
 
                       <Button
@@ -548,17 +548,17 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
                 <IconEdit size={24} className="text-muted-foreground" />
               </div>
               <h3 className="text-lg font-semibold mb-2">
-                Tidak ada artikel ditemukan
+                No articles found
               </h3>
               <p className="text-muted-foreground mb-4">
                 {searchTerm || statusFilter !== "all"
-                  ? "Coba ubah filter atau kata kunci pencarian"
-                  : "Mulai dengan membuat artikel pertama Anda"}
+                  ? "Try changing filters or search terms"
+                  : "Start by creating your first article"}
               </p>
               {!searchTerm && statusFilter === "all" && (
                 <Button onClick={handleAddNew} className="gap-2">
                   <IconPlus size={16} />
-                  Tambah Artikel Pertama
+                  Add Your First Article
                 </Button>
               )}
             </CardContent>

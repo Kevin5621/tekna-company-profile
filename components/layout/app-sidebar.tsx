@@ -40,7 +40,7 @@ const navigationItems: NavigationItem[] = [
     roles: ["admin", "editor", "hr"],
   },
   {
-    title: "Proyek",
+    title: "Projects",
     href: "/dashboard/projects",
     icon: FolderOpen,
     roles: ["admin", "editor"],
@@ -79,7 +79,7 @@ const navigationItems: NavigationItem[] = [
 
 const bottomNavigationItems: NavigationItem[] = [
   {
-    title: "Pengaturan",
+    title: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
     roles: ["admin", "editor", "hr"],

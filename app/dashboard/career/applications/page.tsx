@@ -187,15 +187,15 @@ export default function ApplicationsPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Karir", href: "/dashboard/career" },
+          { label: "Career", href: "/dashboard/career" },
           { label: "Applications", href: "/dashboard/career/applications" },
-          { label: "Daftar Lamaran", isCurrentPage: true },
+          { label: "Application List", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+        <BackButton href="/dashboard/career" label="Back to Career" />
       </div>
 
       {/* Header */}

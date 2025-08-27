@@ -156,7 +156,7 @@ export default function AdminClient({ initialUsers }: AdminClientProps) {
 
   return (
     <DashboardPageTemplate
-      breadcrumbs={[{ label: "Admin", href: "/dashboard/admin" }, { label: "Manajemen Admin", isCurrentPage: true }]}
+      breadcrumbs={[{ label: "Admin", href: "/dashboard/admin" }, { label: "Admin Management", isCurrentPage: true }]}
       title="Admin Management"
       description="Manage admin users, roles, and system settings"
       actions={actions}

@@ -100,7 +100,7 @@ export class MediaServiceServer {
         console.error("Error uploading file:", uploadError);
         return {
           success: false,
-          error: `Gagal upload file: ${uploadError.message}`,
+          error: `Failed to upload file: ${uploadError.message}`,
         };
       }
 
@@ -136,7 +136,7 @@ export class MediaServiceServer {
 
         return {
           success: false,
-          error: `Gagal menyimpan data file: ${dbError.message}`,
+          error: `Failed to save file data: ${dbError.message}`,
         };
       }
 
@@ -151,7 +151,7 @@ export class MediaServiceServer {
         error:
           error instanceof Error
             ? error.message
-            : "Terjadi kesalahan saat upload",
+            : "An error occurred during upload",
       };
     }
   }

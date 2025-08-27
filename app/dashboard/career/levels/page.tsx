@@ -208,15 +208,15 @@ export default function LevelsPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Karir", href: "/dashboard/career" },
-          { label: "Level Karir", href: "/dashboard/career/levels" },
-          { label: "Manajemen Level", isCurrentPage: true },
+          { label: "Career", href: "/dashboard/career" },
+          { label: "Career Levels", href: "/dashboard/career/levels" },
+          { label: "Level Management", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+        <BackButton href="/dashboard/career" label="Back to Career" />
       </div>
 
       {/* Header */}

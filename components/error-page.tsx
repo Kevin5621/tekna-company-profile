@@ -24,10 +24,10 @@ interface ErrorPageProps {
 export function ErrorPage({
   error,
   reset,
-  title = "Terjadi Kesalahan",
-  description = "Maaf, terjadi kesalahan yang tidak terduga. Silakan coba lagi atau kembali ke halaman sebelumnya.",
+  title = "An Error Occurred",
+  description = "Sorry, an unexpected error occurred. Please try again or go back to the previous page.",
   showBackButton = true,
-  backButtonText = "Kembali",
+  backButtonText = "Back",
   backButtonHref,
 }: ErrorPageProps) {
   useEffect(() => {
@@ -87,7 +87,7 @@ export function ErrorPage({
                 className="w-full sm:w-auto"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Coba Lagi
+                Try Again
               </Button>
 
               {showBackButton && (
@@ -110,7 +110,7 @@ export function ErrorPage({
               >
                 <Link href="/">
                   <Home className="w-4 h-4 mr-2" />
-                  Beranda
+                  Home
                 </Link>
               </Button>
             </div>
@@ -127,8 +127,8 @@ export default function RouteError(
   return (
     <ErrorPage
       {...props}
-      title="Terjadi Kesalahan"
-      description="Maaf, terjadi kesalahan pada halaman ini. Silakan coba lagi atau kembali ke halaman sebelumnya."
+      title="An Error Occurred"
+      description="Sorry, an error occurred on this page. Please try again or go back to the previous page."
     />
   );
 }

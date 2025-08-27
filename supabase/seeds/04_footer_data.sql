@@ -114,7 +114,7 @@ BEGIN
     WHERE NOT EXISTS (SELECT 1 FROM footer_links WHERE footer_section_id = company_section_id AND url = '/team');
     
     INSERT INTO footer_links (footer_section_id, title, url, icon, is_external, sort_order, is_active)
-    SELECT company_section_id, 'Karir', '/careers', 'Briefcase', false, 3, true
+    SELECT company_section_id, 'Career', '/careers', 'Briefcase', false, 3, true
     WHERE NOT EXISTS (SELECT 1 FROM footer_links WHERE footer_section_id = company_section_id AND url = '/careers');
     
     INSERT INTO footer_links (footer_section_id, title, url, icon, is_external, sort_order, is_active)

@@ -13,9 +13,9 @@ export default function BlogError({
     <ErrorPage
       error={error}
       reset={reset}
-      title="Kesalahan Blog"
-      description="Terjadi kesalahan saat memuat konten blog. Silakan coba lagi atau kembali ke halaman blog utama."
-      backButtonText="Daftar Blog"
+      title="Blog Error"
+      description="An error occurred while loading blog content. Please try again or return to the main blog page."
+      backButtonText="Blog List"
       backButtonHref="/blog"
     />
   );

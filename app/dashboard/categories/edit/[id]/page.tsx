@@ -38,7 +38,7 @@ export default function EditCategoryPage() {
         });
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Gagal memuat data kategori"
+          err instanceof Error ? err.message : "Failed to load category data"
         );
       } finally {
         setIsLoading(false);
@@ -56,7 +56,7 @@ export default function EditCategoryPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Memuat data kategori...</p>
+            <p>Loading category data...</p>
           </div>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function EditCategoryPage() {
               href="/dashboard/categories"
               className="text-primary hover:underline"
             >
-              ← Kembali ke Categories
+              ← Back to Categories
             </Link>
           </div>
         </div>
@@ -86,12 +86,12 @@ export default function EditCategoryPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Kategori", href: "/dashboard/categories" },
+          { label: "Categories", href: "/dashboard/categories" },
           {
-            label: "Edit Kategori",
+            label: "Edit Category",
             href: `/dashboard/categories/edit/${categoryId}`,
           },
-          { label: "Form Edit", isCurrentPage: true },
+          { label: "Edit Form", isCurrentPage: true },
         ]}
       />
 
@@ -99,7 +99,7 @@ export default function EditCategoryPage() {
       <div className="flex items-center gap-4">
         <BackButton
           href="/dashboard/categories"
-          label="Kembali ke Categories"
+          label="Back to Categories"
         />
       </div>
 

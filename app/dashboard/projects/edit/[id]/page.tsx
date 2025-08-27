@@ -63,17 +63,17 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
   return (
     <DashboardFormTemplate
       breadcrumbs={[
-        { label: "Proyek", href: "/dashboard/projects" },
+        { label: "Projects", href: "/dashboard/projects" },
         {
-          label: "Edit Proyek",
+          label: "Edit Project",
           href: `/dashboard/projects/edit/${project.id}`,
         },
-        { label: "Form Edit", isCurrentPage: true },
+        { label: "Edit Form", isCurrentPage: true },
       ]}
       title="Edit Project"
       description="Update project information"
       backHref="/dashboard/projects"
-      backLabel="Kembali ke Projects"
+      backLabel="Back to Projects"
     >
       <div className="dashboard-form-container">
         <ProjectForm

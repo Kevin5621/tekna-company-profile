@@ -114,11 +114,11 @@ export default function ProjectsPageClient({
   return (
     <DashboardPageTemplate
       breadcrumbs={[
-        { label: "Proyek", href: "/dashboard/projects" },
-        { label: "Daftar Proyek", isCurrentPage: true },
+        { label: "Projects", href: "/dashboard/projects" },
+        { label: "Project List", isCurrentPage: true },
       ]}
-      title="Kelola Proyek"
-      description="Kelola semua proyek perusahaan dalam satu tempat"
+      title="Manage Projects"
+      description="Manage all company projects in one place"
       actions={actions}
     >
       {/* Actions Bar */}
@@ -127,7 +127,7 @@ export default function ProjectsPageClient({
           <div className="relative w-full sm:w-80">
             <IconSearch className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari proyek..."
+              placeholder="Search projects..."
               className="pl-8"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -174,7 +174,7 @@ export default function ProjectsPageClient({
                   <div className="flex gap-2">
                     {project.is_featured && (
                       <Badge variant="secondary" className="text-xs">
-                        Unggulan
+                        Featured
                       </Badge>
                     )}
                   </div>

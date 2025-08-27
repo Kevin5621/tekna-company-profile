@@ -142,7 +142,7 @@ export function ProjectForm({
           globalMutate("/api/projects");
           toast({
             title: "Error",
-            description: "Gagal membuat proyek. Silakan coba lagi.",
+            description: "Failed to create project. Please try again.",
             variant: "destructive",
           });
         }
@@ -211,22 +211,22 @@ export function ProjectForm({
       {/* Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Informasi Proyek</CardTitle>
+          <CardTitle>Project Information</CardTitle>
           <CardDescription>
-            Lengkapi informasi proyek dengan benar
+            Complete the project information correctly
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Nama Proyek */}
+              {/* Project Name */}
               <div className="space-y-2">
-                <Label htmlFor="name">Nama Proyek *</Label>
+                <Label htmlFor="name">Project Name *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="Contoh: Website E-commerce Modern"
+                  placeholder="Example: Modern E-commerce Website"
                   required
                 />
               </div>
@@ -246,13 +246,13 @@ export function ProjectForm({
                   placeholder="website-e-commerce-modern"
                 />
                 <p className="text-xs text-muted-foreground">
-                  URL slug akan dibuat otomatis dari nama proyek
+                  URL slug will be automatically generated from the project name
                 </p>
               </div>
 
-              {/* Deskripsi Proyek */}
+              {/* Project Description */}
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="description">Deskripsi Proyek</Label>
+                <Label htmlFor="description">Project Description</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
@@ -262,14 +262,14 @@ export function ProjectForm({
                       description: e.target.value,
                     }))
                   }
-                  placeholder="Deskripsi lengkap tentang proyek ini..."
+                  placeholder="Complete description about this project..."
                   rows={4}
                 />
               </div>
 
-              {/* URL Proyek */}
+              {/* Project URL */}
               <div className="space-y-2">
-                <Label htmlFor="project_url">URL Proyek</Label>
+                <Label htmlFor="project_url">Project URL</Label>
                 <Input
                   id="project_url"
                   type="url"
@@ -287,7 +287,7 @@ export function ProjectForm({
 
             {/* Featured Image Upload */}
             <div className="space-y-4">
-              <Label htmlFor="featured_image">Gambar Unggulan Proyek</Label>
+              <Label htmlFor="featured_image">Featured Project Image</Label>
               
               {/* Current Image Display */}
               {formData.featured_image_url && (
@@ -305,13 +305,13 @@ export function ProjectForm({
                       size="icon"
                       className="absolute top-2 right-2 h-8 w-8"
                       onClick={removeFeaturedImage}
-                      aria-label="Hapus gambar"
+                      aria-label="Remove image"
                     >
                       <IconX className="h-4 w-4" />
                     </Button>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2 text-center">
-                    Gambar telah dipilih. Klik hapus untuk mengganti gambar
+                    Image has been selected. Click remove to change image
                   </p>
                 </div>
               )}
@@ -326,10 +326,10 @@ export function ProjectForm({
                     className="w-full"
                   >
                     <IconUpload className="h-4 w-4 mr-2" />
-                    Upload Gambar Proyek
+                    Upload Project Image
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
-                    Upload gambar proyek (JPG, PNG, WebP, SVG - max 5MB)
+                    Upload project image (JPG, PNG, WebP, SVG - max 5MB)
                   </p>
                 </div>
               )}
@@ -343,14 +343,14 @@ export function ProjectForm({
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h4 id="upload-dialog-title" className="font-medium">
-                      Upload Gambar Proyek
+                      Upload Project Image
                     </h4>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowImageUpload(false)}
-                      aria-label="Tutup dialog upload"
+                      aria-label="Close upload dialog"
                     >
                       <IconX className="h-4 w-4" />
                     </Button>
@@ -361,7 +361,7 @@ export function ProjectForm({
                     maxFileSize={10 * 1024 * 1024} // 10MB
                     onUploadSuccess={handleMediaUploadSuccess}
                     onUploadError={handleMediaUploadError}
-                    placeholder="Drag & drop gambar proyek di sini atau klik untuk memilih"
+                    placeholder="Drag & drop project image here or click to select"
                     accept="image/*"
                   />
                 </div>
@@ -370,7 +370,7 @@ export function ProjectForm({
               {/* Manual URL Input */}
               <div className="space-y-2">
                 <Label htmlFor="featured_image_url">
-                  Atau masukkan URL Gambar manual
+                  Or enter a manual image URL
                 </Label>
                 <Input
                   id="featured_image_url"
@@ -385,8 +385,7 @@ export function ProjectForm({
                   placeholder="https://example.com/image.jpg"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Opsional: Anda bisa memasukkan URL gambar eksternal
-                  sebagai alternatif dari upload
+                  Optional: You can enter an external image URL as an alternative to upload
                 </p>
               </div>
 
@@ -402,7 +401,7 @@ export function ProjectForm({
                     }))
                   }
                 />
-                <Label htmlFor="is_featured">Jadikan proyek unggulan</Label>
+                <Label htmlFor="is_featured">Make project featured</Label>
               </div>
             </div>
 
@@ -412,14 +411,14 @@ export function ProjectForm({
                 {isLoading && (
                   <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
                 )}
-                {mode === "create" ? "Buat Proyek" : "Update Proyek"}
+                {mode === "create" ? "Create Project" : "Update Project"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => router.back()}
               >
-                Batal
+                Cancel
               </Button>
             </div>
           </form>

@@ -141,8 +141,8 @@ export default function SettingsPage() {
   return (
     <DashboardPageTemplate
       breadcrumbs={[
-        { label: "Pengaturan", href: "/dashboard/settings" },
-        { label: "Konfigurasi Sistem", isCurrentPage: true },
+        { label: "Settings", href: "/dashboard/settings" },
+        { label: "System Configuration", isCurrentPage: true },
       ]}
       title="System Settings"
       description="Configure company settings and system preferences"

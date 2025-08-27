@@ -164,15 +164,15 @@ export default function CategoriesPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Karir", href: "/dashboard/career" },
-          { label: "Kategori Karir", href: "/dashboard/career/categories" },
-          { label: "Manajemen Kategori", isCurrentPage: true },
+          { label: "Career", href: "/dashboard/career" },
+          { label: "Career Categories", href: "/dashboard/career/categories" },
+          { label: "Category Management", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+        <BackButton href="/dashboard/career" label="Back to Career" />
       </div>
 
       {/* Header */}

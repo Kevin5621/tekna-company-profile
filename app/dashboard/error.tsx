@@ -13,8 +13,8 @@ export default function DashboardError({
     <ErrorPage
       error={error}
       reset={reset}
-      title="Kesalahan Dashboard"
-      description="Terjadi kesalahan pada dashboard. Silakan refresh halaman atau hubungi administrator jika masalah berlanjut."
+      title="Dashboard Error"
+      description="An error occurred on the dashboard. Please refresh the page or contact the administrator if the problem persists."
       backButtonText="Dashboard"
       backButtonHref="/dashboard"
     />

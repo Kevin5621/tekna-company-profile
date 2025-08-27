@@ -5,13 +5,13 @@ export default function NewProjectPage() {
   return (
     <DashboardFormTemplate
       breadcrumbs={[
-        { label: "Proyek", href: "/dashboard/projects" },
-        { label: "Tambah Proyek Baru", isCurrentPage: true },
+        { label: "Projects", href: "/dashboard/projects" },
+        { label: "Add New Project", isCurrentPage: true },
       ]}
-      title="Tambah Proyek Baru"
-      description="Buat proyek baru untuk ditampilkan di website"
+      title="Add New Project"
+      description="Create a new project to display on the website"
       backHref="/dashboard/projects"
-      backLabel="Kembali ke Projects"
+      backLabel="Back to Projects"
     >
       <div className="dashboard-form-container">
         <ProjectForm mode="create" />

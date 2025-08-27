@@ -162,15 +162,15 @@ export default function TypesPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Karir", href: "/dashboard/career" },
-          { label: "Tipe Karir", href: "/dashboard/career/types" },
-          { label: "Manajemen Tipe", isCurrentPage: true },
+          { label: "Career", href: "/dashboard/career" },
+          { label: "Career Types", href: "/dashboard/career/types" },
+          { label: "Type Management", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/career" label="Kembali ke Career" />
+        <BackButton href="/dashboard/career" label="Back to Career" />
       </div>
 
       {/* Header */}
