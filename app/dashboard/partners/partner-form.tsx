@@ -18,7 +18,6 @@ import { ImageUpload } from "@/components/ui/image-upload";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
 import Link from "next/link";
-import { DashboardFormTemplate } from "@/components/dashboard/dashboard-form-template";
 
 interface PartnerFormData {
   name: string;
@@ -142,121 +141,93 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
   };
 
   return (
-    <DashboardFormTemplate
-      breadcrumbs={[
-        { label: "Partners", href: "/dashboard/partners" },
-        { label: isEdit ? "Edit Partner" : "New Partner", isCurrentPage: true },
-      ]}
-      title={isEdit ? "Edit Partner" : "Add New Partner"}
-      description={
-        isEdit
-          ? "Update partner information"
-          : "Create a new partner with logo, name, and description"
-      }
-      backHref="/dashboard/partners"
-      backLabel="Back to Partners"
-    >
-      {/* Form */}
-      <div className="max-w-2xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle>Partner Information</CardTitle>
-            <CardDescription>
-              Fill in the basic information for this partner
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Partner Name */}
-              <div className="space-y-2">
-                <Label htmlFor="name">
-                  Partner Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  placeholder="Enter partner name"
-                  required
-                />
-              </div>
+    // Form content only — the surrounding page should provide DashboardFormTemplate
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Partner Information</CardTitle>
+          <CardDescription>Fill in the basic information for this partner</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Partner Name */}
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                Partner Name <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                value={formData.name}
+                onChange={(e) => handleChange("name", e.target.value)}
+                placeholder="Enter partner name"
+                required
+              />
+            </div>
 
-              {/* Logo Upload */}
-              <div className="space-y-2">
-                <ImageUpload
-                  value={formData.logo_url}
-                  onChange={(url) => handleChange("logo_url", url)}
-                  bucket="media"
-                  path="partners"
-                  placeholder="Upload partner logo"
-                />
-                <p className="text-sm text-muted-foreground">
-                  Upload the partner&apos;s logo image (JPG, PNG, WebP, SVG -
-                  max 5MB)
-                </p>
-              </div>
+            {/* Logo Upload */}
+            <div className="space-y-2">
+              <ImageUpload
+                value={formData.logo_url}
+                onChange={(url) => handleChange("logo_url", url)}
+                bucket="media"
+                path="partners"
+                placeholder="Upload partner logo"
+              />
+              <p className="text-sm text-muted-foreground">
+                Upload the partner&apos;s logo image (JPG, PNG, WebP, SVG - max 5MB)
+              </p>
+            </div>
 
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleChange("description", e.target.value)}
-                  placeholder="Brief description of the partner"
-                  rows={4}
-                />
-                <p className="text-sm text-muted-foreground">
-                  A short description about this partner
-                </p>
-              </div>
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+                placeholder="Brief description of the partner"
+                rows={4}
+              />
+              <p className="text-sm text-muted-foreground">A short description about this partner</p>
+            </div>
 
-              {/* Website */}
-              <div className="space-y-2">
-                <Label htmlFor="website">Website</Label>
-                <Input
-                  id="website"
-                  type="url"
-                  value={formData.website}
-                  onChange={(e) => handleChange("website", e.target.value)}
-                  placeholder="https://partner-website.com"
-                />
-                <p className="text-sm text-muted-foreground">
-                  Partner&apos;s official website URL
-                </p>
-              </div>
+            {/* Website */}
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                type="url"
+                value={formData.website}
+                onChange={(e) => handleChange("website", e.target.value)}
+                placeholder="https://partner-website.com"
+              />
+              <p className="text-sm text-muted-foreground">Partner&apos;s official website URL</p>
+            </div>
 
-              {/* Active Status */}
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active}
-                  onCheckedChange={(checked) =>
-                    handleChange("is_active", checked)
-                  }
-                />
-                <Label htmlFor="is_active">Active Partner</Label>
-              </div>
+            {/* Active Status */}
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="is_active"
+                checked={formData.is_active}
+                onCheckedChange={(checked) => handleChange("is_active", checked)}
+              />
+              <Label htmlFor="is_active">Active Partner</Label>
+            </div>
 
-              {/* Submit Button */}
-              <div className="flex gap-4 pt-6">
-                <Button type="submit" disabled={loading}>
-                  <Save className="w-4 h-4 mr-2" />
-                  {loading
-                    ? "Saving..."
-                    : isEdit
-                    ? "Update Partner"
-                    : "Create Partner"}
-                </Button>
-                <Button type="button" variant="outline" asChild>
-                  <Link href="/dashboard/partners">Cancel</Link>
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </DashboardFormTemplate>
+            {/* Submit Button */}
+            <div className="flex gap-4 pt-6">
+              <Button type="submit" disabled={loading}>
+                <Save className="w-4 h-4 mr-2" />
+                {loading ? "Saving..." : isEdit ? "Update Partner" : "Create Partner"}
+              </Button>
+              <Button type="button" variant="outline" asChild>
+                <Link href="/dashboard/partners">Cancel</Link>
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -22,7 +22,9 @@ export default function EditPartnerPage() {
       backLabel="Back to Partners"
     >
       <Suspense fallback={<Skeleton className="w-full h-96" />}>
-        <PartnerForm partnerId={partnerId} />
+        <div className="dashboard-form-container">
+          <PartnerForm partnerId={partnerId} />
+        </div>
       </Suspense>
     </DashboardFormTemplate>
   );
