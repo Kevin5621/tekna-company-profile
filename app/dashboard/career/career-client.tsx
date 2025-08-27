@@ -11,6 +11,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { /* Input,  */ } from "@/components/ui/input";
 import { /* Select, SelectContent, SelectItem, SelectTrigger, SelectValue */ } from "@/components/ui/select";
 import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
@@ -166,6 +174,54 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
             <p className="text-sm text-muted-foreground">Coming soon</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Positions table */}
+      <div className="mt-6">
+        <div className="overflow-hidden rounded-lg border">
+          <Table>
+            <TableHeader className="bg-muted sticky top-0 z-10">
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Level</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Applications</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).length ? (
+                ((positionsPayload?.data as CareerPosition[]) || initialPositions || []).map((p: CareerPosition) => (
+                  <TableRow key={p.id}>
+                    <TableCell>
+                      <Link href={`/dashboard/career/${p.id}`} prefetch={false}>
+                        {p.title}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{p.location?.name || "-"}</TableCell>
+                    <TableCell>{p.type?.name || "-"}</TableCell>
+                    <TableCell>{p.level?.name || "-"}</TableCell>
+                    <TableCell>{p.status}</TableCell>
+                    <TableCell>{p.applications_count || 0}</TableCell>
+                    <TableCell className="text-right">
+                      <Link href={`/dashboard/career/${p.id}/edit`} prefetch={false}>
+                        Edit
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    No positions.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </DashboardPageTemplate>
   );
