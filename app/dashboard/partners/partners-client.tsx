@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus, Edit, Trash2, ExternalLink, Building2 } from "lucide-react";
+import { Plus, Edit, Trash2, Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,14 +17,9 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
 
 interface Partner {
   id: string;
-  name: string;
   logo_url: string | null;
-  description: string | null;
-  website: string | null;
-  sort_order: number;
   created_at: string;
   updated_at: string;
-  is_active: boolean;
 }
 interface PartnersClientProps {
   initialPartners: Partner[];
@@ -127,7 +121,7 @@ export default function PartnersClient({ initialPartners }: PartnersClientProps)
         { label: "Partners", isCurrentPage: true },
       ]}
       title="Partners Management"
-      description="Manage your company partners with logo, name, and description"
+  description="Manage your company partners with logo images"
       actions={actions}
     >
       {/* Stats */}
@@ -145,14 +139,14 @@ export default function PartnersClient({ initialPartners }: PartnersClientProps)
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active Partners
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Last updated</CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {partners.filter((p) => p.is_active).length}
+            <div className="text-sm">
+              {partners.length > 0
+                ? `Most recent: ${new Date(partners[0].updated_at).toLocaleDateString()}`
+                : "No updates yet"}
             </div>
           </CardContent>
         </Card>
@@ -165,63 +159,48 @@ export default function PartnersClient({ initialPartners }: PartnersClientProps)
             key={partner.id}
             className="group hover:shadow-lg transition-shadow"
           >
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="text-lg">{partner.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {partner.description || "No description provided"}
-                  </CardDescription>
-                </div>
-                {partner.logo_url && (
-                  <div className="relative w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
-                    <Image
-                      src={partner.logo_url}
-                      alt={partner.name}
-                      fill
-                      className="object-contain p-1"
-                      sizes="48px"
-                    />
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {partner.logo_url ? (
+                      <div className="relative w-20 h-12 bg-gray-100 rounded-lg overflow-hidden">
+                        <Image
+                          src={partner.logo_url}
+                          alt={`partner-${partner.id}`}
+                          fill
+                          className="object-contain p-1"
+                          sizes="80px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-20 h-12 bg-gray-100 rounded-lg" />
+                    )}
                   </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {partner.website && (
-                  <div className="text-sm">
-                    <a
-                      href={partner.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline flex items-center gap-1"
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/dashboard/partners/edit/${partner.id}`} prefetch={false}>
+                        <Edit className="w-4 h-4 mr-1" />
+                        Edit
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(partner.id, `partner-${partner.id}`)}
+                      disabled={deleting === partner.id}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
-                      Visit Website
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      {deleting === partner.id ? "Deleting..." : "Delete"}
+                    </Button>
                   </div>
-                )}
-
-                <div className="flex items-center gap-2 pt-4">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/dashboard/partners/edit/${partner.id}`} prefetch={false}>
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(partner.id, partner.name)}
-                    disabled={deleting === partner.id}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    {deleting === partner.id ? "Deleting..." : "Delete"}
-                  </Button>
+                  </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="text-sm text-muted-foreground">Added {new Date(partner.created_at).toLocaleDateString()}</div>
                 </div>
-              </div>
-            </CardContent>
+              </CardContent>
           </Card>
         ))}
       </div>

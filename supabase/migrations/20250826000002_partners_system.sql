@@ -9,12 +9,8 @@
 -- Partners table (simplified)
 CREATE TABLE partners (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(255) NOT NULL,
-    logo_url TEXT,
-    description VARCHAR(500),
-    website VARCHAR(500),
-    sort_order INTEGER DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
+    -- simplified: keep only logo (image) and timestamps
+    logo_url TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -23,8 +19,7 @@ CREATE TABLE partners (
 -- INDEXES
 -- =====================================================
 
-CREATE INDEX idx_partners_active ON partners(is_active);
-CREATE INDEX idx_partners_sort_order ON partners(sort_order);
+-- indexes removed: partners now only stores logos and timestamps
 
 -- =====================================================
 -- RLS POLICIES
@@ -33,9 +28,9 @@ CREATE INDEX idx_partners_sort_order ON partners(sort_order);
 -- Enable RLS
 ALTER TABLE partners ENABLE ROW LEVEL SECURITY;
 
--- Partners policies
-CREATE POLICY "Anyone can view active partners" ON partners
-    FOR SELECT USING (is_active = true);
+-- Partners policies: allow anyone to select logos, management restricted
+CREATE POLICY "Anyone can view partners (logos)" ON partners
+    FOR SELECT USING (true);
 
 CREATE POLICY "Admins and editors can manage partners" ON partners
     FOR ALL USING (get_user_role(auth.uid()) IN ('admin', 'editor'));

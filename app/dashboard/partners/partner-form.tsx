@@ -10,21 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+// removed unused form field components; this form only uses ImageUpload now
 import { ImageUpload } from "@/components/ui/image-upload";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
 import Link from "next/link";
 
 interface PartnerFormData {
-  name: string;
   logo_url: string;
-  description: string;
-  website: string;
-  is_active: boolean;
 }
 
 interface PartnerFormProps {
@@ -36,17 +29,13 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PartnerFormData>({
-    name: "",
     logo_url: "",
-    description: "",
-    website: "",
-    is_active: true,
   });
 
   const isEdit = Boolean(partnerId);
 
   useEffect(() => {
-    if (partnerId) {
+      if (partnerId) {
       const fetchPartner = async () => {
         try {
           const response = await fetch(`/api/partners/${partnerId}`);
@@ -55,11 +44,7 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
           if (data.success) {
             const partner = data.partner;
             setFormData({
-              name: partner.name || "",
               logo_url: partner.logo_url || "",
-              description: partner.description || "",
-              website: partner.website || "",
-              is_active: partner.is_active,
             });
           } else {
             throw new Error(data.error || "Failed to fetch partner");
@@ -82,10 +67,10 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
+    if (!formData.logo_url || !formData.logo_url.trim()) {
       toast({
         title: "Error",
-        description: "Partner name is required",
+        description: "Partner logo is required",
         variant: "destructive",
       });
       return;
@@ -130,14 +115,8 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
     }
   };
 
-  const handleChange = (
-    field: keyof PartnerFormData,
-    value: string | boolean
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleChange = (value: string) => {
+    setFormData({ logo_url: value });
   };
 
   return (
@@ -150,69 +129,18 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Partner Name */}
-            <div className="space-y-2">
-              <Label htmlFor="name">
-                Partner Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name"
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleChange("name", e.target.value)}
-                placeholder="Enter partner name"
-                required
-              />
-            </div>
-
             {/* Logo Upload */}
             <div className="space-y-2">
               <ImageUpload
                 value={formData.logo_url}
-                onChange={(url) => handleChange("logo_url", url)}
+                onChange={(url) => handleChange(url)}
                 bucket="media"
                 path="partners"
                 placeholder="Upload partner logo"
               />
               <p className="text-sm text-muted-foreground">
-                Upload the partner&apos;s logo image (JPG, PNG, WebP, SVG - max 5MB)
+                Upload the partner logo image (JPG, PNG, WebP, SVG - max 5MB)
               </p>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleChange("description", e.target.value)}
-                placeholder="Brief description of the partner"
-                rows={4}
-              />
-              <p className="text-sm text-muted-foreground">A short description about this partner</p>
-            </div>
-
-            {/* Website */}
-            <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
-              <Input
-                id="website"
-                type="url"
-                value={formData.website}
-                onChange={(e) => handleChange("website", e.target.value)}
-                placeholder="https://partner-website.com"
-              />
-              <p className="text-sm text-muted-foreground">Partner&apos;s official website URL</p>
-            </div>
-
-            {/* Active Status */}
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_active"
-                checked={formData.is_active}
-                onCheckedChange={(checked) => handleChange("is_active", checked)}
-              />
-              <Label htmlFor="is_active">Active Partner</Label>
             </div>
 
             {/* Submit Button */}
