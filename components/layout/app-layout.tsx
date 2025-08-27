@@ -14,6 +14,15 @@ interface AppLayoutProps {
 export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
+  // Memoize sidebar toggle handler untuk mencegah re-render yang tidak perlu
+  const handleSidebarToggle = React.useCallback(() => {
+    setSidebarOpen(prev => !prev);
+  }, []);
+
+  const handleSidebarClose = React.useCallback(() => {
+    setSidebarOpen(false);
+  }, []);
+
   return (
     <div className="flex h-screen bg-background dashboard-layout">
       {/* Desktop Sidebar - Always visible on desktop */}
@@ -30,6 +39,7 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
             variant="ghost"
             size="icon"
             className="md:hidden fixed top-4 left-4 z-50"
+            onClick={handleSidebarToggle}
           >
             <Menu className="h-4 w-4" />
             <span className="sr-only">Toggle sidebar</span>
@@ -44,7 +54,7 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setSidebarOpen(false)}
+                onClick={handleSidebarClose}
               >
                 <X className="h-4 w-4" />
               </Button>

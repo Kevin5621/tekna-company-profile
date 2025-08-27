@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 
 interface BreadcrumbItem {
@@ -15,7 +15,7 @@ interface DashboardPageTemplateProps {
   actions?: ReactNode;
 }
 
-export function DashboardPageTemplate({
+export const DashboardPageTemplate = React.memo(function DashboardPageTemplate({
   breadcrumbs,
   title,
   description,
@@ -42,4 +42,4 @@ export function DashboardPageTemplate({
       {children}
     </div>
   );
-}
+});

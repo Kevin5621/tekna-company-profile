@@ -92,7 +92,8 @@ const bottomNavigationItems: NavigationItem[] = [
   },
 ];
 
-function NavigationItems() {
+// Memoized navigation items untuk mencegah re-render yang tidak perlu
+const NavigationItems = React.memo(function NavigationItems() {
   const pathname = usePathname();
   const { user } = useSession();
   const [currentAdmin, setCurrentAdmin] = React.useState<AdminUser | null>(
@@ -108,10 +109,10 @@ function NavigationItems() {
   }, [user]);
 
   // Filter items based on user role
-  const filteredItems = navigationItems.filter((item) => {
-    if (!currentAdmin) return false;
-    return item.roles.includes(currentAdmin.role);
-  });
+  const filteredItems = React.useMemo(() => {
+    if (!currentAdmin) return [];
+    return navigationItems.filter((item) => item.roles.includes(currentAdmin.role));
+  }, [currentAdmin]);
 
   return (
     <nav className="flex-1 px-4 pt-4 space-y-2">
@@ -123,7 +124,6 @@ function NavigationItems() {
           <Link
             key={item.href}
             href={item.href}
-            prefetch={false}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               "hover:bg-sidebar-accent hover:text-white",
@@ -149,9 +149,10 @@ function NavigationItems() {
       })}
     </nav>
   );
-}
+});
 
-function BottomNavigationItems() {
+// Memoized bottom navigation items
+const BottomNavigationItems = React.memo(function BottomNavigationItems() {
   const pathname = usePathname();
   const { user } = useSession();
   const [currentAdmin, setCurrentAdmin] = React.useState<AdminUser | null>(
@@ -167,10 +168,10 @@ function BottomNavigationItems() {
   }, [user]);
 
   // Filter items based on user role
-  const filteredItems = bottomNavigationItems.filter((item) => {
-    if (!currentAdmin) return false;
-    return item.roles.includes(currentAdmin.role);
-  });
+  const filteredItems = React.useMemo(() => {
+    if (!currentAdmin) return [];
+    return bottomNavigationItems.filter((item) => item.roles.includes(currentAdmin.role));
+  }, [currentAdmin]);
 
   return (
     <nav className="px-4 pt-4 space-y-2">
@@ -182,7 +183,6 @@ function BottomNavigationItems() {
           <Link
             key={item.href}
             href={item.href}
-            prefetch={false}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               "hover:bg-sidebar-accent hover:text-white",
@@ -208,7 +208,7 @@ function BottomNavigationItems() {
       })}
     </nav>
   );
-}
+});
 
 export function AppSidebarNew() {
   const { user } = useSession();
@@ -217,8 +217,7 @@ export function AppSidebarNew() {
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
       {/* Logo/Brand */}
       <div className="flex items-center justify-center p-2 border-b border-sidebar-border">
-        {/* disable next/link prefetch to avoid preloading many dashboard routes */}
-        <Link href="/dashboard" prefetch={false} className="flex items-center justify-center">
+        <Link href="/dashboard" className="flex items-center justify-center">
           <Image
             src="/logo.webp"
             alt="Tekna Company Logo"

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -20,7 +20,7 @@ interface DashboardFormTemplateProps {
   actions?: ReactNode;
 }
 
-export function DashboardFormTemplate({
+export const DashboardFormTemplate = React.memo(function DashboardFormTemplate({
   breadcrumbs,
   title,
   description,
@@ -60,4 +60,4 @@ export function DashboardFormTemplate({
       {children}
     </div>
   );
-}
+});
