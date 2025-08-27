@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -25,7 +24,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { TrendingUp, Clock } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 interface DashboardChartProps {
   totalApplications?: number;
@@ -72,12 +71,9 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             Website Analytics
-            <Badge variant="outline" className="ml-2">
-              Partial Data
-            </Badge>
           </CardTitle>
           <CardDescription>
-            Displaying career application data (real) - Other analytics features coming soon
+            Displaying career application data 
           </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
@@ -155,7 +151,7 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
         <div className="flex items-center justify-center gap-6 pt-4 flex-wrap">
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-green-500" />
-            <span className="text-sm">Career Applications (Real Data)</span>
+            <span className="text-sm">Career Applications</span>
           </div>
           <div className="flex items-center gap-2 opacity-50">
             <div className="h-3 w-3 rounded-full bg-blue-500" />
@@ -171,18 +167,6 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
           </div>
         </div>
 
-        {/* Coming Soon Notice */}
-        <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-dashed">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">
-              Feature Under Development
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Analytics for website views, blog views, and career views will be available in Q1 2025. Currently only career application data is displayed in real-time.
-          </p>
-        </div>
       </CardContent>
     </Card>
   );

@@ -13,13 +13,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   IconUsers,
-  IconFolder,
-  IconArticle,
-  IconMessageCircle,
-  IconTrendingUp,
   IconEye,
   IconCalendar,
   IconBriefcase,
+  IconArticle,
 } from "@tabler/icons-react";
 import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
@@ -48,9 +45,8 @@ export default function DashboardPage() {
     // attach icons for UI
     data.stats = [
       { ...data.stats[0], icon: IconUsers },
-      { ...data.stats[1], icon: IconFolder },
-      { ...data.stats[2], icon: IconArticle },
-      { ...data.stats[3], icon: IconMessageCircle },
+      { ...data.stats[1], icon: IconEye },
+      { ...data.stats[2], icon: IconCalendar },
     ];
     return data;
   }, [apiPayload]);
@@ -64,8 +60,7 @@ export default function DashboardPage() {
       {/* show skeleton cards while loading */}
       {loading && (
         <>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <SkeletonCard />
+          <div className="grid gap-6 md:grid-cols-3">
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
@@ -77,25 +72,25 @@ export default function DashboardPage() {
       )}
 
       {fetchError && (
-        <div className="text-sm text-destructive">Gagal memuat data dashboard.</div>
+        <div className="text-sm text-destructive">Failed to load dashboard data.</div>
       )}
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
-        items={[{ label: "Beranda", isCurrentPage: true }]}
+        items={[{ label: "Home", isCurrentPage: true }]}
       />
 
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
-          Selamat Datang di Dashboard
+          Welcome to Dashboard
         </h1>
         <p className="text-muted-foreground mt-2">
-          Kelola website company profile Tekna Company dengan mudah dan efisien.
+          Manage Tekna Company website profile easily and efficiently.
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-3">
         {dashboardData?.stats?.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -111,7 +106,7 @@ export default function DashboardPage() {
                 <Badge variant={stat.changeType === "positive" ? "default" : "secondary"}>
                   {stat.change}
                 </Badge>
-                <span className="text-xs text-muted-foreground ml-2">dari bulan lalu</span>
+                <span className="text-xs text-muted-foreground ml-2">from last month</span>
               </div>
             </CardContent>
           </Card>
@@ -119,11 +114,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Analytics Chart */}
-  {/* Dashboard chart loaded only on client via dynamic import */}
-  <DashboardChart totalApplications={totalApplications} />
+      <DashboardChart totalApplications={totalApplications} />
 
-  {/* Analytics Section - Career Applications */}
-  <div className="grid gap-6 md:grid-cols-3">
+      {/* Career Applications Card */}
+      <div className="grid gap-6 md:grid-cols-1">
         {loading ? (
           <div className="col-span-1">
             <div className="animate-pulse bg-card/50 rounded-lg p-4">
@@ -136,59 +130,21 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Total Lamaran Karir
+                Total Career Applications
               </CardTitle>
               <IconBriefcase className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalApplications}</div>
               <p className="text-xs text-muted-foreground">
-                Total lamaran yang diterima
+                Total applications received
               </p>
               <div className="flex items-center pt-2">
-                <Badge variant="default">Aktif</Badge>
+                <Badge variant="default">Active</Badge>
               </div>
             </CardContent>
           </Card>
         )}
-        
-  <Card className="opacity-60">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Analytics Lainnya
-            </CardTitle>
-            <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-muted-foreground">
-              Coming Soon
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Fitur analitik mendalam
-            </p>
-            <div className="flex items-center pt-2">
-              <Badge variant="secondary">Q1 2025</Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="opacity-60">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Insights</CardTitle>
-            <IconEye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-muted-foreground">
-              Coming Soon
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Business intelligence
-            </p>
-            <div className="flex items-center pt-2">
-              <Badge variant="secondary">Segera hadir</Badge>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Recent Posts & Quick Actions */}
@@ -196,9 +152,9 @@ export default function DashboardPage() {
         {/* Recent Posts */}
         <Card>
           <CardHeader>
-            <CardTitle>Artikel Terbaru</CardTitle>
+            <CardTitle>Latest Articles</CardTitle>
             <CardDescription>
-              Artikel blog yang baru diterbitkan
+              Recently published blog articles
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -211,7 +167,7 @@ export default function DashboardPage() {
                         {post.title}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Oleh {post.author} • {post.views} views
+                        By {post.author} • {post.views} views
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -220,7 +176,7 @@ export default function DashboardPage() {
                           post.status === "published" ? "default" : "outline"
                         }
                       >
-                        {post.status === "published" ? "Diterbitkan" : "Draft"}
+                        {post.status === "published" ? "Published" : "Draft"}
                       </Badge>
                     </div>
                   </div>
@@ -229,7 +185,7 @@ export default function DashboardPage() {
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <IconArticle className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>Belum ada artikel</p>
+                <p>No articles yet</p>
               </div>
             )}
           </CardContent>
@@ -238,91 +194,40 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Aksi Cepat</CardTitle>
-            <CardDescription>Akses cepat ke fitur-fitur utama</CardDescription>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Quick access to main features</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
               <a
-                href="/dashboard/projects"
+                href="/dashboard/admin"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
-                <IconFolder className="h-6 w-6" />
-                <span className="text-sm font-medium">Kelola Proyek</span>
+                <IconUsers className="h-6 w-6" />
+                <span className="text-sm font-medium">Manage Team</span>
               </a>
               <a
                 href="/dashboard/blog"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
                 <IconArticle className="h-6 w-6" />
-                <span className="text-sm font-medium">Kelola Blog</span>
+                <span className="text-sm font-medium">Manage Blog</span>
               </a>
               <a
                 href="/dashboard/career"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
                 <IconUsers className="h-6 w-6" />
-                <span className="text-sm font-medium">Kelola Karir</span>
+                <span className="text-sm font-medium">Manage Career</span>
               </a>
               <a
                 href="/dashboard/settings"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
-                <IconTrendingUp className="h-6 w-6" />
-                <span className="text-sm font-medium">Pengaturan</span>
+                <IconCalendar className="h-6 w-6" />
+                <span className="text-sm font-medium">Settings</span>
               </a>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Additional Stats */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Layanan</CardTitle>
-            <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {dashboardData?.servicesCount ?? 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Layanan yang tersedia
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Views</CardTitle>
-            <IconEye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {(dashboardData?.recentPosts || [])
-                .reduce((total, post) => total + post.views, 0)
-                .toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground">Total views artikel</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Update Terakhir
-            </CardTitle>
-            <IconCalendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {new Date().toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "short",
-              })}
-            </div>
-            <p className="text-xs text-muted-foreground">Hari ini</p>
           </CardContent>
         </Card>
       </div>
