@@ -20,13 +20,13 @@ export function AdminHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
-        {/* Logo/Brand */}
-        <div className="flex items-center">
+        {/* Logo/Brand - Hidden on mobile to avoid overlap with menu button */}
+        <div className="hidden md:flex items-center">
           <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
         </div>
 
         {/* Right Side Actions - Only Theme Toggle and Logout */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 ml-auto">
           {/* Theme Switcher */}
           <ThemeSwitcher />
 
