@@ -1,20 +1,34 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://tekna.com/sitemap.xml
+# Allow important pages
+Allow: /about
+Allow: /services
+Allow: /portfolio
+Allow: /projects
+Allow: /career
+Allow: /blog
+Allow: /contact
+Allow: /partners
 
-# Disallow admin and dashboard areas
+# Block admin and private areas
 Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
 Disallow: /auth/
+
+# Block sensitive files
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /_next/
 Disallow: /api/
 
-# Allow blog and public pages
-Allow: /blog/
-Allow: /career/
-Allow: /projects/
-Allow: /partners/
-Allow: /testimonials/
+# Allow sitemap
+Allow: /sitemap.xml
+Allow: /robots.txt
 
-# Crawl delay
+# Crawl delay (optional)
 Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://teknasapujagat.com/sitemap.xml
