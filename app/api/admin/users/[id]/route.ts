@@ -1,98 +1,117 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// PATCH /api/admin/users/[id] - Update a specific user
+// Minimal typed surface for admin auth operations used here (avoid `any`)
+type SupabaseAdmin = {
+  auth?: {
+    admin?: {
+      updateUserById?: (
+        id: string,
+        opts: { user_metadata: Record<string, unknown> }
+      ) => Promise<{ error?: unknown }>;
+    };
+  };
+};
+
+// PATCH /api/admin/users/[id] - Update a specific admin user's role, active flag and display name
 export async function PATCH(request: NextRequest, context: unknown) {
   const { params } = (context as { params: { id: string } }) || {};
-  try {
-    const supabase = await createClient();
 
-    // Check user permissions
+  const supabase = await createClient();
+
+  // helper: ensure caller authenticated and has role
+  async function ensureCallerIsAdminOrEditor() {
     const {
-      data: { user },
+      data: { user: caller },
       error: authError,
     } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (authError || !caller) return { ok: false, status: 401 } as const;
+
+    const { data: callerRole, error: callerRoleError } = await supabase.rpc("get_user_role", { p_user_id: caller.id });
+    if (callerRoleError || !callerRole || !["admin", "editor"].includes(callerRole)) {
+      return { ok: false, status: 403 } as const;
+    }
+    return { ok: true } as const;
+  }
+
+  async function updateRoleAndActive(userId: string, role?: string, is_active?: boolean) {
+    if (typeof role === "undefined" && typeof is_active === "undefined") return;
+    const updates: Record<string, unknown> = {};
+    if (typeof role !== "undefined") updates.role = role;
+    if (typeof is_active !== "undefined") updates.is_active = is_active;
+
+    const { error: roleUpdateError } = await supabase.from("user_roles").update(updates).eq("user_id", userId);
+    if (roleUpdateError) {
+      console.error("Error updating user_roles:", roleUpdateError);
+      throw new Error("Failed to update user role");
+    }
+  }
+
+  async function upsertProfile(userId: string, displayName?: string | null) {
+    if (typeof displayName === "undefined") return;
+    const parts = (displayName || "").trim().split(/\s+/);
+    const first_name = parts.shift() || null;
+    const last_name = parts.length ? parts.join(" ") : null;
+
+    const { data: existingProfile, error: profileSelectError } = await supabase
+      .from("user_profiles")
+      .select("id")
+      .eq("user_id", userId)
+      .single();
+
+    if (profileSelectError) {
+      const code = (profileSelectError as unknown as { code?: string })?.code;
+      if (code && code !== "PGRST116") {
+        console.error("Error checking user_profiles:", profileSelectError);
+      }
     }
 
-    // Get user role
-    const { data: roleData, error: roleError } = await supabase.rpc(
-      "get_user_role",
-      {
-        p_user_id: user.id,
-      }
-    );
+    if (existingProfile) {
+      const { error: profileUpdateError } = await supabase.from("user_profiles").update({ first_name, last_name }).eq("user_id", userId);
+      if (profileUpdateError) console.error("Error updating user_profiles:", profileUpdateError);
+    } else {
+      const { error: profileInsertError } = await supabase.from("user_profiles").insert({ user_id: userId, first_name, last_name });
+      if (profileInsertError) console.error("Error inserting user_profiles:", profileInsertError);
+    }
+  }
 
-    if (roleError || !roleData || !["admin", "editor"].includes(roleData)) {
-      return NextResponse.json(
-        { error: "Insufficient permissions" },
-        { status: 403 }
-      );
+  async function updateAuthMetadata(userId: string, displayName?: string | null) {
+    if (typeof displayName === "undefined") return;
+    try {
+      const admin = supabase as unknown as SupabaseAdmin;
+      if (admin?.auth?.admin?.updateUserById) {
+        const { error: updateUserError } = await admin.auth!.admin!.updateUserById(userId, { user_metadata: { display_name: displayName } });
+        if (updateUserError) console.error("Error updating auth user metadata:", updateUserError);
+      }
+    } catch (e) {
+      console.warn("Auth metadata update not available, skipping.", e);
+    }
+  }
+
+  try {
+    const check = await ensureCallerIsAdminOrEditor();
+    if (!check.ok) {
+      return NextResponse.json({ error: check.status === 401 ? "Unauthorized" : "Insufficient permissions" }, { status: check.status });
     }
 
     const body = await request.json();
-    const {
-      name,
-      slug,
-      logo_url,
-      website,
-      email,
-      phone,
-      industry,
-      partnership_type,
-      partnership_since,
-      is_featured,
-      sort_order,
-      translations,
-    } = body;
+    const { display_name, role, is_active } = body as {
+      display_name?: string | null;
+      role?: string;
+      is_active?: boolean;
+    };
 
-    // Validate required fields
-    if (!name || !slug) {
-      return NextResponse.json(
-        { error: "Name and slug are required" },
-        { status: 400 }
-      );
+    if (role && !["admin", "editor", "hr"].includes(role)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    // Use the database function to update partner with translations
-    const { data: partnerId, error } = await supabase.rpc(
-      "update_partner_with_translations",
-      {
-        p_partner_id: params.id,
-        p_name: name,
-        p_slug: slug,
-        p_logo_url: logo_url,
-        p_website: website,
-        p_email: email,
-        p_phone: phone,
-        p_industry: industry,
-        p_partnership_type: partnership_type,
-        p_partnership_since: partnership_since,
-        p_is_featured: is_featured,
-        p_sort_order: sort_order,
-        p_translations: translations || null,
-      }
-    );
+    await updateRoleAndActive(params.id, role, is_active);
+    await upsertProfile(params.id, display_name);
+    await updateAuthMetadata(params.id, display_name);
 
-    if (error) {
-      console.error("Error updating partner:", error);
-      return NextResponse.json(
-        { error: "Failed to update partner" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      id: partnerId,
-      message: "Partner updated successfully",
-      success: true,
-    });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Unexpected error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    console.error("Unexpected error in PATCH /api/admin/users/[id]:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

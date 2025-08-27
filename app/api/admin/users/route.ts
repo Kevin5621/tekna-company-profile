@@ -104,10 +104,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate role
-    if (!["admin", "editor"].includes(role)) {
+    // Validate role (allow 'hr' as a valid admin-role variant)
+    if (!["admin", "editor", "hr"].includes(role)) {
       return NextResponse.json(
-        { error: "Invalid role. Must be admin or editor" },
+        { error: "Invalid role. Must be one of: admin, editor, hr" },
         { status: 400 }
       );
     }
