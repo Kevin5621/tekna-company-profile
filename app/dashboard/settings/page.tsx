@@ -42,7 +42,6 @@ interface CompanySettings {
   };
   features: {
     blog_enabled: boolean;
-    newsletter_enabled: boolean;
     contact_form_enabled: boolean;
     analytics_enabled: boolean;
   };
@@ -71,7 +70,6 @@ export default function SettingsPage() {
     },
     features: {
       blog_enabled: true,
-      newsletter_enabled: true,
       contact_form_enabled: true,
       analytics_enabled: true,
     },
@@ -366,20 +364,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Newsletter System</Label>
-              <p className="text-sm text-muted-foreground">
-                Enable newsletter subscriptions
-              </p>
-            </div>
-            <Switch
-              checked={settings.features.newsletter_enabled}
-              onCheckedChange={(checked) =>
-                updateSettings("features.newsletter_enabled", checked)
-              }
-            />
-          </div>
+          {/* Newsletter system removed */}
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">

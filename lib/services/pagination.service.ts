@@ -2,8 +2,6 @@ import { createClient } from "@/lib/supabase/client";
 import type {
   Post,
   Project,
-  NewsletterSubscription,
-  Category,
   Tag,
 } from "@/lib/types/dashboard";
 
@@ -157,95 +155,7 @@ export class PaginationService {
   /**
    * Get paginated newsletter subscriptions (super admin only)
    */
-  static async getPaginatedNewsletterSubscriptions(
-    page_number: number = 1,
-    page_size: number = 20,
-    search_query?: string
-  ): Promise<PaginatedResult<NewsletterSubscription>> {
-    const supabase = createClient();
-
-    try {
-      let query = supabase
-        .from("newsletter_subscriptions")
-        .select("*", { count: "exact" });
-
-      // Apply search filter
-      if (search_query) {
-        query = query.or(
-          `email.ilike.%${search_query}%,first_name.ilike.%${search_query}%,last_name.ilike.%${search_query}%`
-        );
-      }
-
-      const { data, error, count } = await query
-        .order("subscribed_at", { ascending: false })
-        .range((page_number - 1) * page_size, page_number * page_size - 1);
-
-      if (error) throw error;
-
-      const total_count = count || 0;
-      const total_pages = Math.ceil(total_count / page_size);
-
-      return {
-        data: data || [],
-        total_count,
-        page_number,
-        page_size,
-        total_pages,
-        has_next: page_number < total_pages,
-        has_previous: page_number > 1,
-      };
-    } catch (error) {
-      console.error("Error getting paginated newsletter subscriptions:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get paginated categories
-   */
-  static async getPaginatedCategories(
-    page_number: number = 1,
-    page_size: number = 50,
-    search_query?: string
-  ): Promise<PaginatedResult<Category>> {
-    const supabase = createClient();
-
-    try {
-      let query = supabase
-        .from("categories")
-        .select("*", { count: "exact" })
-        .eq("is_active", true);
-
-      // Apply search filter
-      if (search_query) {
-        query = query.or(
-          `name.ilike.%${search_query}%,description.ilike.%${search_query}%`
-        );
-      }
-
-      const { data, error, count } = await query
-        .order("sort_order", { ascending: true })
-        .range((page_number - 1) * page_size, page_number * page_size - 1);
-
-      if (error) throw error;
-
-      const total_count = count || 0;
-      const total_pages = Math.ceil(total_count / page_size);
-
-      return {
-        data: data || [],
-        total_count,
-        page_number,
-        page_size,
-        total_pages,
-        has_next: page_number < total_pages,
-        has_previous: page_number > 1,
-      };
-    } catch (error) {
-      console.error("Error getting paginated categories:", error);
-      throw error;
-    }
-  }
+  // Newsletter subscription pagination removed
 
   /**
    * Get paginated tags

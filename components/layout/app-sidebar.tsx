@@ -17,7 +17,6 @@ import {
   FolderOpen,
   FileText,
   Settings,
-  Mail,
   Shield,
   User,
   Footprints,
@@ -74,12 +73,6 @@ const navigationItems: NavigationItem[] = [
     title: "Admin",
     href: "/dashboard/admin",
     icon: Shield,
-    roles: ["admin"],
-  },
-  {
-    title: "Newsletter",
-    href: "/dashboard/newsletter",
-    icon: Mail,
     roles: ["admin"],
   },
 ];
