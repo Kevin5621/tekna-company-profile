@@ -5,6 +5,7 @@ import { SessionProvider } from '@/components/session-provider'
 import { AnalyticsTracker } from '@/components/analytics-tracker'
 import { OrganizationStructuredData } from '@/components/structured-data'
 import { ThemeProvider } from 'next-themes'
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -112,6 +113,7 @@ export default function RootLayout({
             <AnalyticsTracker>
               {children}
               <OrganizationStructuredData siteUrl="https://teknasapujagat.com" />
+              <Toaster />
             </AnalyticsTracker>
           </SessionProvider>
         </ThemeProvider>
