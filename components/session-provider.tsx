@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -18,7 +18,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshSession = async () => {
+  const refreshSession = useCallback(async () => {
     try {
       const supabase = createClient();
       const {
@@ -29,7 +29,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Error refreshing session:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -61,10 +61,16 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Memoize context value untuk mencegah re-render yang tidak perlu
+  const contextValue = useMemo(() => ({
+    user,
+    session,
+    isLoading,
+    refreshSession,
+  }), [user, session, isLoading, refreshSession]);
+
   return (
-    <SessionContext.Provider
-      value={{ user, session, isLoading, refreshSession }}
-    >
+    <SessionContext.Provider value={contextValue}>
       {children}
     </SessionContext.Provider>
   );

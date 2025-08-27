@@ -20,7 +20,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error deleting project:", error);
-      throw new Error("Gagal menghapus proyek");
+      throw new Error("Failed to delete project");
     }
   }
 
@@ -51,7 +51,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error creating project:", error);
-      throw new Error("Gagal membuat proyek baru");
+      throw new Error("Failed to create new project");
     }
   }
 
@@ -92,7 +92,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error updating project:", error);
-      throw new Error("Gagal mengupdate proyek");
+      throw new Error("Failed to update project");
     }
   }
 
@@ -128,7 +128,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error fetching project:", error);
-      throw new Error("Gagal mengambil data proyek");
+      throw new Error("Failed to fetch project data");
     }
   }
 
@@ -235,7 +235,7 @@ export class ClientDashboardService {
       return post;
     } catch (error) {
       console.error("Error creating post:", error);
-      throw new Error("Gagal membuat artikel baru");
+      throw new Error("Failed to create new article");
     }
   }
 
@@ -322,7 +322,7 @@ export class ClientDashboardService {
       return post;
     } catch (error) {
       console.error("Error updating post:", error);
-      throw new Error("Gagal mengupdate artikel");
+      throw new Error("Failed to update article");
     }
   }
 
@@ -344,7 +344,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error deleting post:", error);
-      throw new Error("Gagal menghapus artikel");
+      throw new Error("Failed to delete article");
     }
   }
 
@@ -414,7 +414,7 @@ export class ClientDashboardService {
       return post;
     } catch (error) {
       console.error("Error getting post by ID:", error);
-      throw new Error("Gagal mengambil artikel");
+      throw new Error("Failed to fetch article");
     }
   }
 
@@ -494,7 +494,7 @@ export class ClientDashboardService {
       return authors.find((author) => author.id === authorId) || null;
     } catch (error) {
       console.error("Error fetching author:", error);
-      throw new Error("Gagal mengambil data author");
+      throw new Error("Failed to fetch author data");
     }
   }
 
@@ -607,7 +607,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error fetching category:", error);
-      throw new Error("Gagal mengambil data kategori");
+      throw new Error("Failed to fetch category data");
     }
   }
 
@@ -639,7 +639,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error creating category:", error);
-      throw new Error("Gagal membuat kategori baru");
+      throw new Error("Failed to create new category");
     }
   }
 
@@ -672,7 +672,7 @@ export class ClientDashboardService {
       return data;
     } catch (error) {
       console.error("Error updating category:", error);
-      throw new Error("Gagal mengupdate kategori");
+      throw new Error("Failed to update category");
     }
   }
 

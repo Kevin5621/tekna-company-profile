@@ -103,6 +103,21 @@ const nextConfig: NextConfig = {
   // Optimize bundle size
   experimental: {
     // optimizeCss: true, // Disabled due to critters module issue
+    // Optimize page loading performance
+    optimizePackageImports: ['@tabler/icons-react', 'lucide-react'],
+    // Enable concurrent features for better performance
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+  },
+  // Optimize page loading
+  swcMinify: true,
+  // Enable static optimization
+  staticPageGenerationTimeout: 120,
+  // Optimize navigation performance
+  onDemandEntries: {
+    // Period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // Number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
   },
 };
 

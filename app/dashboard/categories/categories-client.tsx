@@ -105,8 +105,8 @@ export function CategoriesPageClient({
   return (
     <DashboardPageTemplate
       breadcrumbs={[
-        { label: "Kategori", href: "/dashboard/categories" },
-        { label: "Daftar Kategori", isCurrentPage: true },
+        { label: "Categories", href: "/dashboard/categories" },
+        { label: "Category List", isCurrentPage: true },
       ]}
       title="Categories"
       description="Manage categories for blog articles"
@@ -191,7 +191,7 @@ export function CategoriesPageClient({
                     className="flex-1"
                   >
                     <IconTrash className="h-4 w-4 mr-1" />
-                    Hapus
+                    Delete
                   </Button>
                 </div>
               </CardContent>

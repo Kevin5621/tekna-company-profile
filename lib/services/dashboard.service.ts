@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { DashboardData, ProjectStatus } from "@/lib/types/dashboard";
+import type { DashboardData } from "@/lib/types/dashboard";
 
 export class DashboardService {
   /**
@@ -12,12 +12,8 @@ export class DashboardService {
       // Get all data in parallel for better performance
       const [
         teamCountResult,
-        projectsCountResult,
-        postsCountResult,
-        testimonialsCountResult,
-        servicesCountResult,
-        recentProjectsResult,
         recentPostsResult,
+        totalViewsResult,
       ] = await Promise.all([
         // Team members count (from posts authors)
         supabase
@@ -26,51 +22,6 @@ export class DashboardService {
           .not("author_name", "is", null)
           .not("author_name", "eq", "")
           .eq("is_active", true),
-
-        // Active projects count
-        supabase
-          .from("projects")
-          .select("*", { count: "exact", head: true })
-          .eq("is_active", true),
-
-        // Published posts count
-        supabase
-          .from("posts")
-          .select("*", { count: "exact", head: true })
-          .eq("status", "published")
-          .eq("is_active", true),
-
-        // Testimonials count
-        supabase
-          .from("testimonials")
-          .select("*", { count: "exact", head: true })
-          .eq("is_active", true),
-
-        // Services count
-        supabase
-          .from("services")
-          .select("*", { count: "exact", head: true })
-          .eq("is_active", true),
-
-        // Recent projects
-        supabase
-          .from("projects")
-          .select(
-            `
-            id,
-            name,
-            client_name,
-            status,
-            start_date,
-            end_date,
-            project_translations!inner(
-              short_description
-            )
-          `
-          )
-          .eq("is_active", true)
-          .order("created_at", { ascending: false })
-          .limit(3),
 
         // Recent posts
         supabase
@@ -88,55 +39,47 @@ export class DashboardService {
           .eq("is_active", true)
           .order("created_at", { ascending: false })
           .limit(3),
+
+        // Total views from all posts
+        supabase
+          .from("posts")
+          .select("view_count")
+          .eq("is_active", true),
       ]);
 
       // Extract data from results
       const teamCount = teamCountResult.count || 0;
-      const projectsCount = projectsCountResult.count || 0;
-      const postsCount = postsCountResult.count || 0;
-      const testimonialsCount = testimonialsCountResult.count || 0;
-      const servicesCount = servicesCountResult.count || 0;
-      const recentProjects = recentProjectsResult.data || [];
       const recentPosts = recentPostsResult.data || [];
+      const totalViews = (totalViewsResult.data || []).reduce((sum, post) => sum + (post.view_count || 0), 0);
 
       return {
         stats: [
           {
-            title: "Total Tim",
+            title: "Total Team",
             value: teamCount.toString(),
-            description: "Anggota tim aktif",
+            description: "Active team members",
             change: "+2",
             changeType: "positive" as const,
           },
           {
-            title: "Proyek Aktif",
-            value: projectsCount.toString(),
-            description: "Proyek sedang berjalan",
-            change: "+1",
+            title: "Total Views",
+            value: totalViews.toLocaleString(),
+            description: "Total article views",
+            change: "+15%",
             changeType: "positive" as const,
           },
           {
-            title: "Artikel Blog",
-            value: postsCount.toString(),
-            description: "Artikel diterbitkan",
-            change: "+3",
-            changeType: "positive" as const,
-          },
-          {
-            title: "Testimonial",
-            value: testimonialsCount.toString(),
-            description: "Ulasan klien",
-            change: "+2",
+            title: "Last Update",
+            value: new Date().toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "short",
+            }),
+            description: "Today",
+            change: "Live",
             changeType: "positive" as const,
           },
         ],
-        recentProjects: recentProjects.map((project) => ({
-          id: project.id,
-          name: project.name,
-          status: project.status as ProjectStatus,
-          description:
-            project.project_translations?.[0]?.short_description || "",
-        })),
+        recentProjects: [], // Empty array since we removed projects from stats
         recentPosts: recentPosts.map((post) => ({
           id: post.id,
           title: post.title,
@@ -145,11 +88,11 @@ export class DashboardService {
           views: post.view_count || 0,
           publishedAt: post.published_at,
         })),
-        servicesCount,
+        servicesCount: 0, // Set to 0 since we removed services from stats
       };
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
-      throw new Error("Gagal mengambil data dashboard");
+      throw new Error("Failed to fetch dashboard data");
     }
   }
 
@@ -187,7 +130,7 @@ export class DashboardService {
       }));
     } catch (error) {
       console.error("Error fetching team members:", error);
-      throw new Error("Gagal mengambil data tim");
+      throw new Error("Failed to fetch team data");
     }
   }
 
@@ -217,7 +160,7 @@ export class DashboardService {
       return data;
     } catch (error) {
       console.error("Error fetching projects:", error);
-      throw new Error("Gagal mengambil data proyek");
+      throw new Error("Failed to fetch project data");
     }
   }
 
@@ -250,7 +193,7 @@ export class DashboardService {
       return data;
     } catch (error) {
       console.error("Error fetching project:", error);
-      throw new Error("Gagal mengambil data proyek");
+      throw new Error("Failed to fetch project data");
     }
   }
 
@@ -281,7 +224,7 @@ export class DashboardService {
       return data;
     } catch (error) {
       console.error("Error creating project:", error);
-      throw new Error("Gagal membuat proyek baru");
+      throw new Error("Failed to create new project");
     }
   }
 
@@ -314,7 +257,7 @@ export class DashboardService {
       return data;
     } catch (error) {
       console.error("Error updating project:", error);
-      throw new Error("Gagal mengupdate proyek");
+      throw new Error("Failed to update project");
     }
   }
 
@@ -336,7 +279,7 @@ export class DashboardService {
       return data;
     } catch (error) {
       console.error("Error deleting project:", error);
-      throw new Error("Gagal menghapus proyek");
+      throw new Error("Failed to delete project");
     }
   }
 
@@ -582,7 +525,7 @@ export class DashboardService {
       return data;
     } catch (error) {
       console.error("Error fetching services:", error);
-      throw new Error("Gagal mengambil data layanan");
+      throw new Error("Failed to fetch services data");
     }
   }
 

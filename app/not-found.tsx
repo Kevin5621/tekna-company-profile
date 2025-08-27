@@ -33,11 +33,10 @@ export default function NotFound() {
             {/* Content */}
             <div className="mb-8 space-y-4">
               <CardTitle className="text-2xl md:text-3xl font-semibold text-foreground">
-                Halaman Tidak Ditemukan
+                Page Not Found
               </CardTitle>
               <CardDescription className="text-lg text-muted-foreground max-w-md mx-auto">
-                Maaf, halaman yang Anda cari tidak dapat ditemukan. Mungkin
-                halaman telah dipindahkan atau URL salah.
+                Sorry, the page you are looking for cannot be found. The page may have been moved or the URL is incorrect.
               </CardDescription>
             </div>
 
@@ -46,7 +45,7 @@ export default function NotFound() {
               <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/">
                   <Home className="w-4 h-4 mr-2" />
-                  Kembali ke Beranda
+                  Back to Home
                 </Link>
               </Button>
 
@@ -57,27 +56,27 @@ export default function NotFound() {
                 className="w-full sm:w-auto"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Halaman Sebelumnya
+                Previous Page
               </Button>
             </div>
 
             {/* Additional Links */}
             <div className="mt-8 pt-6 border-t border-border">
               <p className="text-sm text-muted-foreground mb-4">
-                Atau kunjungi halaman lainnya:
+                Or visit other pages:
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Button variant="ghost" size="sm" asChild>
                   <Link href="/blog">Blog</Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/career">Karir</Link>
+                  <Link href="/career">Career</Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/#projects">Proyek</Link>
+                  <Link href="/#projects">Projects</Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/#testimonials">Testimoni</Link>
+                  <Link href="/#testimonials">Testimonials</Link>
                 </Button>
               </div>
             </div>

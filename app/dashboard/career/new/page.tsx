@@ -163,13 +163,13 @@ export default function NewCareerPositionPage() {
   return (
     <DashboardFormTemplate
       breadcrumbs={[
-        { label: "Karir", href: "/dashboard/career" },
-        { label: "Tambah Posisi Baru", isCurrentPage: true },
+        { label: "Career", href: "/dashboard/career" },
+        { label: "Add New Position", isCurrentPage: true },
       ]}
-      title="Tambah Posisi Baru"
-      description="Buat posisi karir baru untuk perusahaan"
+      title="Add New Position"
+      description="Create a new career position for the company"
       backHref="/dashboard/career"
-      backLabel="Kembali ke Career"
+      backLabel="Back to Career"
     >
       <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
         {/* Basic Information */}

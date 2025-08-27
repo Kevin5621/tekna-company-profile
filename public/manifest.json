@@ -1,12 +1,15 @@
 {
-  "name": "PT Sapujagat Nirmana Tekna - Digital Innovation & Technology Solutions",
+  "name": "PT Sapujagat Nirmana Tekna - Software House Indonesia",
   "short_name": "Tekna",
-  "description": "Leading technology solutions provider in Indonesia. We specialize in web development, mobile apps, AI solutions, and digital transformation services.",
+  "description": "Software house Indonesia terkemuka untuk pengembangan IoT, aplikasi mobile, dan website. Solusi teknologi terdepan untuk bisnis Anda.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "id",
+  "categories": ["business", "productivity", "utilities"],
   "icons": [
     {
       "src": "/logo.webp",
@@ -21,7 +24,41 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["business", "productivity", "technology"],
-  "lang": "en",
-  "dir": "ltr"
+  "screenshots": [
+    {
+      "src": "/images/screenshot-home.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/images/screenshot-mobile.jpg",
+      "sizes": "390x844",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Layanan",
+      "short_name": "Layanan",
+      "description": "Lihat layanan kami",
+      "url": "/services",
+      "icons": [{ "src": "/logo.webp", "sizes": "96x96" }]
+    },
+    {
+      "name": "Portfolio",
+      "short_name": "Portfolio",
+      "description": "Lihat portfolio kami",
+      "url": "/portfolio",
+      "icons": [{ "src": "/logo.webp", "sizes": "96x96" }]
+    },
+    {
+      "name": "Kontak",
+      "short_name": "Kontak",
+      "description": "Hubungi kami",
+      "url": "/contact",
+      "icons": [{ "src": "/logo.webp", "sizes": "96x96" }]
+    }
+  ]
 }

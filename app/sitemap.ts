@@ -1,57 +1,92 @@
-import { MetadataRoute } from "next";
-import { PublicService } from "@/lib/services/public.service";
+import { MetadataRoute } from 'next'
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://tekna.com";
-
-  // Static pages
-  const staticPages = [
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = 'https://teknasapujagat.com'
+  
+  return [
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: "weekly" as const,
+      changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: `${baseUrl}/blog`,
+      url: `${baseUrl}/about`,
       lastModified: new Date(),
-      changeFrequency: "daily" as const,
-      priority: 0.9,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/services`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/services/iot-development`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/services/mobile-app-development`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/services/web-development`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/portfolio`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/projects`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/career`,
       lastModified: new Date(),
-      changeFrequency: "weekly" as const,
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
       priority: 0.8,
     },
-  ];
-
-  try {
-    // Get all published blog posts
-    const postsResult = await PublicService.getPaginatedPublishedPosts({
-      page: 1,
-      limit: 1000, // Get all posts
-    });
-
-    const blogPosts = postsResult.data.map((post) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: new Date(post.created_at),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    }));
-
-    // Get all categories
-    const categories = await PublicService.getActiveCategories();
-    const categoryPages = categories.map((category) => ({
-      url: `${baseUrl}/blog/category/${category.slug}`,
+    {
+      url: `${baseUrl}/contact`,
       lastModified: new Date(),
-      changeFrequency: "weekly" as const,
+      changeFrequency: 'monthly',
       priority: 0.6,
-    }));
-
-    return [...staticPages, ...blogPosts, ...categoryPages];
-  } catch (error) {
-    console.error("Error generating sitemap:", error);
-    return staticPages;
-  }
+    },
+    {
+      url: `${baseUrl}/partners`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/privacy-policy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms-of-service`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+  ]
 }

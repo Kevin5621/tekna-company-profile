@@ -146,7 +146,7 @@ export function AppHeader() {
             }`}
           >
             <Briefcase className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-            Karir
+            Career
           </Link>
         </nav>
 
@@ -228,7 +228,7 @@ export function AppHeader() {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <Briefcase className="w-4 h-4" />
-                Karir
+                Career
               </Link>
             </nav>
           </div>

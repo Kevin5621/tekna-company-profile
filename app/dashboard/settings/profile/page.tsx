@@ -8,14 +8,14 @@ export default function ProfileSettingsPage() {
     <div className="space-y-6">
       <DashboardBreadcrumb
         items={[
-          { label: "Pengaturan", href: "/dashboard/settings" },
-          { label: "Profil Pengguna", isCurrentPage: true },
+          { label: "Settings", href: "/dashboard/settings" },
+          { label: "User Profile", isCurrentPage: true },
         ]}
       />
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Profil Pengguna</h1>
+        <h1 className="text-3xl font-bold tracking-tight">User Profile</h1>
         <p className="text-muted-foreground">
-          Kelola informasi profil, email, dan kata sandi Anda.
+          Manage your profile information, email, and password.
         </p>
       </div>
       <ProfileSettingsForm />

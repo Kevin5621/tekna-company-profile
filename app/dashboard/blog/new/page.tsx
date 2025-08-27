@@ -6,14 +6,16 @@ export default function NewPostPage() {
     <DashboardFormTemplate
       breadcrumbs={[
         { label: "Blog", href: "/dashboard/blog" },
-        { label: "Tambah Artikel Baru", isCurrentPage: true },
+        { label: "New Post", isCurrentPage: true },
       ]}
-      title="Tambah Artikel Baru"
-      description="Buat artikel blog baru dengan konten yang menarik"
+      title="Add New Post"
+      description="Create a new blog post with engaging content"
       backHref="/dashboard/blog"
-      backLabel="Kembali ke Blog"
+      backLabel="Back to Blog"
     >
-      <PostForm />
+      <div className="dashboard-form-container">
+        <PostForm />
+      </div>
     </DashboardFormTemplate>
   );
 }

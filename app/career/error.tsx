@@ -13,9 +13,9 @@ export default function CareerError({
     <ErrorPage
       error={error}
       reset={reset}
-      title="Kesalahan Karir"
-      description="Terjadi kesalahan saat memuat informasi karir. Silakan coba lagi atau kembali ke halaman karir utama."
-      backButtonText="Daftar Karir"
+      title="Career Error"
+      description="An error occurred while loading career information. Please try again or return to the main career page."
+      backButtonText="Career List"
       backButtonHref="/career"
     />
   );

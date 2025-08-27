@@ -38,11 +38,10 @@ export default function GlobalError({
             {/* Content */}
             <div className="mb-8 space-y-4">
               <CardTitle className="text-2xl md:text-3xl font-semibold text-foreground">
-                Terjadi Kesalahan Sistem
+                System Error Occurred
               </CardTitle>
               <CardDescription className="text-lg text-muted-foreground max-w-md mx-auto">
-                Maaf, terjadi kesalahan yang tidak terduga pada sistem kami. Tim
-                teknis telah diberitahu dan sedang menangani masalah ini.
+                Sorry, an unexpected error occurred on our system. Our technical team has been notified and is handling this issue.
               </CardDescription>
             </div>
 
@@ -64,7 +63,7 @@ export default function GlobalError({
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button onClick={reset} size="lg" className="w-full sm:w-auto">
                 <RefreshCw className="w-4 h-4 mr-2" />
-                Coba Lagi
+                Try Again
               </Button>
 
               <Button
@@ -75,7 +74,7 @@ export default function GlobalError({
               >
                 <Link href="/">
                   <Home className="w-4 h-4 mr-2" />
-                  Kembali ke Beranda
+                  Back to Home
                 </Link>
               </Button>
             </div>
@@ -83,7 +82,7 @@ export default function GlobalError({
             {/* Contact Information */}
             <div className="mt-8 pt-6 border-t border-border">
               <p className="text-sm text-muted-foreground mb-4">
-                Jika masalah berlanjut, silakan hubungi tim support kami:
+                If the problem persists, please contact our support team:
               </p>
               <Button variant="ghost" size="sm" asChild>
                 <a href="mailto:support@tekna.id">
