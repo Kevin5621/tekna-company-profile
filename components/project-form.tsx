@@ -21,6 +21,7 @@ import {
   IconUpload,
 } from "@tabler/icons-react";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import { mutate as globalMutate } from "swr";
 import { MediaUpload } from "@/components/media-upload";
 import type { MediaFile } from "@/lib/services/media.service";
 import { useToast } from "@/hooks/use-toast";
@@ -85,23 +86,68 @@ export function ProjectForm({
       console.log("Submitting form data:", formData);
 
       if (mode === "create") {
-        const result = await ClientDashboardService.createProject({
+        // Optimistic create: build temp object and update SWR cache immediately
+        const tempId = `temp-${Date.now()}`;
+        const optimisticProject = {
+          id: tempId,
           name: formData.name,
-          slug: formData.slug,
-          project_url: formData.project_url || undefined,
-          description: formData.description || undefined,
-          featured_image_url: formData.featured_image_url || undefined,
+          description: formData.description,
           is_featured: formData.is_featured,
-        });
-        console.log("Create result:", result);
-        toast({
-          title: "Project Created!",
-          description: "Project has been created successfully.",
-          variant: "success",
-        });
-        router.push("/dashboard/projects");
+          is_active: true,
+          featured_image_url: formData.featured_image_url || undefined,
+        };
+
+        // update local cache
+        interface _P { id: string; name: string; description?: string; featured_image_url?: string; is_featured?: boolean; is_active?: boolean }
+
+        globalMutate(
+          "/api/projects",
+          async (current: { data?: _P[] } | undefined) => {
+            const existing = (current?.data as _P[]) || [];
+            return { success: true, data: [optimisticProject as _P, ...existing] };
+          },
+          false
+        );
+
+        try {
+          // create on server via API route
+          const res = await fetch("/api/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: formData.name,
+              slug: formData.slug,
+              project_url: formData.project_url || undefined,
+              description: formData.description || undefined,
+              featured_image_url: formData.featured_image_url || undefined,
+              is_featured: formData.is_featured,
+            }),
+          });
+
+          if (!res.ok) throw new Error("Failed to create project");
+
+          await res.json();
+          // replace temp item with real one by revalidating
+          await globalMutate("/api/projects");
+
+          toast({
+            title: "Project Created!",
+            description: "Project has been created successfully.",
+            variant: "success",
+          });
+          router.push("/dashboard/projects");
+        } catch (err) {
+          console.error("Create failed, reverting optimistic update", err);
+          // revert
+          globalMutate("/api/projects");
+          toast({
+            title: "Error",
+            description: "Gagal membuat proyek. Silakan coba lagi.",
+            variant: "destructive",
+          });
+        }
       } else if (mode === "edit" && projectId) {
-        const result = await ClientDashboardService.updateProject(projectId, {
+  const result = await ClientDashboardService.updateProject(projectId, {
           name: formData.name,
           slug: formData.slug,
           project_url: formData.project_url || undefined,
@@ -115,7 +161,9 @@ export function ProjectForm({
           description: "Project has been updated successfully.",
           variant: "success",
         });
-        router.push("/dashboard/projects");
+  // revalidate projects list
+  globalMutate("/api/projects");
+  router.push("/dashboard/projects");
       }
     } catch (error) {
       console.error("Error saving project:", error);

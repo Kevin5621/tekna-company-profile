@@ -17,6 +17,7 @@ import {
   IconLoader2,
 } from "@tabler/icons-react";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import useSWR, { mutate as globalMutate } from "swr";
 import { useToast } from "@/hooks/use-toast";
 import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
@@ -37,7 +38,13 @@ export default function ProjectsPageClient({
   initialProjects,
 }: Readonly<ProjectsPageProps>) {
   const router = useRouter();
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload } = useSWR("/api/projects", fetcher, {
+    fallbackData: { success: true, data: initialProjects },
+    revalidateOnFocus: true,
+  });
+
+  const projects = (apiPayload?.data as Project[]) || initialProjects;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -48,8 +55,18 @@ export default function ProjectsPageClient({
 
     setDeletingId(projectId);
     try {
+      // optimistic update: remove locally first
+      const optimistic = projects.filter((p) => p.id !== projectId);
+      // update SWR cache locally
+      globalMutate(
+        "/api/projects",
+        { success: true, data: optimistic },
+        false
+      );
+
       await ClientDashboardService.deleteProject(projectId);
-      setProjects((prev) => prev.filter((p) => p.id !== projectId));
+      // revalidate in background
+      globalMutate("/api/projects");
       toast({
         title: "Project Deleted!",
         description: "Project has been deleted successfully.",
@@ -62,6 +79,8 @@ export default function ProjectsPageClient({
         description: "Gagal menghapus proyek",
         variant: "destructive",
       });
+      // revert cache on error
+      globalMutate("/api/projects");
     } finally {
       setDeletingId(null);
     }
@@ -106,7 +125,7 @@ export default function ProjectsPageClient({
       </div>
 
       {/* Projects Grid */}
-      {projects.length > 0 ? (
+  {projects.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <Card

@@ -25,6 +25,8 @@ import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 const DashboardChart = dynamic(() => import("@/components/dashboard-chart").then((m) => m.DashboardChart), { ssr: false });
 import { SkeletonCard } from "@/components/ui/skeleton-card";
+// deeper skeletons for lists
+import { SkeletonAnalytics } from "@/components/ui/skeleton-analytics";
 
 // Client-side fetch will call /api/dashboard
 
@@ -37,6 +39,7 @@ export default function DashboardPage() {
   const { data: apiPayload, error, isLoading } = useSWR("/api/dashboard", fetcher, {
     revalidateOnFocus: true,
     refreshWhenHidden: false,
+    fallbackData: undefined,
   });
 
   const dashboardData: DashboardData | null = React.useMemo(() => {
@@ -60,12 +63,17 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* show skeleton cards while loading */}
       {loading && (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
+        <>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+          <div className="mt-6">
+            <SkeletonAnalytics />
+          </div>
+        </>
       )}
 
       {fetchError && (
@@ -114,27 +122,37 @@ export default function DashboardPage() {
   {/* Dashboard chart loaded only on client via dynamic import */}
   <DashboardChart totalApplications={totalApplications} />
 
-      {/* Analytics Section - Career Applications */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Lamaran Karir
-            </CardTitle>
-            <IconBriefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalApplications}</div>
-            <p className="text-xs text-muted-foreground">
-              Total lamaran yang diterima
-            </p>
-            <div className="flex items-center pt-2">
-              <Badge variant="default">Aktif</Badge>
+  {/* Analytics Section - Career Applications */}
+  <div className="grid gap-6 md:grid-cols-3">
+        {loading ? (
+          <div className="col-span-1">
+            <div className="animate-pulse bg-card/50 rounded-lg p-4">
+              <div className="h-4 bg-muted rounded w-1/2 mb-3" />
+              <div className="h-10 bg-muted rounded mb-2" />
+              <div className="h-3 bg-muted rounded w-2/3" />
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="opacity-60">
+          </div>
+        ) : (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Lamaran Karir
+              </CardTitle>
+              <IconBriefcase className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalApplications}</div>
+              <p className="text-xs text-muted-foreground">
+                Total lamaran yang diterima
+              </p>
+              <div className="flex items-center pt-2">
+                <Badge variant="default">Aktif</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+  <Card className="opacity-60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Analytics Lainnya

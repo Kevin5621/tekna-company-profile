@@ -1,22 +1,35 @@
 import { NextResponse } from "next/server";
 import { DashboardService } from "@/lib/services/dashboard.service";
 import { CareerService } from "@/lib/services/career";
+import { getCached, setCached } from "@/lib/cache/redis";
 
-// Simple in-memory cache (per server instance). TTL in ms.
+// Simple in-memory fallback cache (per server instance). TTL in ms.
 const CACHE_TTL = 30 * 1000; // 30 seconds - adjust as needed
-let cachedData: { timestamp: number; payload: unknown } | null = null;
+let fallbackCache: { timestamp: number; payload: unknown } | null = null;
 
 export async function GET() {
   try {
     const now = Date.now();
 
-    if (cachedData && now - cachedData.timestamp < CACHE_TTL) {
-      // Return cached response with cache headers
-      return new NextResponse(JSON.stringify(cachedData.payload), {
+    // try redis first
+    const redisKey = "dashboard:summary";
+    const redisCached = await getCached(redisKey);
+    if (redisCached) {
+      return new NextResponse(JSON.stringify(redisCached), {
         status: 200,
         headers: {
           "Content-Type": "application/json",
-          // Let clients/cache proxies cache shortly; still revalidate on focus via SWR
+          "Cache-Control": `s-maxage=${Math.floor(CACHE_TTL / 1000)}, stale-while-revalidate=${Math.floor(CACHE_TTL / 1000)}`,
+        },
+      });
+    }
+
+    // fallback to in-memory
+    if (fallbackCache && now - fallbackCache.timestamp < CACHE_TTL) {
+      return new NextResponse(JSON.stringify(fallbackCache.payload), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
           "Cache-Control": `s-maxage=${Math.floor(CACHE_TTL / 1000)}, stale-while-revalidate=${Math.floor(CACHE_TTL / 1000)}`,
         },
       });
@@ -35,8 +48,15 @@ export async function GET() {
       },
     };
 
-    // cache in-memory
-    cachedData = { timestamp: now, payload };
+    // try to set redis cache (best-effort)
+    try {
+      await setCached(redisKey, payload, Math.floor(CACHE_TTL / 1000));
+    } catch {
+      // ignore Redis set errors (best-effort)
+    }
+
+    // set fallback
+    fallbackCache = { timestamp: now, payload };
 
     return new NextResponse(JSON.stringify(payload), {
       status: 200,
