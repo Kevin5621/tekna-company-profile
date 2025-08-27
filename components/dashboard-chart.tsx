@@ -34,7 +34,7 @@ interface DashboardChartProps {
 export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
   const [timeRange, setTimeRange] = React.useState("30d");
 
-  // Generate chart data with only career applications (real data) and placeholder for others
+  // Generate chart data with accurate career applications showing sharp spike on last date
   const chartData = React.useMemo(() => {
     const data = [];
     const today = new Date();
@@ -44,12 +44,10 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
 
+      // Show 0 applications for all previous days, and total applications only on the last day
       data.push({
         date: date.toISOString().split("T")[0],
-        career_applications:
-          i === 0
-            ? totalApplications
-            : Math.floor(totalApplications * (1 - i / days)), // Real data trend
+        career_applications: i === 0 ? totalApplications : 0, // Sharp spike on last date
         website_views: 0, // Coming soon
         blog_views: 0, // Coming soon
         career_views: 0, // Coming soon
@@ -61,7 +59,7 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("id-ID", {
+    return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
@@ -73,32 +71,31 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
         <div className="grid flex-1 gap-1">
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Analitik Website
+            Website Analytics
             <Badge variant="outline" className="ml-2">
-              Parsial Data
+              Partial Data
             </Badge>
           </CardTitle>
           <CardDescription>
-            Menampilkan data lamaran karir (real) - Fitur analitik lainnya
-            segera hadir
+            Displaying career application data (real) - Other analytics features coming soon
           </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger
             className="w-[160px] rounded-lg"
-            aria-label="Pilih rentang waktu"
+            aria-label="Select time range"
           >
-            <SelectValue placeholder="30 hari terakhir" />
+            <SelectValue placeholder="Last 30 days" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
             <SelectItem value="7d" className="rounded-lg">
-              7 hari terakhir
+              Last 7 days
             </SelectItem>
             <SelectItem value="30d" className="rounded-lg">
-              30 hari terakhir
+              Last 30 days
             </SelectItem>
             <SelectItem value="90d" className="rounded-lg">
-              90 hari terakhir
+              Last 90 days
             </SelectItem>
           </SelectContent>
         </Select>
@@ -127,7 +124,7 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
                               {formatDate(label)}
                             </span>
                             <span className="font-bold text-muted-foreground">
-                              Lamaran Karir: {payload[0]?.value}
+                              Career Applications: {payload[0]?.value}
                             </span>
                             <div className="mt-2 text-xs text-muted-foreground">
                               <div>Website Views: Coming Soon</div>
@@ -158,7 +155,7 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
         <div className="flex items-center justify-center gap-6 pt-4 flex-wrap">
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-green-500" />
-            <span className="text-sm">Lamaran Karir (Real Data)</span>
+            <span className="text-sm">Career Applications (Real Data)</span>
           </div>
           <div className="flex items-center gap-2 opacity-50">
             <div className="h-3 w-3 rounded-full bg-blue-500" />
@@ -179,13 +176,11 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
           <div className="flex items-center gap-2 mb-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">
-              Fitur Dalam Pengembangan
+              Feature Under Development
             </span>
           </div>
           <p className="text-xs text-muted-foreground">
-            Analytics untuk website views, blog views, dan career views akan
-            segera hadir pada Q1 2025. Saat ini hanya data lamaran karir yang
-            ditampilkan secara real-time.
+            Analytics for website views, blog views, and career views will be available in Q1 2025. Currently only career application data is displayed in real-time.
           </p>
         </div>
       </CardContent>
