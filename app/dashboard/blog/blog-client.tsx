@@ -29,7 +29,7 @@ import {
   IconExternalLink,
 } from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface BlogPost {
   id: string;
@@ -69,9 +69,7 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Real-time sync for blog posts
   useRealtimeBlogPosts(() => {
-    // Refresh posts when real-time changes are detected
     const refreshPosts = async () => {
       try {
         const updatedPosts = await ClientDashboardService.getBlogPosts();
@@ -83,7 +81,6 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
     refreshPosts();
   });
 
-  // Filtered and sorted posts
   const filteredPosts = useMemo(() => {
     const filtered = posts.filter((post) => {
       const matchesSearch =
@@ -95,7 +92,6 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
       return matchesSearch && matchesStatus;
     });
 
-    // Sort posts
     const sorted = [...filtered].sort((a, b) => {
       let aValue: string | Date, bValue: string | Date;
 
@@ -205,30 +201,23 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
     return posts.filter((post) => post.status === status).length;
   };
 
+  const actions = (
+    <Button onClick={handleAddNew}>
+      <IconPlus className="h-4 w-4 mr-2" />
+      Add Post
+    </Button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Blog", href: "/dashboard/blog" },
-          { label: "Daftar Artikel", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Blog Posts</h1>
-          <p className="text-muted-foreground">
-            Manage blog posts and articles
-          </p>
-        </div>
-        <Button onClick={handleAddNew}>
-          <IconPlus className="h-4 w-4 mr-2" />
-          Add Post
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Blog", href: "/dashboard/blog" },
+        { label: "Daftar Artikel", isCurrentPage: true },
+      ]}
+      title="Blog Posts"
+      description="Manage blog posts and articles"
+      actions={actions}
+    >
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -566,6 +555,6 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
           </CardContent>
         </Card>
       )}
-    </div>
+    </DashboardPageTemplate>
   );
 }

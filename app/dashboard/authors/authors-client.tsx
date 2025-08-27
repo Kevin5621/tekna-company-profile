@@ -10,7 +10,7 @@ import { ClientDashboardService } from "@/lib/services/client-dashboard.service"
 import { useRealtimeAuthors } from "@/lib/hooks/use-realtime-simple";
 import { IconPlus, IconEdit, IconTrash, IconMail } from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface Author {
   id: string;
@@ -34,9 +34,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Real-time sync for authors
   useRealtimeAuthors(() => {
-    // Refresh authors when real-time changes are detected
     const refreshAuthors = async () => {
       try {
         const updatedAuthors = await ClientDashboardService.getAuthors();
@@ -87,30 +85,23 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
+  const actions = (
+    <Button onClick={handleAddNew}>
+      <IconPlus className="h-4 w-4 mr-2" />
+      Add Author
+    </Button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Penulis", href: "/dashboard/authors" },
-          { label: "Daftar Penulis", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Authors</h1>
-          <p className="text-muted-foreground">
-            Manage authors/team members for blog articles
-          </p>
-        </div>
-        <Button onClick={handleAddNew}>
-          <IconPlus className="h-4 w-4 mr-2" />
-          Add Author
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Penulis", href: "/dashboard/authors" },
+        { label: "Daftar Penulis", isCurrentPage: true },
+      ]}
+      title="Authors"
+      description="Manage authors/team members for blog articles"
+      actions={actions}
+    >
       {/* Authors Grid */}
       {authors.length === 0 ? (
         <Card>
@@ -203,6 +194,6 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
           ))}
         </div>
       )}
-    </div>
+    </DashboardPageTemplate>
   );
 }

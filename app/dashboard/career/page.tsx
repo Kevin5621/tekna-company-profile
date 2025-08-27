@@ -56,7 +56,7 @@ import {
   CareerPosition,
   CareerCategory,
 } from "@/lib/services/career";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 export default function CareerManagementPage() {
   const [positions, setPositions] = useState<CareerPosition[]>([]);
@@ -156,42 +156,33 @@ export default function CareerManagementPage() {
     );
   }
 
+  const actions = (
+    <div className="flex gap-2">
+      <Button variant="outline" asChild>
+        <Link href="/dashboard/career/categories">
+          <Settings className="h-4 w-4 mr-2" />
+          Categories
+        </Link>
+      </Button>
+      <Button asChild>
+        <Link href="/dashboard/career/new">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Position
+        </Link>
+      </Button>
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Karir", href: "/dashboard/career" },
-          { label: "Manajemen Karir", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Career Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage job positions, categories, and applications
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" asChild>
-            <Link href="/dashboard/career/categories">
-              <Settings className="h-4 w-4 mr-2" />
-              Categories
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/dashboard/career/new">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Position
-            </Link>
-          </Button>
-        </div>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Karir", href: "/dashboard/career" },
+        { label: "Manajemen Karir", isCurrentPage: true },
+      ]}
+      title="Career Management"
+      description="Manage job positions, categories, and applications"
+      actions={actions}
+    >
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
@@ -545,6 +536,6 @@ export default function CareerManagementPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </DashboardPageTemplate>
   );
 }

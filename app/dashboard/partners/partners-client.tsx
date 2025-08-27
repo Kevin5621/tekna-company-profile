@@ -13,14 +13,7 @@ import { Plus, Edit, Trash2, ExternalLink, Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface Partner {
   id: string;
@@ -103,23 +96,13 @@ export default function PartnersClient() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        {/* Breadcrumb */}
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Partners</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Partners Management</h1>
-        </div>
+      <DashboardPageTemplate
+        breadcrumbs={[
+          { label: "Partners", isCurrentPage: true },
+        ]}
+        title="Partners Management"
+        description="Manage your company partners with logo, name, and description"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="animate-pulse">
@@ -133,41 +116,28 @@ export default function PartnersClient() {
             </Card>
           ))}
         </div>
-      </div>
+      </DashboardPageTemplate>
     );
   }
 
+  const actions = (
+    <Button asChild>
+      <Link href="/dashboard/partners/new">
+        <Plus className="w-4 h-4 mr-2" />
+        Add Partner
+      </Link>
+    </Button>
+  );
+
   return (
-    <div className="space-y-6 min-h-full dashboard-form-page">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Partners</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Partners Management</h1>
-          <p className="text-muted-foreground">
-            Manage your company partners with logo, name, and description
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/dashboard/partners/new">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Partner
-          </Link>
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Partners", isCurrentPage: true },
+      ]}
+      title="Partners Management"
+      description="Manage your company partners with logo, name, and description"
+      actions={actions}
+    >
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
@@ -281,6 +251,6 @@ export default function PartnersClient() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </DashboardPageTemplate>
   );
 }

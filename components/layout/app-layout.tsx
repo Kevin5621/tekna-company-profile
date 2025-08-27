@@ -63,7 +63,7 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto dashboard-scroll-container">
-          <div className="w-full py-6 min-h-full dashboard-content-wrapper">
+          <div className="container mx-auto px-6 py-6">
             {children}
           </div>
         </main>

@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { ProjectForm } from "@/components/project-form";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
-import BackButton from "@/components/ui/back-button";
+import { DashboardFormTemplate } from "@/components/dashboard/dashboard-form-template";
 
 interface EditProjectPageProps {
   params: Promise<{
@@ -51,7 +50,7 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-full">
         <div className="text-lg">Loading...</div>
       </div>
     );
@@ -62,24 +61,20 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
   }
 
   return (
-    <div className="space-y-6 min-h-full dashboard-form-page">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Proyek", href: "/dashboard/projects" },
-          {
-            label: "Edit Proyek",
-            href: `/dashboard/projects/edit/${project.id}`,
-          },
-          { label: "Form Edit", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Back Button */}
-      <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/projects" label="Kembali ke Projects" />
-      </div>
-
+    <DashboardFormTemplate
+      breadcrumbs={[
+        { label: "Proyek", href: "/dashboard/projects" },
+        {
+          label: "Edit Proyek",
+          href: `/dashboard/projects/edit/${project.id}`,
+        },
+        { label: "Form Edit", isCurrentPage: true },
+      ]}
+      title="Edit Project"
+      description="Update project information"
+      backHref="/dashboard/projects"
+      backLabel="Kembali ke Projects"
+    >
       <div className="dashboard-form-container">
         <ProjectForm
           mode="edit"
@@ -94,6 +89,6 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
           }}
         />
       </div>
-    </div>
+    </DashboardFormTemplate>
   );
 }

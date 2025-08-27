@@ -22,7 +22,7 @@ import {
 } from "@/lib/services/pagination.service";
 import { SearchFilter } from "@/components/ui/search-filter";
 import { Pagination } from "@/components/ui/pagination";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface NewsletterSubscription {
   id: string;
@@ -133,32 +133,23 @@ export default function NewsletterPage() {
     );
   }
 
+  const actions = (
+    <Button onClick={handleExportCSV} variant="outline">
+      <IconDownload className="h-4 w-4 mr-2" />
+      Export CSV
+    </Button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Newsletter", href: "/dashboard/newsletter" },
-          { label: "Manajemen Newsletter", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Newsletter Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage newsletter subscriptions and settings
-          </p>
-        </div>
-        <Button onClick={handleExportCSV} variant="outline">
-          <IconDownload className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Newsletter", href: "/dashboard/newsletter" },
+        { label: "Manajemen Newsletter", isCurrentPage: true },
+      ]}
+      title="Newsletter Management"
+      description="Manage newsletter subscriptions and settings"
+      actions={actions}
+    >
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
@@ -287,6 +278,6 @@ export default function NewsletterPage() {
           onPageChange={handlePageChange}
         />
       )}
-    </div>
+    </DashboardPageTemplate>
   );
 }

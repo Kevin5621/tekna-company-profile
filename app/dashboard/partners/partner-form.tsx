@@ -16,16 +16,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import Link from "next/link";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { DashboardFormTemplate } from "@/components/dashboard/dashboard-form-template";
 
 interface PartnerFormData {
   name: string;
@@ -53,7 +46,6 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
 
   const isEdit = Boolean(partnerId);
 
-  // Fetch partner data for editing
   useEffect(() => {
     if (partnerId) {
       const fetchPartner = async () => {
@@ -150,46 +142,20 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard/partners">Partners</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>
-              {isEdit ? "Edit Partner" : "New Partner"}
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/partners">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Partners
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">
-            {isEdit ? "Edit Partner" : "Add New Partner"}
-          </h1>
-          <p className="text-muted-foreground">
-            {isEdit
-              ? "Update partner information"
-              : "Create a new partner with logo, name, and description"}
-          </p>
-        </div>
-      </div>
-
+    <DashboardFormTemplate
+      breadcrumbs={[
+        { label: "Partners", href: "/dashboard/partners" },
+        { label: isEdit ? "Edit Partner" : "New Partner", isCurrentPage: true },
+      ]}
+      title={isEdit ? "Edit Partner" : "Add New Partner"}
+      description={
+        isEdit
+          ? "Update partner information"
+          : "Create a new partner with logo, name, and description"
+      }
+      backHref="/dashboard/partners"
+      backLabel="Back to Partners"
+    >
       {/* Form */}
       <div className="max-w-2xl mx-auto">
         <Card>
@@ -291,6 +257,6 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardFormTemplate>
   );
 }

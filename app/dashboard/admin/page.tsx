@@ -18,7 +18,7 @@ import {
 } from "@/lib/services/admin-auth.service";
 import { AdminUserModal } from "./admin-user-modal";
 import { AdminStats } from "./admin-stats";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 export default function AdminManagementPage() {
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
@@ -178,32 +178,23 @@ export default function AdminManagementPage() {
     );
   }
 
+  const actions = (
+    <Button onClick={() => handleModalOpen()}>
+      <IconPlus className="h-4 w-4 mr-2" />
+      Add User
+    </Button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Admin", href: "/dashboard/admin" },
-          { label: "Manajemen Admin", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Admin Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage admin users, roles, and system settings
-          </p>
-        </div>
-        <Button onClick={() => handleModalOpen()}>
-          <IconPlus className="h-4 w-4 mr-2" />
-          Add User
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Admin", href: "/dashboard/admin" },
+        { label: "Manajemen Admin", isCurrentPage: true },
+      ]}
+      title="Admin Management"
+      description="Manage admin users, roles, and system settings"
+      actions={actions}
+    >
       {/* Stats Cards */}
       <AdminStats adminUsers={adminUsers} />
 
@@ -259,6 +250,6 @@ export default function AdminManagementPage() {
         user={editingUser}
         mode={editingUser ? "edit" : "create"}
       />
-    </div>
+    </DashboardPageTemplate>
   );
 }

@@ -20,7 +20,7 @@ import {
   IconBuilding,
   IconGlobe,
 } from "@tabler/icons-react";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface CompanySettings {
   name: string;
@@ -82,16 +82,13 @@ export default function SettingsPage() {
   }, []);
 
   const loadSettings = async () => {
-    // TODO: Implement loading settings from database
-    // For now, using default values
     setIsLoading(false);
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // TODO: Implement saving settings to database
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log("Settings saved:", settings);
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -101,7 +98,6 @@ export default function SettingsPage() {
   };
 
   const handleReset = () => {
-    // TODO: Implement reset to default settings
     console.log("Settings reset");
   };
 
@@ -131,36 +127,29 @@ export default function SettingsPage() {
     );
   }
 
+  const actions = (
+    <div className="flex gap-2">
+      <Button variant="outline" onClick={handleReset} disabled={isLoading}>
+        <IconRefresh className="h-4 w-4 mr-2" />
+        Reset
+      </Button>
+      <Button onClick={handleSave} disabled={isLoading || isSaving}>
+        <IconDeviceFloppy className="h-4 w-4 mr-2" />
+        {isSaving ? "Saving..." : "Save Changes"}
+      </Button>
+    </div>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Pengaturan", href: "/dashboard/settings" },
-          { label: "Konfigurasi Sistem", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">System Settings</h1>
-          <p className="text-muted-foreground">
-            Configure company settings and system preferences
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleReset} disabled={isLoading}>
-            <IconRefresh className="h-4 w-4 mr-2" />
-            Reset
-          </Button>
-          <Button onClick={handleSave} disabled={isLoading || isSaving}>
-            <IconDeviceFloppy className="h-4 w-4 mr-2" />
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Pengaturan", href: "/dashboard/settings" },
+        { label: "Konfigurasi Sistem", isCurrentPage: true },
+      ]}
+      title="System Settings"
+      description="Configure company settings and system preferences"
+      actions={actions}
+    >
       {/* Company Information */}
       <Card>
         <CardHeader>
@@ -423,6 +412,6 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </DashboardPageTemplate>
   );
 }

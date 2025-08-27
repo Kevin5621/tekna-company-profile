@@ -17,7 +17,7 @@ import {
   Mail,
 } from "lucide-react";
 import Link from "next/link";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 export default function FooterManagementPage() {
   const managementSections = [
@@ -64,26 +64,14 @@ export default function FooterManagementPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Footer", href: "/dashboard/footer" },
-          { label: "Manajemen Footer", isCurrentPage: true },
-        ]}
-      />
-
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Footer Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage all footer-related content and settings
-          </p>
-        </div>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Footer", href: "/dashboard/footer" },
+        { label: "Manajemen Footer", isCurrentPage: true },
+      ]}
+      title="Footer Management"
+      description="Manage all footer-related content and settings"
+    >
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {managementSections.map((section) => {
           const IconComponent = section.icon;
@@ -149,6 +137,6 @@ export default function FooterManagementPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </DashboardPageTemplate>
   );
 }

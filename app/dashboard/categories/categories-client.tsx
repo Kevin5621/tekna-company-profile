@@ -9,7 +9,7 @@ import { ClientDashboardService } from "@/lib/services/client-dashboard.service"
 import { useRealtimeCategories } from "@/lib/hooks/use-realtime-simple";
 import { IconPlus, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface Category {
   id: string;
@@ -35,9 +35,7 @@ export function CategoriesPageClient({
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Real-time sync for categories
   useRealtimeCategories(() => {
-    // Refresh categories when real-time changes are detected
     const refreshCategories = async () => {
       try {
         const updatedCategories = await ClientDashboardService.getCategories();
@@ -94,30 +92,23 @@ export function CategoriesPageClient({
     });
   };
 
+  const actions = (
+    <Button onClick={handleAddNew}>
+      <IconPlus className="h-4 w-4 mr-2" />
+      Add Category
+    </Button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Kategori", href: "/dashboard/categories" },
-          { label: "Daftar Kategori", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Categories</h1>
-          <p className="text-muted-foreground">
-            Manage categories for blog articles
-          </p>
-        </div>
-        <Button onClick={handleAddNew}>
-          <IconPlus className="h-4 w-4 mr-2" />
-          Add Category
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Kategori", href: "/dashboard/categories" },
+        { label: "Daftar Kategori", isCurrentPage: true },
+      ]}
+      title="Categories"
+      description="Manage categories for blog articles"
+      actions={actions}
+    >
       {/* Categories Grid */}
       {categories.length === 0 ? (
         <Card>
@@ -203,6 +194,6 @@ export function CategoriesPageClient({
           ))}
         </div>
       )}
-    </div>
+    </DashboardPageTemplate>
   );
 }
