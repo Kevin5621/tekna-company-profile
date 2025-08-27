@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -19,15 +20,14 @@ import {
   Clock,
   Briefcase,
   Star,
-  Grid3x3,
-  List,
   X,
-  Filter,
   Building2,
   Users,
   TrendingUp,
+  Send,
+  UserPlus,
+  Share2,
 } from "lucide-react";
-import Link from "next/link";
 import {
   CareerService,
   CareerPosition,
@@ -38,12 +38,13 @@ import {
   CareerSearchParams,
 } from "@/lib/services/career";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { ContentRenderer } from "@/components/content-renderer";
 
 export default function CareerPage() {
+  const { toast } = useToast();
   const [positions, setPositions] = useState<CareerPosition[]>([]);
-  const [featuredPositions, setFeaturedPositions] = useState<CareerPosition[]>(
-    []
-  );
+  const [featuredPositions, setFeaturedPositions] = useState<CareerPosition[]>([]);
   const [categories, setCategories] = useState<CareerCategory[]>([]);
   const [locations, setLocations] = useState<CareerLocation[]>([]);
   const [types, setTypes] = useState<CareerType[]>([]);
@@ -56,32 +57,31 @@ export default function CareerPage() {
   });
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState<CareerPosition | null>(null);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [applicationData, setApplicationData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    cover_letter: "",
+    resume_url: "",
+    portfolio_url: "",
+    linkedin_url: "",
+    github_url: "",
+    source: "website",
+  });
 
   const careerService = useMemo(() => new CareerService(), []);
-
-  // Debug: Log current filter state
-  useEffect(() => {
-    console.log("Current search params state:", searchParams);
-    console.log("Current filter state:", {
-      search: searchParams.filters?.search,
-      category: searchParams.filters?.category,
-      location: searchParams.filters?.location,
-      type: searchParams.filters?.type,
-      level: searchParams.filters?.level,
-      remote: searchParams.filters?.remote,
-    });
-  }, [searchParams]);
 
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
     }, 500);
-
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -99,13 +99,7 @@ export default function CareerPage() {
 
   const loadInitialData = useCallback(async () => {
     try {
-      const [
-        categoriesData,
-        locationsData,
-        typesData,
-        levelsData,
-        featuredData,
-      ] = await Promise.all([
+      const [categoriesData, locationsData, typesData, levelsData, featuredData] = await Promise.all([
         careerService.getPublicCategories(),
         careerService.getPublicLocations(),
         careerService.getPublicTypes(),
@@ -126,40 +120,22 @@ export default function CareerPage() {
   const loadPositions = useCallback(async () => {
     setLoading(true);
     try {
-      console.log("Loading positions with params:", searchParams);
-      console.log("Active filters:", {
-        search: searchParams.filters?.search,
-        category: searchParams.filters?.category,
-        location: searchParams.filters?.location,
-        type: searchParams.filters?.type,
-        level: searchParams.filters?.level,
-        remote: searchParams.filters?.remote,
-      });
-
       const result = await careerService.getPublicPositions(searchParams);
-      console.log("Positions result:", result);
-      console.log("Positions data:", result.positions);
-
-      if (result.positions.length > 0) {
-        console.log("First position sample:", {
-          id: result.positions[0].id,
-          title: result.positions[0].title,
-          category: result.positions[0].category,
-          location: result.positions[0].location,
-          type: result.positions[0].type,
-          level: result.positions[0].level,
-        });
-      }
-
+      
       setPositions(result.positions);
       setTotalCount(result.total);
       setTotalPages(result.totalPages);
+
+      // Auto-select first position only if no position is currently selected
+      if (result.positions.length > 0 && !selectedPosition) {
+        setSelectedPosition(result.positions[0]);
+      }
     } catch (error) {
       console.error("Error loading positions:", error);
     } finally {
       setLoading(false);
     }
-  }, [careerService, searchParams]);
+  }, [careerService, searchParams]); // Removed selectedPosition dependency
 
   useEffect(() => {
     loadInitialData();
@@ -174,49 +150,26 @@ export default function CareerPage() {
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    console.log(`Filter changed: ${key} = ${value}`);
-
-    // Don't process 'all' values
     if (value === "all") {
-      setSearchParams((prev) => {
-        const newParams = {
-          ...prev,
-          filters: {
-            ...prev.filters,
-            [key]: undefined,
-          },
-          page: 1,
-        };
-        console.log("New search params (cleared filter):", newParams);
-        return newParams;
-      });
+      setSearchParams((prev) => ({
+        ...prev,
+        filters: { ...prev.filters, [key as keyof typeof prev.filters]: undefined },
+        page: 1,
+      }));
       return;
     }
 
-    setSearchParams((prev) => {
-      const newParams = {
-        ...prev,
-        filters: {
-          ...prev.filters,
-          [key]: value,
-        },
-        page: 1,
-      };
-      console.log("New search params (set filter):", newParams);
-      return newParams;
-    });
+    setSearchParams((prev) => ({
+      ...prev,
+      filters: { ...prev.filters, [key as keyof typeof prev.filters]: value },
+      page: 1,
+    }));
   };
 
   const handleSortChange = (sort: string) => {
     setSearchParams((prev) => ({
       ...prev,
-      sort: sort as
-        | "newest"
-        | "oldest"
-        | "title"
-        | "salary_high"
-        | "salary_low"
-        | "deadline",
+      sort: sort as "newest" | "oldest" | "title" | "salary_high" | "salary_low" | "deadline",
       page: 1,
     }));
   };
@@ -227,11 +180,7 @@ export default function CareerPage() {
 
   const clearFilters = () => {
     setSearchQuery("");
-    setSearchParams({
-      page: 1,
-      limit: 12,
-      sort: "newest",
-    });
+    setSearchParams({ page: 1, limit: 12, sort: "newest" });
   };
 
   const hasActiveFilters = () => {
@@ -247,26 +196,111 @@ export default function CareerPage() {
 
   const formatSalary = (min?: number, max?: number, currency = "IDR") => {
     if (!min && !max) return "Salary not disclosed";
-
     const format = (amount: number) => {
-      if (currency === "IDR") {
-        return `Rp ${(amount / 1000000).toFixed(0)}M`;
-      }
+      if (currency === "IDR") return `Rp ${(amount / 1000000).toFixed(0)}M`;
       return `$${(amount / 1000).toFixed(0)}K`;
     };
-
-    if (min && max) {
-      return `${format(min)} - ${format(max)}`;
-    }
+    if (min && max) return `${format(min)} - ${format(max)}`;
     return min ? `From ${format(min)}` : `Up to ${format(max!)}`;
+  };
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+    
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
+    
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  };
+
+  const handleApplication = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPosition) return;
+
+    setApplying(true);
+    try {
+      const application = {
+        position_id: selectedPosition.id,
+        ...applicationData,
+      };
+
+      const result = await careerService.submitApplication(application);
+
+      if (result.success) {
+        setShowApplicationForm(false);
+        setApplicationData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          phone: "",
+          cover_letter: "",
+          resume_url: "",
+          portfolio_url: "",
+          linkedin_url: "",
+          github_url: "",
+          source: "website",
+        });
+
+        toast({
+          title: "Application Submitted!",
+          description: "You will receive a confirmation email shortly.",
+          variant: "success",
+        });
+      } else {
+        console.error("Application submission failed:", result.error);
+        throw new Error(result.error || "Failed to submit application");
+      }
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      let errorMessage = "Failed to submit application. Please try again.";
+      if (error instanceof Error && error.message) {
+        errorMessage = `Failed to submit application: ${error.message}`;
+      }
+
+      toast({
+        title: "Submission Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const sharePosition = async () => {
+    if (navigator.share && selectedPosition) {
+      try {
+        await navigator.share({
+          title: selectedPosition.title,
+          text: selectedPosition.description?.substring(0, 100) + "...",
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log("Error sharing:", err);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "URL Copied!",
+        description: "Position URL copied to clipboard!",
+        variant: "success",
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section with Background Paths */}
+      {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-primary via-primary/90 to-primary/80 text-primary-foreground overflow-hidden">
         <BackgroundPaths />
-
         <div className="relative z-10 container mx-auto px-4 py-12 md:px-6 lg:py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl bg-gradient-to-r from-primary-foreground to-primary-foreground/80 bg-clip-text text-transparent mb-6">
@@ -277,34 +311,20 @@ export default function CareerPage() {
               Discover opportunities that match your passion and skills.
             </p>
 
-            {/* Enhanced Search Section */}
-            <div className="bg-primary-foreground/10 backdrop-blur-sm rounded-3xl p-6 md:p-8 max-w-4xl mx-auto border border-primary-foreground/20">
-              <div className="flex flex-col lg:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-foreground/60 h-5 w-5" />
-                  <Input
-                    placeholder="Search jobs, skills, or companies..."
-                    className="pl-12 pr-4 h-12 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/30 focus:ring-2 focus:ring-primary-foreground/50"
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                  />
-                </div>
-                <Button
-                  size="lg"
-                  className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-12 px-8"
-                  onClick={() =>
-                    document
-                      .getElementById("jobs-section")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                >
-                  <Search className="mr-2 h-5 w-5" />
-                  Search Jobs
-                </Button>
+            {/* Search Section */}
+            <div className="max-w-2xl mx-auto">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary-foreground/60 h-5 w-5" />
+                <Input
+                  placeholder="Search jobs, skills, or companies..."
+                  className="pl-12 pr-4 h-12 bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-primary-foreground/30 focus:ring-2 focus:ring-primary-foreground/50 rounded-xl"
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
               </div>
             </div>
 
-            {/* Enhanced Stats */}
+            {/* Stats */}
             <div className="flex flex-wrap items-center justify-center gap-6 pt-8 text-sm text-primary-foreground/80">
               <div className="flex items-center gap-2 bg-primary-foreground/10 px-4 py-2 rounded-full">
                 <Building2 className="w-4 h-4" />
@@ -327,543 +347,569 @@ export default function CareerPage() {
         </div>
       </section>
 
-      {/* All Positions */}
-      <section id="jobs-section" className="py-20">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center mb-16 space-y-6">
-            <div className="space-y-4">
-              <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                All Positions
-              </h2>
-              <p className="mt-6 max-w-3xl mx-auto text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                Browse all available opportunities and find your perfect match
-              </p>
+      {/* Main Content - Jobstreet Style Layout */}
+      <section className="py-12 bg-gradient-to-b from-background to-muted/5">
+        <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary text-sm font-medium rounded-full mb-6">
+              <Briefcase className="w-4 h-4" />
+              Career Opportunities
             </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-muted-foreground bg-clip-text text-transparent mb-6">
+              Available Positions
+            </h2>
+            <p className="max-w-2xl mx-auto text-lg text-muted-foreground leading-relaxed">
+              Discover opportunities that match your skills and aspirations
+            </p>
           </div>
 
-          <div className="flex flex-col xl:flex-row gap-8">
-            {/* Mobile Filter Toggle */}
-            <div className="xl:hidden">
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                className={cn(
-                  "w-full transition-all duration-200",
-                  showFilters
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background text-foreground border-border hover:bg-accent hover:text-accent-foreground"
-                )}
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                {showFilters ? "Hide Filters" : "Show Filters"}
-              </Button>
-            </div>
-
-            {/* Filters Sidebar */}
-            <div
-              className={cn(
-                "xl:w-80 space-y-6 transition-all duration-300",
-                showFilters ? "block" : "hidden xl:block"
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Filters</h3>
+          {/* Filters Section - Moved to top */}
+          <div className="mb-8">
+            <div className="bg-card rounded-lg border shadow-sm p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-foreground">Filters</h3>
                 {hasActiveFilters() && (
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={clearFilters}
-                    className="border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-auto px-2 py-1 rounded-md text-xs"
                   >
-                    <X className="w-4 h-4 mr-2" />
-                    Clear All
+                    <X className="w-3 h-3 mr-1" />
+                    Reset
                   </Button>
                 )}
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Category
-                  </label>
-                  <Select
-                    value={searchParams.filters?.category || "all"}
-                    onValueChange={(value) =>
-                      handleFilterChange("category", value)
-                    }
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "transition-all duration-200",
-                        searchParams.filters?.category &&
-                          searchParams.filters.category !== "all"
-                          ? "border-primary ring-1 ring-primary/20"
-                          : "border-border hover:border-primary/50"
-                      )}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { key: "category" as const, label: "Category", options: categories },
+                  { key: "location" as const, label: "Location", options: locations },
+                  { key: "type" as const, label: "Job Type", options: types },
+                  { key: "level" as const, label: "Experience Level", options: levels },
+                ].map(({ key, label, options }) => (
+                  <div key={label}>
+                    <label className="text-sm font-medium text-foreground mb-2 block">
+                      {label}
+                    </label>
+                    <Select
+                      value={searchParams.filters?.[key] || "all"}
+                      onValueChange={(value) => handleFilterChange(key, value)}
                     >
-                      <SelectValue placeholder="All Categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.slug}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Location
-                  </label>
-                  <Select
-                    value={searchParams.filters?.location || "all"}
-                    onValueChange={(value) =>
-                      handleFilterChange("location", value)
-                    }
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "transition-all duration-200",
-                        searchParams.filters?.location &&
-                          searchParams.filters.location !== "all"
-                          ? "border-primary ring-1 ring-primary/20"
-                          : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      <SelectValue placeholder="All Locations" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Locations</SelectItem>
-                      {locations.map((location) => (
-                        <SelectItem key={location.id} value={location.slug}>
-                          {location.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Job Type
-                  </label>
-                  <Select
-                    value={searchParams.filters?.type || "all"}
-                    onValueChange={(value) => handleFilterChange("type", value)}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "transition-all duration-200",
-                        searchParams.filters?.type &&
-                          searchParams.filters.type !== "all"
-                          ? "border-primary ring-1 ring-primary/20"
-                          : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      <SelectValue placeholder="All Types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      {types.map((type) => (
-                        <SelectItem key={type.id} value={type.slug}>
-                          {type.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Experience Level
-                  </label>
-                  <Select
-                    value={searchParams.filters?.level || "all"}
-                    onValueChange={(value) =>
-                      handleFilterChange("level", value)
-                    }
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "transition-all duration-200",
-                        searchParams.filters?.level &&
-                          searchParams.filters.level !== "all"
-                          ? "border-primary ring-1 ring-primary/20"
-                          : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      <SelectValue placeholder="All Levels" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Levels</SelectItem>
-                      {levels.map((level) => (
-                        <SelectItem key={level.id} value={level.slug}>
-                          {level.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Remote Work
-                  </label>
-                  <Select
-                    value={searchParams.filters?.remote ? "true" : "all"}
-                    onValueChange={(value) =>
-                      handleFilterChange("remote", value)
-                    }
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "transition-all duration-200",
-                        searchParams.filters?.remote === true ||
-                          String(searchParams.filters?.remote) === "true"
-                          ? "border-primary ring-1 ring-primary/20"
-                          : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      <SelectValue placeholder="All Work Types" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Work Types</SelectItem>
-                      <SelectItem value="true">Remote Only</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                      <SelectTrigger className="h-10 rounded-lg">
+                        <SelectValue placeholder={`All ${label}s`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All {label}s</SelectItem>
+                        {options.map((option) => (
+                          <SelectItem key={option.id} value={option.slug}>
+                            {option.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
               </div>
             </div>
+          </div>
 
-            {/* Main Content */}
-            <main role="main" aria-label="Career positions" className="flex-1">
-              {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-                <div>
-                  <p className="text-muted-foreground">
-                    {totalCount} positions found
-                    {hasActiveFilters() && (
-                      <span className="ml-2 text-sm text-primary">
-                        (filtered results)
-                      </span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <Select
-                    value={searchParams.sort || "newest"}
-                    onValueChange={handleSortChange}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "w-40 transition-all duration-200",
-                        searchParams.sort && searchParams.sort !== "newest"
-                          ? "border-primary ring-1 ring-primary/20"
-                          : "border-border hover:border-primary/50"
-                      )}
-                    >
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Column - Job Listings */}
+            <div className="lg:w-2/5">
+              {/* Job Listings */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {totalCount} Jobs
+                  </h3>
+                  <Select value={searchParams.sort || "newest"} onValueChange={handleSortChange}>
+                    <SelectTrigger className="w-40 h-9 rounded-lg text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="newest">Newest First</SelectItem>
+                      <SelectItem value="newest">Latest Posts</SelectItem>
                       <SelectItem value="oldest">Oldest First</SelectItem>
-                      <SelectItem value="title">By Title</SelectItem>
-                      <SelectItem value="salary_high">
-                        Salary: High to Low
-                      </SelectItem>
-                      <SelectItem value="salary_low">
-                        Salary: Low to High
-                      </SelectItem>
-                      <SelectItem value="deadline">By Deadline</SelectItem>
+                      <SelectItem value="title">Alphabetical</SelectItem>
+                      <SelectItem value="salary_high">Highest Salary</SelectItem>
+                      <SelectItem value="salary_low">Lowest Salary</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
 
-                  <div className="flex border rounded-lg overflow-hidden">
-                    <Button
-                      variant={viewMode === "grid" ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setViewMode("grid")}
-                      className={cn(
-                        "rounded-none border-r transition-all duration-200",
-                        viewMode === "grid"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
-                      )}
-                    >
-                      <Grid3x3 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === "list" ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setViewMode("list")}
-                      className={cn(
-                        "rounded-none transition-all duration-200",
-                        viewMode === "list"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
-                      )}
-                    >
-                      <List className="h-4 w-4" />
-                    </Button>
+                {/* Job Cards */}
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+                    <p className="text-sm text-muted-foreground">Loading positions...</p>
                   </div>
-                </div>
-              </div>
-
-              {/* Position Cards */}
-              {loading ? (
-                <div className="text-center py-16">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-4 text-muted-foreground">
-                    {hasActiveFilters()
-                      ? "Applying filters..."
-                      : "Loading positions..."}
-                  </p>
-                </div>
-              ) : positions.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="max-w-md mx-auto space-y-6">
-                    <div className="w-24 h-24 mx-auto bg-muted/50 rounded-full flex items-center justify-center">
+                ) : positions.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto bg-muted/20 rounded-full flex items-center justify-center mb-4">
                       <Briefcase className="h-8 w-8 text-muted-foreground" />
                     </div>
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-semibold">
-                        No positions found
-                      </h3>
-                      <p className="text-muted-foreground">
-                        {hasActiveFilters()
-                          ? "Try adjusting your filters to see more results."
-                          : "No positions have been published yet. Please check back later!"}
-                      </p>
-                    </div>
-                    {hasActiveFilters() && (
-                      <Button
-                        variant="outline"
-                        onClick={clearFilters}
-                        className="gap-2"
-                      >
-                        <X className="h-4 w-4" />
-                        Clear Filters
-                      </Button>
-                    )}
+                    <h3 className="text-lg font-medium text-foreground mb-2">No positions found</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {hasActiveFilters() ? "Try adjusting your filters." : "Check back later for new opportunities!"}
+                    </p>
                   </div>
-                </div>
-              ) : (
-                <>
-                  <div
-                    className={cn(
-                      viewMode === "grid"
-                        ? "grid gap-6 sm:gap-8 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-                        : "space-y-4"
-                    )}
-                    aria-label="Career positions"
-                  >
+                ) : (
+                  <div className="space-y-3 max-h-[900px] overflow-y-auto">
                     {positions.map((position) => (
                       <Card
                         key={position.id}
-                        className="group hover:shadow-xl transition-all duration-300 ease-in-out group-hover:-translate-y-1 group-focus-visible:ring-2 group-focus-visible:ring-primary group-focus-visible:ring-offset-2 border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm"
+                        className={cn(
+                          "group cursor-pointer transition-all duration-200 border hover:border-primary/30 hover:shadow-md",
+                          selectedPosition?.id === position.id
+                            ? "border-primary bg-primary/5 shadow-md"
+                            : "border-border"
+                        )}
+                        onClick={() => setSelectedPosition(position)}
                       >
-                        <CardHeader className="pb-3">
-                          <div className="flex items-start justify-between">
-                            <div className="space-y-3 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                {position.featured && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="bg-primary/10 text-primary gap-1 px-2 py-1"
-                                  >
-                                    <Star className="h-3 w-3" />
-                                    <span className="text-xs">Featured</span>
-                                  </Badge>
-                                )}
-                                {position.urgent && (
-                                  <Badge
-                                    variant="destructive"
-                                    className="gap-1 px-2 py-1"
-                                  >
-                                    <span className="text-xs">Urgent</span>
-                                  </Badge>
-                                )}
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Building2 className="w-6 h-6 text-muted-foreground" />
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between mb-2">
+                                <h4 className="font-semibold text-foreground text-sm line-clamp-1 group-hover:text-primary transition-colors">
+                                  {position.title}
+                                </h4>
                               </div>
-                              <CardTitle className="group-hover:text-primary transition-colors text-lg leading-tight line-clamp-2">
-                                {position.title}
-                              </CardTitle>
-                              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                                {position.category && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs text-primary-foreground border-0 px-2 py-1"
-                                    style={{
-                                      backgroundColor:
-                                        position.category.color ||
-                                        "hsl(var(--primary))",
-                                    }}
-                                  >
-                                    {position.category.name}
-                                  </Badge>
-                                )}
+
+                              <p className="text-sm text-muted-foreground mb-2">
+                                Company Name
+                              </p>
+
+                              <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
                                 <div className="flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />
-                                  <span className="text-xs">
-                                    {position.location?.name}
-                                  </span>
+                                  <MapPin className="w-3 h-3" />
+                                  <span>{position.location?.name}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  <span className="text-xs">
-                                    {position.type?.name}
-                                  </span>
+                                  <Clock className="w-3 h-3" />
+                                  <span>{position.type?.name}</span>
                                 </div>
                               </div>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="pt-0">
-                          <p className="text-sm text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
-                            {position.summary}
-                          </p>
 
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="text-sm">
-                              <span className="font-medium text-primary">
-                                {formatSalary(
-                                  position.salary_min,
-                                  position.salary_max,
-                                  position.salary_currency
-                                )}
-                              </span>
-                              <span className="text-muted-foreground ml-1 text-xs">
-                                /{position.salary_type}
-                              </span>
-                            </div>
-                            <Badge
-                              variant="outline"
-                              className="text-xs px-2 py-1"
-                            >
-                              {position.level?.name}
-                            </Badge>
-                          </div>
+                              {position.salary_min || position.salary_max ? (
+                                <p className="text-sm font-medium text-primary mb-2">
+                                  {formatSalary(position.salary_min, position.salary_max, position.salary_currency)}
+                                </p>
+                              ) : null}
 
-                          {position.skills && position.skills.length > 0 && (
-                            <div className="mb-4">
-                              <div className="flex flex-wrap gap-1">
-                                {position.skills
-                                  .slice(0, 3)
-                                  .map((skillItem) => (
-                                    <Badge
-                                      key={skillItem.id}
-                                      variant={
-                                        skillItem.level === "required"
-                                          ? "default"
-                                          : "secondary"
-                                      }
-                                      className={cn(
-                                        "text-xs px-2 py-1",
-                                        skillItem.level === "required" &&
-                                          "bg-primary hover:bg-primary/90"
-                                      )}
-                                    >
-                                      {skillItem.skill?.name}
-                                      {skillItem.level === "required" && " *"}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  {position.featured && (
+                                    <Badge variant="secondary" className="text-xs px-2 py-1 bg-primary/10 text-primary">
+                                      <Star className="w-3 h-3 mr-1 fill-current" />
+                                      Featured
                                     </Badge>
-                                  ))}
-                                {position.skills.length > 3 && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs px-2 py-1"
-                                  >
-                                    +{position.skills.length - 3} more
+                                  )}
+                                  <Badge variant="outline" className="text-xs px-2 py-1">
+                                    {position.level?.name}
                                   </Badge>
-                                )}
+                                </div>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatTimeAgo(position.created_at)}
+                                </span>
                               </div>
                             </div>
-                          )}
-
-                          <div className="flex items-center justify-between">
-                            <div className="text-xs text-muted-foreground">
-                              {position.views_count} views •{" "}
-                              {position.applications_count} applications
-                            </div>
-                            <Link href={`/career/${position.slug}`}>
-                              <Button
-                                variant="outline"
-                                className="group-hover:bg-primary group-hover:text-primary-foreground text-xs px-3 py-2"
-                              >
-                                View Details
-                              </Button>
-                            </Link>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
                   </div>
+                )}
 
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <nav
-                      className="flex items-center justify-center mt-12"
-                      aria-label="Pagination"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          disabled={searchParams.page === 1}
-                          onClick={() =>
-                            handlePageChange((searchParams.page || 1) - 1)
-                          }
-                          aria-label="Previous page"
-                        >
-                          Previous
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center mt-6">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={searchParams.page === 1}
+                        onClick={() => handlePageChange((searchParams.page || 1) - 1)}
+                        className="h-9 px-3"
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-muted-foreground px-3">
+                        Page {searchParams.page || 1} of {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={searchParams.page === totalPages}
+                        onClick={() => handlePageChange((searchParams.page || 1) + 1)}
+                        className="h-9 px-3"
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column - Job Details */}
+            <div className="lg:w-3/5">
+              {selectedPosition ? (
+                <div className="bg-card rounded-lg border shadow-sm p-6">
+                  {/* Job Header */}
+                  <div className="mb-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap mb-3">
+                          {selectedPosition.featured && (
+                            <Badge
+                              variant="secondary"
+                              className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                            >
+                              <Star className="w-3 h-3 mr-1 fill-current" />
+                              Featured
+                            </Badge>
+                          )}
+                          {selectedPosition.urgent && (
+                            <Badge variant="destructive">
+                              <Clock className="w-3 h-3 mr-1" />
+                              Urgent
+                            </Badge>
+                          )}
+                          <Badge
+                            variant={
+                              selectedPosition.status === "open"
+                                ? "default"
+                                : selectedPosition.status === "closed"
+                                ? "secondary"
+                                : "outline"
+                            }
+                          >
+                            {selectedPosition.status}
+                          </Badge>
+                        </div>
+
+                        <h2 className="text-2xl font-bold text-foreground mb-2">
+                          {selectedPosition.title}
+                        </h2>
+
+
+                        <div className="text-lg font-semibold text-primary">
+                          {formatSalary(
+                            selectedPosition.salary_min,
+                            selectedPosition.salary_max,
+                            selectedPosition.salary_currency
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Button onClick={sharePosition} variant="outline" size="sm">
+                          <Share2 className="w-4 h-4 mr-2" />
+                          Share
                         </Button>
-
-                        {Array.from(
-                          { length: Math.min(5, totalPages) },
-                          (_, i) => {
-                            const page = i + 1;
-                            return (
-                              <Button
-                                key={page}
-                                variant={
-                                  searchParams.page === page
-                                    ? "default"
-                                    : "outline"
-                                }
-                                onClick={() => handlePageChange(page)}
-                                aria-label={`Page ${page}`}
-                                aria-current={
-                                  searchParams.page === page
-                                    ? "page"
-                                    : undefined
-                                }
-                              >
-                                {page}
-                              </Button>
-                            );
-                          }
-                        )}
-
                         <Button
-                          variant="outline"
-                          disabled={searchParams.page === totalPages}
-                          onClick={() =>
-                            handlePageChange((searchParams.page || 1) + 1)
-                          }
-                          aria-label="Next page"
+                          onClick={() => setShowApplicationForm(true)}
+                          className="bg-primary hover:bg-primary/90"
                         >
-                          Next
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Apply Now
                         </Button>
                       </div>
-                    </nav>
+                    </div>
+                  </div>
+
+                  {/* Position Details Sidebar - Moved to top */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 bg-muted/30 rounded-lg border">
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2">Department</h4>
+                      <p className="text-foreground">{selectedPosition.category?.name}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2">Location</h4>
+                      <p className="text-foreground">{selectedPosition.location?.name}</p>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2">Employment Type</h4>
+                      <p className="text-foreground">{selectedPosition.type?.name}</p>
+                    </div>
+                    {selectedPosition.level && (
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Experience Level</h4>
+                        <p className="text-foreground">{selectedPosition.level.name}</p>
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-2">Posted</h4>
+                      <p className="text-foreground">{new Date(selectedPosition.created_at).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+
+                  {/* Job Description */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-foreground mb-3">Job Description</h3>
+                    <div className="prose prose-sm max-w-none">
+                      <ContentRenderer 
+                        content={selectedPosition.description || "No description available."} 
+                        contentType="markdown"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Requirements */}
+                  {selectedPosition.requirements && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold text-foreground mb-3">Requirements</h3>
+                      <div className="prose prose-sm max-w-none">
+                        <ContentRenderer 
+                          content={selectedPosition.requirements} 
+                          contentType="markdown"
+                        />
+                      </div>
+                    </div>
                   )}
-                </>
+
+                  {/* Benefits */}
+                  {selectedPosition.benefits && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold text-foreground mb-3">Benefits & Perks</h3>
+                      <div className="prose prose-sm max-w-none">
+                        <ContentRenderer 
+                          content={selectedPosition.benefits} 
+                          contentType="markdown"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Skills */}
+                  {selectedPosition.skills && selectedPosition.skills.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold text-foreground mb-3">Required Skills</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedPosition.skills.map((skillItem) => (
+                          <Badge
+                            key={skillItem.id}
+                            variant={skillItem.level === "required" ? "default" : "secondary"}
+                            className={cn(
+                              "text-sm px-3 py-1.5",
+                              skillItem.level === "required"
+                                ? "bg-primary hover:bg-primary/90"
+                                : "bg-muted/50 text-muted-foreground border border-border"
+                            )}
+                          >
+                            {skillItem.skill?.name}
+                            {skillItem.level === "required" && " *"}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-card rounded-lg border shadow-sm p-12 text-center">
+                  <div className="w-24 h-24 mx-auto bg-muted/20 rounded-full flex items-center justify-center mb-6">
+                    <Briefcase className="h-12 w-12 text-muted-foreground" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Select a Position</h3>
+                  <p className="text-muted-foreground">Choose a job from the list to view details and apply</p>
+                </div>
               )}
-            </main>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Application Form Modal */}
+      {showApplicationForm && selectedPosition && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Apply for {selectedPosition.title}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowApplicationForm(false)}
+                >
+                  ×
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleApplication} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-foreground">
+                      First Name *
+                    </label>
+                    <Input
+                      value={applicationData.first_name}
+                      onChange={(e) =>
+                        setApplicationData((prev) => ({
+                          ...prev,
+                          first_name: e.target.value,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-foreground">
+                      Last Name *
+                    </label>
+                    <Input
+                      value={applicationData.last_name}
+                      onChange={(e) =>
+                        setApplicationData((prev) => ({
+                          ...prev,
+                          last_name: e.target.value,
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground">
+                    Email *
+                  </label>
+                  <Input
+                    type="email"
+                    value={applicationData.email}
+                    onChange={(e) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground">
+                    Phone
+                  </label>
+                  <Input
+                    type="tel"
+                    value={applicationData.phone}
+                    onChange={(e) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground">
+                    Cover Letter
+                  </label>
+                  <Textarea
+                    value={applicationData.cover_letter}
+                    onChange={(e) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        cover_letter: e.target.value,
+                      }))
+                    }
+                    rows={4}
+                    placeholder="Tell us why you're perfect for this role..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground">
+                    Resume URL
+                  </label>
+                  <Input
+                    type="url"
+                    value={applicationData.resume_url}
+                    onChange={(e) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        resume_url: e.target.value,
+                      }))
+                    }
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-foreground">
+                      Portfolio URL
+                    </label>
+                    <Input
+                      type="url"
+                      value={applicationData.portfolio_url}
+                      onChange={(e) =>
+                        setApplicationData((prev) => ({
+                          ...prev,
+                          portfolio_url: e.target.value,
+                        }))
+                      }
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-foreground">
+                      LinkedIn URL
+                    </label>
+                    <Input
+                      type="url"
+                      value={applicationData.portfolio_url}
+                      onChange={(e) =>
+                        setApplicationData((prev) => ({
+                          ...prev,
+                          linkedin_url: e.target.value,
+                        }))
+                      }
+                      placeholder="https://linkedin.com/in/..."
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-foreground">
+                    GitHub URL
+                  </label>
+                  <Input
+                    type="url"
+                    value={applicationData.github_url}
+                    onChange={(e) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        github_url: e.target.value,
+                      }))
+                    }
+                    placeholder="https://github.com/..."
+                  />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowApplicationForm(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={applying}
+                    className="flex-1"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    {applying ? "Submitting..." : "Submit Application"}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

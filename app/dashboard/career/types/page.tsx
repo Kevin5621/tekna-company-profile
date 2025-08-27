@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { CareerService, CareerType } from "@/lib/services/career";
+import { CareerService, CareerCategory } from "@/lib/services/career";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,17 +31,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Edit2, Trash2, Briefcase, Building2 } from "lucide-react";
+import { Plus, Edit2, Trash2, FolderOpen, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 import BackButton from "@/components/ui/back-button";
 
-interface Type extends CareerType {
+interface Category extends CareerCategory {
   positions_count?: number;
 }
 
-export default function TypesPage() {
-  const [types, setTypes] = useState<Type[]>([]);
+export default function CategoriesPage() {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -53,93 +53,96 @@ export default function TypesPage() {
 
   const careerService = useMemo(() => new CareerService(), []);
 
-  const loadTypes = useCallback(async () => {
+  const loadCategories = useCallback(async () => {
     try {
-      const data = await careerService.getAllTypes();
-      // Get position counts for each type
-      const typesWithCounts = await Promise.all(
-        data.map(async (type: CareerType) => {
+      const data = await careerService.getCategories();
+      // Get position counts for each category
+      const categoriesWithCounts = await Promise.all(
+        data.map(async (category: CareerCategory) => {
           try {
-            const positions = await careerService.getPositionsByType(type.id);
-            return { ...type, positions_count: positions.length };
+            const positions = await careerService.getPositionsByCategory(category.id);
+            return { ...category, positions_count: positions.length };
           } catch (error) {
-            console.error(`Error getting positions for type ${type.id}:`, error);
-            return { ...type, positions_count: 0 };
+            console.error(`Error getting positions for category ${category.id}:`, error);
+            return { ...category, positions_count: 0 };
           }
         })
       );
-      setTypes(typesWithCounts);
+      setCategories(categoriesWithCounts);
     } catch (error) {
-      console.error("Error loading types:", error);
-      toast.error("Failed to load types");
+      console.error("Error loading categories:", error);
+      toast.error("Failed to load categories");
     } finally {
       setLoading(false);
     }
   }, [careerService]);
 
   useEffect(() => {
-    loadTypes();
-  }, [loadTypes]);
+    loadCategories();
+  }, [loadCategories]);
 
   const handleAdd = async () => {
     if (!formData.name.trim()) {
-      toast.error("Type name is required");
+      toast.error("Category name is required");
       return;
     }
 
     try {
-      await careerService.createType({
+      await careerService.createCategory({
         name: formData.name.trim(),
         description: formData.description.trim() || null,
       });
 
-      toast.success("Type created successfully");
+      toast.success("Category created successfully");
       resetForm();
-      loadTypes();
+      loadCategories();
     } catch (error) {
-      console.error("Error creating type:", error);
-      toast.error("Failed to create type");
+      console.error("Error creating category:", error);
+      toast.error("Failed to create category");
     }
   };
 
   const handleEdit = async (id: string) => {
     if (!formData.name.trim()) {
-      toast.error("Type name is required");
+      toast.error("Category name is required");
       return;
     }
 
     try {
-      await careerService.updateType(id, {
+      await careerService.updateCategory(id, {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
       });
 
-      toast.success("Type updated successfully");
+      toast.success("Category updated successfully");
       resetForm();
-      loadTypes();
+      loadCategories();
     } catch (error) {
-      console.error("Error updating type:", error);
-      toast.error("Failed to update type");
+      console.error("Error updating category:", error);
+      toast.error("Failed to update category");
     }
   };
 
   const handleDelete = async (id: string) => {
+    const category = categories.find((c) => c.id === id);
+    if (!category) return;
+
     try {
-      await careerService.deleteType(id);
-      toast.success("Type deleted successfully");
+      await careerService.deleteCategory(id);
+      toast.success("Category deleted successfully");
       setShowDeleteConfirm(null);
-      loadTypes();
+      loadCategories();
     } catch (error) {
-      console.error("Error deleting type:", error);
-      toast.error("Failed to delete type");
+      console.error("Error deleting category:", error);
+      toast.error("Failed to delete category");
     }
   };
 
-  const startEdit = (type: Type) => {
-    setEditingId(type.id);
+  const startEdit = (category: Category) => {
+    setEditingId(category.id);
     setFormData({
-      name: type.name,
-      description: type.description || "",
+      name: category.name,
+      description: category.description || "",
     });
     setShowAddForm(false);
   };
@@ -156,14 +159,14 @@ export default function TypesPage() {
     setFormData({ name: "", description: "" });
   };
 
-  const confirmDelete = (type: Type) => {
-    if (type.positions_count && type.positions_count > 0) {
+  const confirmDelete = (category: Category) => {
+    if (category.positions_count && category.positions_count > 0) {
       toast.error(
-        `Cannot delete type. It has ${type.positions_count} positions.`
+        `Cannot delete category. It has ${category.positions_count} positions.`
       );
       return;
     }
-    setShowDeleteConfirm(type.id);
+    setShowDeleteConfirm(category.id);
   };
 
   if (loading) {
@@ -171,7 +174,7 @@ export default function TypesPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">Loading types...</p>
+          <p className="mt-2 text-muted-foreground">Loading categories...</p>
         </div>
       </div>
     );
@@ -183,8 +186,8 @@ export default function TypesPage() {
       <DashboardBreadcrumb
         items={[
           { label: "Career", href: "/dashboard/career" },
-          { label: "Career Types", href: "/dashboard/career/types" },
-          { label: "Type Management", isCurrentPage: true },
+          { label: "Career Categories", href: "/dashboard/career/categories" },
+          { label: "Category Management", isCurrentPage: true },
         ]}
       />
 
@@ -196,14 +199,14 @@ export default function TypesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Job Types</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Job Categories</h1>
           <p className="text-muted-foreground">
-            Manage employment types and arrangements
+            Organize job positions by categories
           </p>
         </div>
         <Button onClick={startAdd} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          Add Type
+          Add Category
         </Button>
       </div>
 
@@ -212,24 +215,24 @@ export default function TypesPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingId ? "Edit Job Type" : "Add New Job Type"}
+              {editingId ? "Edit Category" : "Add New Category"}
             </DialogTitle>
             <DialogDescription>
               {editingId 
-                ? "Update the job type information below."
-                : "Create a new employment type for job positions."
+                ? "Update the category information below."
+                : "Create a new job category to organize positions."
               }
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Type Name *</Label>
+              <Label htmlFor="name">Name *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="e.g., Full-time, Part-time, Contract"
+                placeholder="e.g., Software Development"
                 className="mt-1"
               />
             </div>
@@ -239,7 +242,7 @@ export default function TypesPage() {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Brief description of this employment type..."
+                placeholder="Brief description of this category..."
                 rows={3}
                 className="mt-1"
               />
@@ -254,7 +257,7 @@ export default function TypesPage() {
               onClick={() => editingId ? handleEdit(editingId) : handleAdd()}
               disabled={!formData.name.trim()}
             >
-              {editingId ? "Update Type" : "Create Type"}
+              {editingId ? "Update Category" : "Create Category"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -264,9 +267,9 @@ export default function TypesPage() {
       <AlertDialog open={showDeleteConfirm !== null} onOpenChange={() => setShowDeleteConfirm(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Job Type</AlertDialogTitle>
+            <AlertDialogTitle>Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &ldquo;{types.find(t => t.id === showDeleteConfirm)?.name}&rdquo;? 
+              Are you sure you want to delete &ldquo;{categories.find(c => c.id === showDeleteConfirm)?.name}&rdquo;? 
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -282,23 +285,23 @@ export default function TypesPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Types Grid */}
-      {types.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {types.map((type) => (
-            <Card key={type.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
+      {/* Categories Grid */}
+      {categories.length > 0 ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {categories.map((category) => (
+            <Card key={category.id} className="hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <Briefcase className="h-5 w-5 text-primary" />
+                      <FolderOpen className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{type.name}</CardTitle>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{category.name}</CardTitle>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="secondary" className="text-xs">
                           <Building2 className="h-3 w-3 mr-1" />
-                          {type.positions_count || 0} positions
+                          {category.positions_count || 0} positions
                         </Badge>
                       </div>
                     </div>
@@ -307,7 +310,7 @@ export default function TypesPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => startEdit(type)}
+                      onClick={() => startEdit(category)}
                       className="h-8 w-8 p-0"
                     >
                       <Edit2 className="h-3 w-3" />
@@ -315,19 +318,19 @@ export default function TypesPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => confirmDelete(type)}
+                      onClick={() => confirmDelete(category)}
                       className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                      disabled={(type.positions_count || 0) > 0}
+                      disabled={(category.positions_count || 0) > 0}
                     >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
-              {type.description && (
+              {category.description && (
                 <CardContent className="pt-0">
                   <p className="text-sm text-muted-foreground line-clamp-3">
-                    {type.description}
+                    {category.description}
                   </p>
                 </CardContent>
               )}
@@ -339,16 +342,16 @@ export default function TypesPage() {
           <CardContent className="p-8 text-center">
             <div className="space-y-4">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
-                <Briefcase className="h-8 w-8 text-muted-foreground" />
+                <FolderOpen className="h-8 w-8 text-muted-foreground" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">No job types yet</h3>
+                <h3 className="text-lg font-semibold mb-2">No categories yet</h3>
                 <p className="text-muted-foreground mb-4">
-                  Create employment types to categorize your job positions by work arrangement.
+                  Create categories to organize your job positions effectively.
                 </p>
                 <Button onClick={startAdd} className="flex items-center gap-2">
                   <Plus className="h-4 w-4" />
-                  Create First Type
+                  Create First Category
                 </Button>
               </div>
             </div>
