@@ -58,9 +58,6 @@ export function usePermissions() {
     return hasPermission("admin");
   };
 
-  const canAccessNewsletter = (): boolean => {
-    return hasPermission("admin");
-  };
 
   const refreshUser = () => {
     loadCurrentUser();
@@ -75,7 +72,6 @@ export function usePermissions() {
     canManageSettings,
     canManageContent,
     canAccessAdminPanel,
-    canAccessNewsletter,
     refreshUser,
   };
 }

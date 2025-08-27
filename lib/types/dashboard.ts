@@ -100,6 +100,7 @@ export interface NewsletterSubscription {
   source?: string;
 }
 
+
 export interface Category {
   id: string;
   name: string;

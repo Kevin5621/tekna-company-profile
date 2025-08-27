@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+// Footer newsletter UI removed - button/input components not needed here
 import { Separator } from "@/components/ui/separator";
 import {
   Mail,
@@ -14,7 +13,6 @@ import {
   Linkedin,
   Youtube,
   ExternalLink,
-  ArrowRight,
   Users,
   Briefcase,
   FileText,
@@ -40,7 +38,7 @@ import {
   type SocialMedia,
   type ContactInfo,
   type CompanyInfo,
-  type NewsletterSettings,
+  // newsletter settings type removed
 } from "@/lib/services/footer";
 
 // Icon mapping for dynamic icons
@@ -74,37 +72,33 @@ const iconMap = {
 };
 
 export function Footer() {
-  const [email, setEmail] = useState("");
-  const [isSubscribing, setIsSubscribing] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  // newsletter state removed
   const [footerSections, setFooterSections] = useState<FooterSection[]>([]);
   const [socialMedia, setSocialMedia] = useState<SocialMedia[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
-  const [newsletterSettings, setNewsletterSettings] =
-    useState<NewsletterSettings | null>(null);
+  // newsletter removed
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const footerService = new FooterService();
 
-    async function loadFooterData() {
+  async function loadFooterData() {
       setIsLoading(true);
       try {
-        const [sections, social, contact, company, newsletter] =
+            const [sections, social, contact, company] =
           await Promise.all([
             footerService.getPublicFooterSections(),
             footerService.getPublicSocialMedia(),
             footerService.getPublicContactInfo(),
             footerService.getCompanyInfo(),
-            footerService.getPublicNewsletterSettings(),
-          ]);
+            ]);
 
         setFooterSections(sections);
         setSocialMedia(social);
         setContactInfo(contact);
         setCompanyInfo(company);
-        setNewsletterSettings(newsletter);
+  // newsletter omitted
       } catch (error) {
         console.error("Error loading footer data:", error);
       } finally {
@@ -115,30 +109,7 @@ export function Footer() {
     loadFooterData();
   }, []);
 
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubscribing(true);
-
-    try {
-      const footerService = new FooterService();
-      const success = await footerService.subscribeToNewsletter(email);
-
-      if (success) {
-        setIsSubscribed(true);
-        setEmail("");
-
-        // Reset message after 3 seconds
-        setTimeout(() => setIsSubscribed(false), 3000);
-      } else {
-        // Handle error - you might want to show an error message
-        console.error("Failed to subscribe");
-      }
-    } catch (error) {
-      console.error("Newsletter subscription error:", error);
-    } finally {
-      setIsSubscribing(false);
-    }
-  };
+  // newsletter subscription removed
 
   const getIcon = (iconName: string) => {
     const IconComponent = iconMap[iconName as keyof typeof iconMap];
@@ -176,7 +147,7 @@ export function Footer() {
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 md:px-6 py-16">
         <div className="grid gap-12 lg:grid-cols-4 md:grid-cols-2">
-          {/* Company Info & Newsletter */}
+          {/* Company Info */}
           <div className="lg:col-span-1 space-y-6">
             <div>
               <h3 className="text-xl font-bold text-sidebar-foreground mb-4">
@@ -188,53 +159,7 @@ export function Footer() {
               </p>
             </div>
 
-            {/* Newsletter Subscription */}
-            <div>
-              <h4 className="font-semibold text-sidebar-foreground mb-3">
-                {newsletterSettings?.title || "Newsletter"}
-              </h4>
-              <p className="text-sm text-sidebar-foreground/80 mb-4">
-                {newsletterSettings?.description ||
-                  "Dapatkan update terbaru tentang teknologi dan tips bisnis."}
-              </p>
-
-              {isSubscribed ? (
-                <div className="bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-lg p-3">
-                  <p className="text-sm text-green-700 dark:text-green-400">
-                    {newsletterSettings?.success_message ||
-                      "✓ Terima kasih! Anda telah berlangganan newsletter kami."}
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleNewsletterSubmit} className="space-y-3">
-                  <div className="flex gap-2">
-                    <Input
-                      type="email"
-                      placeholder={
-                        newsletterSettings?.placeholder_text || "Email Anda"
-                      }
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isSubscribing}
-                      className="flex-1 bg-white dark:bg-cyan-950 border-cyan-300 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400"
-                    />
-                    <Button
-                      type="submit"
-                      size="sm"
-                      disabled={isSubscribing}
-                      className="px-3 bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-600 dark:hover:bg-cyan-500"
-                    >
-                      {isSubscribing ? (
-                        <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <ArrowRight className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </div>
+            {/* newsletter removed */}
           </div>
 
           {/* Dynamic Footer Sections */}

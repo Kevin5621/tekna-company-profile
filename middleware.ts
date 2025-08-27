@@ -10,7 +10,6 @@ const routePermissions: Record<string, ("admin" | "editor" | "hr")[]> = {
   "/dashboard/career": ["admin", "hr"],
   "/dashboard/footer": ["admin"],
   "/dashboard/admin": ["admin"],
-  "/dashboard/newsletter": ["admin"],
   "/dashboard/settings": ["admin", "editor", "hr"],
 };
 
@@ -114,7 +113,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // Admin routes that require specific roles
-  const adminRoutes = ["/dashboard/admin", "/dashboard/newsletter"];
+  const adminRoutes = ["/dashboard/admin"];
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
 
   // Dashboard routes that require authentication

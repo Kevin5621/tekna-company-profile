@@ -7,12 +7,9 @@ import { ProgressiveBlur } from '@/components/motion-primitives/progressive-blur
 
 interface Partner {
   id: string;
-  name: string;
-  logo_url: string | null;
-  description: string | null;
-  website: string | null;
-  is_active: boolean;
-  sort_order: number;
+  logo_url: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export function PartnersSection() {
@@ -26,44 +23,19 @@ export function PartnersSection() {
         const response = await fetch("/api/partners?limit=20");
         console.log("Response status:", response.status);
 
-        type PartnersResponse = {
-          success?: boolean;
-          partners?: Partner[];
-          error?: string;
-        };
-
-        let data: PartnersResponse = {};
-        const text = await response.text();
-        try {
-          data = text ? (JSON.parse(text) as PartnersResponse) : {};
-        } catch (err) {
-          console.error(
-            "Failed to parse JSON from /api/partners:",
-            err,
-            "raw:",
-            text
-          );
-          data = {};
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
+        const data = await response.json();
         console.log("Partners data:", data);
 
-        if (response.ok && data?.success) {
-          // Filter active partners and remove duplicates
-          const activePartners = (data.partners || []).filter(
-            (partner: Partner) => partner.is_active
+        if (data.partners && Array.isArray(data.partners)) {
+          // Filter partners yang memiliki logo_url
+          const validPartners = data.partners.filter(
+            (partner: Partner) => partner.logo_url && partner.logo_url.trim() !== ""
           );
-          const uniquePartners: Partner[] = [];
-          const seenIds = new Set<string>();
-
-          for (const partner of activePartners) {
-            if (!seenIds.has(partner.id)) {
-              seenIds.add(partner.id);
-              uniquePartners.push(partner);
-            }
-          }
-
-          setPartners(uniquePartners);
+          setPartners(validPartners);
         } else {
           console.warn("/api/partners returned no data or error", {
             status: response.status,
@@ -127,21 +99,15 @@ export function PartnersSection() {
               gap={112}>
               {partners.map((partner) => (
                 <div key={partner.id} className="flex items-center justify-center">
-                  {partner.logo_url ? (
-                    <div className="relative h-24 w-64">
-                      <Image
-                        className="object-contain dark:invert filter grayscale hover:grayscale-0 transition-all duration-300"
-                        src={partner.logo_url}
-                        alt={`${partner.name} Logo`}
-                        fill
-                        sizes="256px"
-                      />
-                    </div>
-                  ) : (
-                    <div className="h-24 px-10 bg-muted rounded flex items-center justify-center text-muted-foreground text-base font-medium">
-                      {partner.name.split(' ').map(word => word.charAt(0)).join('').slice(0, 3)}
-                    </div>
-                  )}
+                  <div className="relative h-24 w-64">
+                    <Image
+                      className="object-contain dark:invert filter grayscale hover:grayscale-0 transition-all duration-300"
+                      src={partner.logo_url}
+                      alt={`Partner Logo`}
+                      fill
+                      sizes="256px"
+                    />
+                  </div>
                 </div>
               ))}
             </InfiniteSlider>

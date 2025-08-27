@@ -14,7 +14,6 @@ import {
   Link as LinkIcon,
   Share2,
   Phone,
-  Mail,
 } from "lucide-react";
 import Link from "next/link";
 import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
@@ -52,14 +51,6 @@ export default function FooterManagementPage() {
       href: "/dashboard/footer/contact-info",
       color: "bg-orange-500",
       count: "3 contacts",
-    },
-    {
-      title: "Newsletter Settings",
-      description: "Manage newsletter configuration",
-      icon: Mail,
-      href: "/dashboard/footer/newsletter",
-      color: "bg-red-500",
-      count: "1 setting",
     },
   ];
 

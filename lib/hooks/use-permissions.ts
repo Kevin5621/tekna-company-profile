@@ -45,7 +45,6 @@ export function usePermissions() {
   const canManageSettings = (): boolean => hasPermission("admin");
   const canManageContent = (): boolean => hasPermission("editor");
   const canAccessAdminPanel = (): boolean => hasPermission("admin");
-  const canAccessNewsletter = (): boolean => hasPermission("admin");
 
   const refreshUser = async () => {
     setIsLoading(true);
@@ -70,7 +69,6 @@ export function usePermissions() {
     canManageSettings,
     canManageContent,
     canAccessAdminPanel,
-    canAccessNewsletter,
     refreshUser,
   };
 }
