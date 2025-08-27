@@ -38,27 +38,11 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
     };
   }, [positionsPayload?.data, initialPositions]);
 
-  const actions = (
-    <div className="flex gap-2">
-      <Button variant="outline" asChild>
-        <Link href="/dashboard/career/categories" prefetch={false}>
-          Categories
-        </Link>
-      </Button>
-      <Button asChild>
-        <Link href="/dashboard/career/new" prefetch={false}>
-          Add Position
-        </Link>
-      </Button>
-    </div>
-  );
-
   return (
     <DashboardPageTemplate
       breadcrumbs={[{ label: "Career", href: "/dashboard/career" }, { label: "Career Management", isCurrentPage: true }]}
       title="Career Management"
       description="Manage job positions, categories, and applications"
-      actions={actions}
     >
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
