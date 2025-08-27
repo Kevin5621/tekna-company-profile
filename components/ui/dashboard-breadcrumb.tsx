@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import React from "react"
+import React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,16 +8,16 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Home } from "lucide-react"
-import Link from "next/link"
+} from "@/components/ui/breadcrumb";
+import { Home } from "lucide-react";
+import Link from "next/link";
 
 interface DashboardBreadcrumbProps {
   items: Array<{
-    label: string
-    href?: string
-    isCurrentPage?: boolean
-  }>
+    label: string;
+    href?: string;
+    isCurrentPage?: boolean;
+  }>;
 }
 
 export function DashboardBreadcrumb({ items }: DashboardBreadcrumbProps) {
@@ -33,7 +33,7 @@ export function DashboardBreadcrumb({ items }: DashboardBreadcrumbProps) {
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        
+
         {/* Additional breadcrumb items with separators */}
         {items.map((item, index) => (
           <React.Fragment key={index}>
@@ -53,5 +53,5 @@ export function DashboardBreadcrumb({ items }: DashboardBreadcrumbProps) {
         ))}
       </BreadcrumbList>
     </Breadcrumb>
-  )
+  );
 }

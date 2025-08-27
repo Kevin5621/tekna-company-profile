@@ -1,18 +1,35 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ClientDashboardService } from '@/lib/services/client-dashboard.service';
-import { useRealtimeBlogPosts } from '@/lib/hooks/use-realtime-simple';
-import { IconPlus, IconEdit, IconTrash, IconEye, IconCalendar, IconUser, IconSearch, IconSortAscending, IconSortDescending, IconExternalLink } from '@tabler/icons-react';
-import { useToast } from '@/hooks/use-toast'
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import { useRealtimeBlogPosts } from "@/lib/hooks/use-realtime-simple";
+import {
+  IconPlus,
+  IconEdit,
+  IconTrash,
+  IconEye,
+  IconCalendar,
+  IconUser,
+  IconSearch,
+  IconSortAscending,
+  IconSortDescending,
+  IconExternalLink,
+} from "@tabler/icons-react";
+import { useToast } from "@/hooks/use-toast";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 
 interface BlogPost {
   id: string;
@@ -23,7 +40,7 @@ interface BlogPost {
   featured_image_url: string | null;
   author_name: string | null;
   category_id: string | null;
-  status: 'draft' | 'published' | 'archived';
+  status: "draft" | "published" | "archived";
   published_at: string | null;
   is_featured: boolean;
   is_active: boolean;
@@ -43,12 +60,14 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
   const router = useRouter();
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'created_at' | 'title' | 'status'>('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"created_at" | "title" | "status">(
+    "created_at"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   // Real-time sync for blog posts
   useRealtimeBlogPosts(() => {
@@ -58,7 +77,7 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
         const updatedPosts = await ClientDashboardService.getBlogPosts();
         setPosts(updatedPosts);
       } catch (error) {
-        console.error('Error refreshing posts:', error);
+        console.error("Error refreshing posts:", error);
       }
     };
     refreshPosts();
@@ -66,23 +85,26 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
 
   // Filtered and sorted posts
   const filteredPosts = useMemo(() => {
-    const filtered = posts.filter(post => {
-      const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           (post.excerpt && post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesStatus = statusFilter === 'all' || post.status === statusFilter;
+    const filtered = posts.filter((post) => {
+      const matchesSearch =
+        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (post.excerpt &&
+          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesStatus =
+        statusFilter === "all" || post.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
 
     // Sort posts
     const sorted = [...filtered].sort((a, b) => {
       let aValue: string | Date, bValue: string | Date;
-      
+
       switch (sortBy) {
-        case 'title':
+        case "title":
           aValue = a.title.toLowerCase();
           bValue = b.title.toLowerCase();
           break;
-        case 'status':
+        case "status":
           aValue = a.status;
           bValue = b.status;
           break;
@@ -91,7 +113,7 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
           bValue = new Date(b.created_at);
       }
 
-      if (sortOrder === 'asc') {
+      if (sortOrder === "asc") {
         return aValue > bValue ? 1 : -1;
       } else {
         return aValue < bValue ? 1 : -1;
@@ -109,17 +131,18 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
     setIsLoading(true);
     try {
       await ClientDashboardService.deletePost(postId);
-      setPosts(prev => prev.filter(post => post.id !== postId));
+      setPosts((prev) => prev.filter((post) => post.id !== postId));
       toast({
         title: "Article Deleted!",
         description: "Article has been deleted successfully.",
         variant: "success",
       });
     } catch (error) {
-      console.error('Error deleting post:', error);
+      console.error("Error deleting post:", error);
       toast({
         title: "Delete Failed",
-        description: error instanceof Error ? error.message : 'Failed to delete article',
+        description:
+          error instanceof Error ? error.message : "Failed to delete article",
         variant: "destructive",
       });
     } finally {
@@ -132,7 +155,7 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
   };
 
   const handleAddNew = () => {
-    router.push('/dashboard/blog/new');
+    router.push("/dashboard/blog/new");
   };
 
   const toggleExpanded = (postId: string) => {
@@ -141,12 +164,25 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      draft: { label: 'Draft', variant: 'secondary' as const, color: 'bg-yellow-100 text-yellow-800' },
-      published: { label: 'Published', variant: 'default' as const, color: 'bg-green-100 text-green-800' },
-      archived: { label: 'Archived', variant: 'outline' as const, color: 'bg-gray-100 text-gray-800' },
+      draft: {
+        label: "Draft",
+        variant: "secondary" as const,
+        color: "bg-yellow-100 text-yellow-800",
+      },
+      published: {
+        label: "Published",
+        variant: "default" as const,
+        color: "bg-green-100 text-green-800",
+      },
+      archived: {
+        label: "Archived",
+        variant: "outline" as const,
+        color: "bg-gray-100 text-gray-800",
+      },
     };
-    
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
+
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
     return (
       <Badge variant={config.variant} className={config.color}>
         {config.label}
@@ -155,27 +191,27 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
   };
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusCount = (status: string) => {
-    return posts.filter(post => post.status === status).length;
+    return posts.filter((post) => post.status === status).length;
   };
 
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Blog", href: "/dashboard/blog" },
-          { label: "Daftar Artikel", isCurrentPage: true }
+          { label: "Daftar Artikel", isCurrentPage: true },
         ]}
       />
 
@@ -199,7 +235,9 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Artikel</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Artikel
+                </p>
                 <p className="text-2xl font-bold">{posts.length}</p>
               </div>
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -213,8 +251,12 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Published</p>
-                <p className="text-2xl font-bold text-green-600">{getStatusCount('published')}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Published
+                </p>
+                <p className="text-2xl font-bold text-green-600">
+                  {getStatusCount("published")}
+                </p>
               </div>
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <IconEye size={20} className="text-green-600" />
@@ -227,8 +269,12 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Draft</p>
-                <p className="text-2xl font-bold text-yellow-600">{getStatusCount('draft')}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Draft
+                </p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {getStatusCount("draft")}
+                </p>
               </div>
               <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <IconEdit size={20} className="text-yellow-600" />
@@ -241,9 +287,11 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Featured</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Featured
+                </p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {posts.filter(post => post.is_featured).length}
+                  {posts.filter((post) => post.is_featured).length}
                 </p>
               </div>
               <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -261,7 +309,10 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
             {/* Search */}
             <div className="flex-1">
               <div className="relative">
-                <IconSearch size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <IconSearch
+                  size={16}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                />
                 <Input
                   placeholder="Cari artikel..."
                   value={searchTerm}
@@ -285,7 +336,12 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
             </Select>
 
             {/* Sort */}
-            <Select value={sortBy} onValueChange={(value: 'created_at' | 'title' | 'status') => setSortBy(value)}>
+            <Select
+              value={sortBy}
+              onValueChange={(value: "created_at" | "title" | "status") =>
+                setSortBy(value)
+              }
+            >
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Urutkan" />
               </SelectTrigger>
@@ -300,10 +356,14 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
               className="w-10"
             >
-              {sortOrder === 'asc' ? <IconSortAscending size={16} /> : <IconSortDescending size={16} />}
+              {sortOrder === "asc" ? (
+                <IconSortAscending size={16} />
+              ) : (
+                <IconSortDescending size={16} />
+              )}
             </Button>
           </div>
         </CardContent>
@@ -312,7 +372,10 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
       {/* Posts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredPosts.map((post) => (
-          <Card key={post.id} className="group hover:shadow-lg transition-all duration-200">
+          <Card
+            key={post.id}
+            className="group hover:shadow-lg transition-all duration-200"
+          >
             {/* Featured Image */}
             {post.featured_image_url && (
               <div className="relative h-48 overflow-hidden rounded-t-lg">
@@ -370,12 +433,14 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
               <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <IconUser size={14} />
-                  <span>{post.author_name || 'Unknown Author'}</span>
+                  <span>{post.author_name || "Unknown Author"}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <IconCalendar size={14} />
-                  <span>{formatDate(post.published_at || post.created_at)}</span>
+                  <span>
+                    {formatDate(post.published_at || post.created_at)}
+                  </span>
                 </div>
 
                 {post.view_count !== undefined && (
@@ -391,7 +456,10 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
                 <div className="flex items-center gap-2">
                   {getStatusBadge(post.status)}
                   {post.is_featured && (
-                    <Badge variant="outline" className="text-purple-600 border-purple-200">
+                    <Badge
+                      variant="outline"
+                      className="text-purple-600 border-purple-200"
+                    >
                       Featured
                     </Badge>
                   )}
@@ -404,13 +472,13 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
                     onClick={() => toggleExpanded(post.id)}
                     className="text-xs"
                   >
-                    {expandedPost === post.id ? 'Sembunyikan' : 'Detail'}
+                    {expandedPost === post.id ? "Sembunyikan" : "Detail"}
                   </Button>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                    onClick={() => window.open(`/blog/${post.slug}`, "_blank")}
                     className="text-xs gap-1"
                   >
                     <IconExternalLink size={12} />
@@ -423,13 +491,28 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
               {expandedPost === post.id && (
                 <div className="mt-4 pt-4 border-t space-y-3">
                   <div className="text-xs space-y-1">
-                    <p><strong>Slug:</strong> /blog/{post.slug}</p>
-                    <p><strong>Created:</strong> {formatDate(post.created_at)}</p>
-                    <p><strong>Updated:</strong> {formatDate(post.updated_at)}</p>
-                    {post.meta_title && <p><strong>Meta Title:</strong> {post.meta_title}</p>}
-                    {post.meta_description && <p><strong>Meta Description:</strong> {post.meta_description}</p>}
+                    <p>
+                      <strong>Slug:</strong> /blog/{post.slug}
+                    </p>
+                    <p>
+                      <strong>Created:</strong> {formatDate(post.created_at)}
+                    </p>
+                    <p>
+                      <strong>Updated:</strong> {formatDate(post.updated_at)}
+                    </p>
+                    {post.meta_title && (
+                      <p>
+                        <strong>Meta Title:</strong> {post.meta_title}
+                      </p>
+                    )}
+                    {post.meta_description && (
+                      <p>
+                        <strong>Meta Description:</strong>{" "}
+                        {post.meta_description}
+                      </p>
+                    )}
                   </div>
-                  
+
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
@@ -443,7 +526,9 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.open(`/blog/${post.slug}`, '_blank')}
+                      onClick={() =>
+                        window.open(`/blog/${post.slug}`, "_blank")
+                      }
                       className="flex-1"
                     >
                       <IconExternalLink size={14} className="mr-1" />
@@ -464,14 +549,15 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
               <IconEdit size={24} className="text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Tidak ada artikel ditemukan</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Tidak ada artikel ditemukan
+            </h3>
             <p className="text-muted-foreground mb-4">
-              {searchTerm || statusFilter !== 'all' 
-                ? 'Coba ubah filter atau kata kunci pencarian'
-                : 'Mulai dengan membuat artikel pertama Anda'
-              }
+              {searchTerm || statusFilter !== "all"
+                ? "Coba ubah filter atau kata kunci pencarian"
+                : "Mulai dengan membuat artikel pertama Anda"}
             </p>
-            {!searchTerm && statusFilter === 'all' && (
+            {!searchTerm && statusFilter === "all" && (
               <Button onClick={handleAddNew} className="gap-2">
                 <IconPlus size={16} />
                 Tambah Artikel Pertama

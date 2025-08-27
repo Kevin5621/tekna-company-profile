@@ -7,20 +7,20 @@ export class ClientDashboardService {
    */
   static async deleteProject(projectId: string) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
+        .from("projects")
         .update({ is_active: false })
-        .eq('id', projectId)
+        .eq("id", projectId)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error deleting project:', error);
-      throw new Error('Gagal menghapus proyek');
+      console.error("Error deleting project:", error);
+      throw new Error("Gagal menghapus proyek");
     }
   }
 
@@ -36,13 +36,13 @@ export class ClientDashboardService {
     is_featured?: boolean;
   }) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
+        .from("projects")
         .insert({
           ...projectData,
-          is_active: true
+          is_active: true,
         })
         .select()
         .single();
@@ -50,8 +50,8 @@ export class ClientDashboardService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating project:', error);
-      throw new Error('Gagal membuat proyek baru');
+      console.error("Error creating project:", error);
+      throw new Error("Gagal membuat proyek baru");
     }
   }
 
@@ -59,7 +59,7 @@ export class ClientDashboardService {
    * Update existing project - Client side
    */
   static async updateProject(
-    projectId: string, 
+    projectId: string,
     projectData: {
       name?: string;
       slug?: string;
@@ -70,29 +70,29 @@ export class ClientDashboardService {
     }
   ) {
     const supabase = createClient();
-    
+
     try {
-      console.log('Updating project with ID:', projectId);
-      console.log('Update data:', projectData);
-      
+      console.log("Updating project with ID:", projectId);
+      console.log("Update data:", projectData);
+
       const { data, error } = await supabase
-        .from('projects')
+        .from("projects")
         .update(projectData)
-        .eq('id', projectId)
-        .eq('is_active', true)
+        .eq("id", projectId)
+        .eq("is_active", true)
         .select()
         .single();
 
       if (error) {
-        console.error('Update error:', error);
+        console.error("Update error:", error);
         throw error;
       }
-      
-      console.log('Update success, returned data:', data);
+
+      console.log("Update success, returned data:", data);
       return data;
     } catch (error) {
-      console.error('Error updating project:', error);
-      throw new Error('Gagal mengupdate proyek');
+      console.error("Error updating project:", error);
+      throw new Error("Gagal mengupdate proyek");
     }
   }
 
@@ -101,11 +101,12 @@ export class ClientDashboardService {
    */
   static async getProjectById(projectId: string) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
-        .select(`
+        .from("projects")
+        .select(
+          `
           id,
           name,
           slug,
@@ -117,16 +118,17 @@ export class ClientDashboardService {
           sort_order,
           created_at,
           updated_at
-        `)
-        .eq('id', projectId)
-        .eq('is_active', true)
+        `
+        )
+        .eq("id", projectId)
+        .eq("is_active", true)
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching project:', error);
-      throw new Error('Gagal mengambil data proyek');
+      console.error("Error fetching project:", error);
+      throw new Error("Gagal mengambil data proyek");
     }
   }
 
@@ -139,28 +141,28 @@ export class ClientDashboardService {
    */
   static async getDefaultLanguageId(): Promise<string> {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('languages')
-        .select('id')
-        .eq('is_default', true)
-        .eq('is_active', true)
+        .from("languages")
+        .select("id")
+        .eq("is_default", true)
+        .eq("is_active", true)
         .single();
 
       if (error) throw error;
       return data.id;
     } catch (error) {
-      console.error('Error getting default language:', error);
+      console.error("Error getting default language:", error);
       // Fallback to first available language
       const { data } = await supabase
-        .from('languages')
-        .select('id')
-        .eq('is_active', true)
+        .from("languages")
+        .select("id")
+        .eq("is_active", true)
         .limit(1)
         .single();
-      
-      return data?.id || 'en'; // Ultimate fallback
+
+      return data?.id || "en"; // Ultimate fallback
     }
   }
 
@@ -183,27 +185,27 @@ export class ClientDashboardService {
     meta_keywords?: string;
   }) {
     const supabase = createClient();
-    
+
     try {
       // Get default language ID
       const defaultLanguageId = await this.getDefaultLanguageId();
 
       // First, create the main post
-              const { data: post, error: postError } = await supabase
-          .from('posts')
-          .insert({
-            title: postData.title,
-            slug: postData.slug,
-            excerpt: postData.excerpt,
-            content_type: 'markdown', // Always use markdown
-            featured_image_url: postData.featured_image_url,
-            author_name: postData.author_name || null,
-            category_id: postData.category_id || null,
-            status: postData.status,
-            published_at: postData.published_at,
-            is_featured: postData.is_featured || false,
-            is_active: true
-          })
+      const { data: post, error: postError } = await supabase
+        .from("posts")
+        .insert({
+          title: postData.title,
+          slug: postData.slug,
+          excerpt: postData.excerpt,
+          content_type: "markdown", // Always use markdown
+          featured_image_url: postData.featured_image_url,
+          author_name: postData.author_name || null,
+          category_id: postData.category_id || null,
+          status: postData.status,
+          published_at: postData.published_at,
+          is_featured: postData.is_featured || false,
+          is_active: true,
+        })
         .select()
         .single();
 
@@ -212,7 +214,7 @@ export class ClientDashboardService {
       // Then, create the post translation for default language
       if (post && postData.content) {
         const { error: translationError } = await supabase
-          .from('post_translations')
+          .from("post_translations")
           .insert({
             post_id: post.id,
             language_id: defaultLanguageId,
@@ -221,19 +223,19 @@ export class ClientDashboardService {
             excerpt: postData.excerpt,
             meta_title: postData.meta_title || postData.title,
             meta_description: postData.meta_description || postData.excerpt,
-            meta_keywords: postData.meta_keywords
+            meta_keywords: postData.meta_keywords,
           });
 
         if (translationError) {
-          console.error('Error creating post translation:', translationError);
+          console.error("Error creating post translation:", translationError);
           // Continue anyway as the main post was created
         }
       }
 
       return post;
     } catch (error) {
-      console.error('Error creating post:', error);
-      throw new Error('Gagal membuat artikel baru');
+      console.error("Error creating post:", error);
+      throw new Error("Gagal membuat artikel baru");
     }
   }
 
@@ -241,7 +243,7 @@ export class ClientDashboardService {
    * Update existing blog post - Client side
    */
   static async updatePost(
-    postId: string, 
+    postId: string,
     postData: {
       title?: string;
       slug?: string;
@@ -259,60 +261,68 @@ export class ClientDashboardService {
     }
   ) {
     const supabase = createClient();
-    
+
     try {
       // Get default language ID
       const defaultLanguageId = await this.getDefaultLanguageId();
 
       // Update the main post
       const { data: post, error: postError } = await supabase
-        .from('posts')
+        .from("posts")
         .update({
           title: postData.title,
           slug: postData.slug,
           excerpt: postData.excerpt,
-          content_type: 'markdown', // Always use markdown
+          content_type: "markdown", // Always use markdown
           featured_image_url: postData.featured_image_url,
           author_name: postData.author_name || null,
           category_id: postData.category_id || null,
           status: postData.status,
           published_at: postData.published_at,
-          is_featured: postData.is_featured
+          is_featured: postData.is_featured,
         })
-        .eq('id', postId)
-        .eq('is_active', true)
+        .eq("id", postId)
+        .eq("is_active", true)
         .select()
         .single();
 
       if (postError) throw postError;
 
       // Update the post translation for default language
-      if (postData.content || postData.meta_title || postData.meta_description || postData.meta_keywords) {
+      if (
+        postData.content ||
+        postData.meta_title ||
+        postData.meta_description ||
+        postData.meta_keywords
+      ) {
         const { error: translationError } = await supabase
-          .from('post_translations')
-          .upsert({
-            post_id: postId,
-            language_id: defaultLanguageId,
-            title: postData.title,
-            content: postData.content,
-            excerpt: postData.excerpt,
-            meta_title: postData.meta_title,
-            meta_description: postData.meta_description,
-            meta_keywords: postData.meta_keywords
-          }, {
-            onConflict: 'post_id,language_id'
-          });
+          .from("post_translations")
+          .upsert(
+            {
+              post_id: postId,
+              language_id: defaultLanguageId,
+              title: postData.title,
+              content: postData.content,
+              excerpt: postData.excerpt,
+              meta_title: postData.meta_title,
+              meta_description: postData.meta_description,
+              meta_keywords: postData.meta_keywords,
+            },
+            {
+              onConflict: "post_id,language_id",
+            }
+          );
 
         if (translationError) {
-          console.error('Error updating post translation:', translationError);
+          console.error("Error updating post translation:", translationError);
           // Continue anyway as the main post was updated
         }
       }
 
       return post;
     } catch (error) {
-      console.error('Error updating post:', error);
-      throw new Error('Gagal mengupdate artikel');
+      console.error("Error updating post:", error);
+      throw new Error("Gagal mengupdate artikel");
     }
   }
 
@@ -321,20 +331,20 @@ export class ClientDashboardService {
    */
   static async deletePost(postId: string) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('posts')
+        .from("posts")
         .update({ is_active: false })
-        .eq('id', postId)
+        .eq("id", postId)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error deleting post:', error);
-      throw new Error('Gagal menghapus artikel');
+      console.error("Error deleting post:", error);
+      throw new Error("Gagal menghapus artikel");
     }
   }
 
@@ -343,12 +353,13 @@ export class ClientDashboardService {
    */
   static async getPostById(postId: string) {
     const supabase = createClient();
-    
+
     try {
       // Get main post data
-              const { data: post, error: postError } = await supabase
-          .from('posts')
-          .select(`
+      const { data: post, error: postError } = await supabase
+        .from("posts")
+        .select(
+          `
             id,
             title,
             slug,
@@ -364,9 +375,10 @@ export class ClientDashboardService {
             view_count,
             created_at,
             updated_at
-          `)
-        .eq('id', postId)
-        .eq('is_active', true)
+          `
+        )
+        .eq("id", postId)
+        .eq("is_active", true)
         .single();
 
       if (postError) throw postError;
@@ -375,32 +387,34 @@ export class ClientDashboardService {
       if (post) {
         const defaultLanguageId = await this.getDefaultLanguageId();
         const { data: translation, error: translationError } = await supabase
-          .from('post_translations')
-          .select(`
+          .from("post_translations")
+          .select(
+            `
             content,
             meta_title,
             meta_description,
             meta_keywords
-          `)
-          .eq('post_id', postId)
-          .eq('language_id', defaultLanguageId)
+          `
+          )
+          .eq("post_id", postId)
+          .eq("language_id", defaultLanguageId)
           .single();
 
         if (!translationError && translation) {
           return {
             ...post,
-            content: translation.content || '',
+            content: translation.content || "",
             meta_title: translation.meta_title || post.title,
             meta_description: translation.meta_description || post.excerpt,
-            meta_keywords: translation.meta_keywords || ''
+            meta_keywords: translation.meta_keywords || "",
           };
         }
       }
 
       return post;
     } catch (error) {
-      console.error('Error getting post by ID:', error);
-      throw new Error('Gagal mengambil artikel');
+      console.error("Error getting post by ID:", error);
+      throw new Error("Gagal mengambil artikel");
     }
   }
 
@@ -409,25 +423,27 @@ export class ClientDashboardService {
    */
   static async getCategories() {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('categories')
-        .select(`
+        .from("categories")
+        .select(
+          `
           id,
           name,
           slug,
           description,
           color,
           is_active
-        `)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+        `
+        )
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
 
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
       return [];
     }
   }
@@ -437,32 +453,34 @@ export class ClientDashboardService {
    */
   static async getAuthors() {
     const supabase = createClient();
-    
+
     try {
       // Get unique authors from existing posts
       const { data, error } = await supabase
-        .from('posts')
-        .select('author_name')
-        .not('author_name', 'is', null)
-        .not('author_name', 'eq', '')
-        .eq('is_active', true);
+        .from("posts")
+        .select("author_name")
+        .not("author_name", "is", null)
+        .not("author_name", "eq", "")
+        .eq("is_active", true);
 
       if (error) throw error;
-      
+
       // Create unique authors list with generated IDs
-      const uniqueAuthors = [...new Set(data?.map(post => post.author_name) || [])];
-      
+      const uniqueAuthors = [
+        ...new Set(data?.map((post) => post.author_name) || []),
+      ];
+
       return uniqueAuthors.map((name, index) => ({
         id: `author-${index + 1}`,
-        first_name: name.split(' ')[0] || name,
-        last_name: name.split(' ').slice(1).join(' ') || '',
-        position: 'Author',
-        department: 'Content',
+        first_name: name.split(" ")[0] || name,
+        last_name: name.split(" ").slice(1).join(" ") || "",
+        position: "Author",
+        department: "Content",
         avatar_url: null,
-        is_active: true
+        is_active: true,
       }));
     } catch (error) {
-      console.error('Error fetching authors:', error);
+      console.error("Error fetching authors:", error);
       return [];
     }
   }
@@ -473,10 +491,10 @@ export class ClientDashboardService {
   static async getAuthorById(authorId: string) {
     try {
       const authors = await this.getAuthors();
-      return authors.find(author => author.id === authorId) || null;
+      return authors.find((author) => author.id === authorId) || null;
     } catch (error) {
-      console.error('Error fetching author:', error);
-      throw new Error('Gagal mengambil data author');
+      console.error("Error fetching author:", error);
+      throw new Error("Gagal mengambil data author");
     }
   }
 
@@ -500,7 +518,7 @@ export class ClientDashboardService {
   }) {
     // For company profile, we don't store authors separately
     // They are stored as author_name in posts
-    
+
     return {
       id: `author-${Date.now()}`,
       first_name: authorData.first_name,
@@ -508,7 +526,7 @@ export class ClientDashboardService {
       position: authorData.position,
       department: authorData.department,
       avatar_url: authorData.avatar_url,
-      is_active: true
+      is_active: true,
     };
   }
 
@@ -516,7 +534,7 @@ export class ClientDashboardService {
    * Update existing author - Client side
    */
   static async updateAuthor(
-    authorId: string, 
+    authorId: string,
     authorData: {
       first_name?: string;
       last_name?: string;
@@ -534,15 +552,15 @@ export class ClientDashboardService {
   ) {
     // For company profile, we don't store authors separately
     // They are stored as author_name in posts
-    
+
     return {
       id: authorId,
-      first_name: authorData.first_name || '',
-      last_name: authorData.last_name || '',
-      position: authorData.position || 'Author',
-      department: authorData.department || 'Content',
+      first_name: authorData.first_name || "",
+      last_name: authorData.last_name || "",
+      position: authorData.position || "Author",
+      department: authorData.department || "Content",
       avatar_url: authorData.avatar_url,
-      is_active: authorData.is_active ?? true
+      is_active: authorData.is_active ?? true,
     };
   }
 
@@ -555,7 +573,7 @@ export class ClientDashboardService {
     // They are stored as author_name in posts
     return {
       id: authorId,
-      is_active: false
+      is_active: false,
     };
   }
 
@@ -564,11 +582,12 @@ export class ClientDashboardService {
    */
   static async getCategoryById(categoryId: string) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('categories')
-        .select(`
+        .from("categories")
+        .select(
+          `
           id,
           name,
           slug,
@@ -578,16 +597,17 @@ export class ClientDashboardService {
           sort_order,
           created_at,
           updated_at
-        `)
-        .eq('id', categoryId)
-        .eq('is_active', true)
+        `
+        )
+        .eq("id", categoryId)
+        .eq("is_active", true)
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching category:', error);
-      throw new Error('Gagal mengambil data kategori');
+      console.error("Error fetching category:", error);
+      throw new Error("Gagal mengambil data kategori");
     }
   }
 
@@ -603,14 +623,14 @@ export class ClientDashboardService {
     sort_order?: number;
   }) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('categories')
+        .from("categories")
         .insert({
           ...categoryData,
           is_active: categoryData.is_active ?? true,
-          sort_order: categoryData.sort_order || 0
+          sort_order: categoryData.sort_order || 0,
         })
         .select()
         .single();
@@ -618,8 +638,8 @@ export class ClientDashboardService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating category:', error);
-      throw new Error('Gagal membuat kategori baru');
+      console.error("Error creating category:", error);
+      throw new Error("Gagal membuat kategori baru");
     }
   }
 
@@ -627,7 +647,7 @@ export class ClientDashboardService {
    * Update existing category - Client side
    */
   static async updateCategory(
-    categoryId: string, 
+    categoryId: string,
     categoryData: {
       name?: string;
       slug?: string;
@@ -638,21 +658,21 @@ export class ClientDashboardService {
     }
   ) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('categories')
+        .from("categories")
         .update(categoryData)
-        .eq('id', categoryId)
-        .eq('is_active', true)
+        .eq("id", categoryId)
+        .eq("is_active", true)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating category:', error);
-      throw new Error('Gagal mengupdate kategori');
+      console.error("Error updating category:", error);
+      throw new Error("Gagal mengupdate kategori");
     }
   }
 
@@ -661,20 +681,20 @@ export class ClientDashboardService {
    */
   static async deleteCategory(categoryId: string) {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('categories')
+        .from("categories")
         .update({ is_active: false })
-        .eq('id', categoryId)
+        .eq("id", categoryId)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error deleting category:', error);
-      throw new Error('Failed to delete category');
+      console.error("Error deleting category:", error);
+      throw new Error("Failed to delete category");
     }
   }
 
@@ -683,11 +703,12 @@ export class ClientDashboardService {
    */
   static async getBlogPosts() {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('posts')
-        .select(`
+        .from("posts")
+        .select(
+          `
           id,
           title,
           slug,
@@ -701,15 +722,16 @@ export class ClientDashboardService {
           is_active,
           created_at,
           updated_at
-        `)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching blog posts:', error);
-      throw new Error('Failed to fetch blog posts');
+      console.error("Error fetching blog posts:", error);
+      throw new Error("Failed to fetch blog posts");
     }
   }
 }

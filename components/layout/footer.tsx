@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Globe, 
-  Facebook, 
-  Twitter, 
-  Instagram, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+  Facebook,
+  Twitter,
+  Instagram,
   Linkedin,
   Youtube,
   ExternalLink,
@@ -30,17 +30,17 @@ import {
   Palette,
   Cloud,
   TrendingUp,
-  Info
+  Info,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { 
-  FooterService, 
-  type FooterSection, 
-  type SocialMedia, 
-  type ContactInfo, 
-  type CompanyInfo, 
-  type NewsletterSettings 
+import {
+  FooterService,
+  type FooterSection,
+  type SocialMedia,
+  type ContactInfo,
+  type CompanyInfo,
+  type NewsletterSettings,
 } from "@/lib/services/footer";
 
 // Icon mapping for dynamic icons
@@ -70,33 +70,35 @@ const iconMap = {
   Palette,
   Cloud,
   TrendingUp,
-  Info
+  Info,
 };
 
 export function Footer() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [footerSections, setFooterSections] = useState<FooterSection[]>([]);
   const [socialMedia, setSocialMedia] = useState<SocialMedia[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
-  const [newsletterSettings, setNewsletterSettings] = useState<NewsletterSettings | null>(null);
+  const [newsletterSettings, setNewsletterSettings] =
+    useState<NewsletterSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const footerService = new FooterService();
-    
+
     async function loadFooterData() {
       setIsLoading(true);
       try {
-        const [sections, social, contact, company, newsletter] = await Promise.all([
-          footerService.getPublicFooterSections(),
-          footerService.getPublicSocialMedia(),
-          footerService.getPublicContactInfo(),
-          footerService.getCompanyInfo(),
-          footerService.getPublicNewsletterSettings(),
-        ]);
+        const [sections, social, contact, company, newsletter] =
+          await Promise.all([
+            footerService.getPublicFooterSections(),
+            footerService.getPublicSocialMedia(),
+            footerService.getPublicContactInfo(),
+            footerService.getCompanyInfo(),
+            footerService.getPublicNewsletterSettings(),
+          ]);
 
         setFooterSections(sections);
         setSocialMedia(social);
@@ -104,7 +106,7 @@ export function Footer() {
         setCompanyInfo(company);
         setNewsletterSettings(newsletter);
       } catch (error) {
-        console.error('Error loading footer data:', error);
+        console.error("Error loading footer data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -116,23 +118,23 @@ export function Footer() {
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubscribing(true);
-    
+
     try {
       const footerService = new FooterService();
       const success = await footerService.subscribeToNewsletter(email);
-      
+
       if (success) {
         setIsSubscribed(true);
-        setEmail('');
-        
+        setEmail("");
+
         // Reset message after 3 seconds
         setTimeout(() => setIsSubscribed(false), 3000);
       } else {
         // Handle error - you might want to show an error message
-        console.error('Failed to subscribe');
+        console.error("Failed to subscribe");
       }
     } catch (error) {
-      console.error('Newsletter subscription error:', error);
+      console.error("Newsletter subscription error:", error);
     } finally {
       setIsSubscribing(false);
     }
@@ -154,7 +156,10 @@ export function Footer() {
                   <div className="h-6 bg-cyan-200 dark:bg-cyan-800 rounded w-3/4"></div>
                   <div className="space-y-2">
                     {[...Array(4)].map((_, j) => (
-                      <div key={j} className="h-4 bg-cyan-150 dark:bg-cyan-750 rounded w-full"></div>
+                      <div
+                        key={j}
+                        className="h-4 bg-cyan-150 dark:bg-cyan-750 rounded w-full"
+                      ></div>
                     ))}
                   </div>
                 </div>
@@ -175,29 +180,29 @@ export function Footer() {
           <div className="lg:col-span-1 space-y-6">
             <div>
               <h3 className="text-xl font-bold text-sidebar-foreground mb-4">
-                {companyInfo?.name || 'Tekna'}
+                {companyInfo?.name || "Tekna"}
               </h3>
               <p className="text-sidebar-foreground/80 text-sm leading-relaxed">
-                {companyInfo?.short_description || 
-                  'Kami adalah partner teknologi terpercaya yang membantu bisnis berkembang melalui solusi digital inovatif dan berkualitas tinggi.'}
+                {companyInfo?.short_description ||
+                  "Kami adalah partner teknologi terpercaya yang membantu bisnis berkembang melalui solusi digital inovatif dan berkualitas tinggi."}
               </p>
             </div>
 
             {/* Newsletter Subscription */}
             <div>
               <h4 className="font-semibold text-sidebar-foreground mb-3">
-                {newsletterSettings?.title || 'Newsletter'}
+                {newsletterSettings?.title || "Newsletter"}
               </h4>
               <p className="text-sm text-sidebar-foreground/80 mb-4">
-                {newsletterSettings?.description || 
-                  'Dapatkan update terbaru tentang teknologi dan tips bisnis.'}
+                {newsletterSettings?.description ||
+                  "Dapatkan update terbaru tentang teknologi dan tips bisnis."}
               </p>
-              
+
               {isSubscribed ? (
                 <div className="bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-lg p-3">
                   <p className="text-sm text-green-700 dark:text-green-400">
-                    {newsletterSettings?.success_message || 
-                      '✓ Terima kasih! Anda telah berlangganan newsletter kami.'}
+                    {newsletterSettings?.success_message ||
+                      "✓ Terima kasih! Anda telah berlangganan newsletter kami."}
                   </p>
                 </div>
               ) : (
@@ -205,16 +210,18 @@ export function Footer() {
                   <div className="flex gap-2">
                     <Input
                       type="email"
-                      placeholder={newsletterSettings?.placeholder_text || "Email Anda"}
+                      placeholder={
+                        newsletterSettings?.placeholder_text || "Email Anda"
+                      }
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={isSubscribing}
                       className="flex-1 bg-white dark:bg-cyan-950 border-cyan-300 dark:border-cyan-700 focus:border-cyan-500 dark:focus:border-cyan-400"
                     />
-                    <Button 
-                      type="submit" 
-                      size="sm" 
+                    <Button
+                      type="submit"
+                      size="sm"
                       disabled={isSubscribing}
                       className="px-3 bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-600 dark:hover:bg-cyan-500"
                     >
@@ -238,13 +245,15 @@ export function Footer() {
               </h4>
               <ul className="space-y-3">
                 {section.links.map((link) => {
-                  const IconComponent = getIcon(link.icon || 'ExternalLink');
+                  const IconComponent = getIcon(link.icon || "ExternalLink");
                   return (
                     <li key={link.id}>
-                      <Link 
+                      <Link
                         href={link.url}
-                        target={link.is_external ? '_blank' : undefined}
-                        rel={link.is_external ? 'noopener noreferrer' : undefined}
+                        target={link.is_external ? "_blank" : undefined}
+                        rel={
+                          link.is_external ? "noopener noreferrer" : undefined
+                        }
                         className="text-sidebar-foreground/80 hover:text-sidebar-accent transition-colors text-sm flex items-center group"
                       >
                         {link.title}
@@ -279,7 +288,7 @@ export function Footer() {
                         {item.label}
                       </p>
                       {item.href ? (
-                        <a 
+                        <a
                           href={item.href}
                           className="text-sm font-medium text-sidebar-foreground hover:text-sidebar-accent transition-colors"
                         >
@@ -304,7 +313,9 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           {socialMedia.length > 0 && (
             <div className="flex items-center gap-4">
-              <span className="text-sm text-sidebar-foreground/80">Ikuti Kami:</span>
+              <span className="text-sm text-sidebar-foreground/80">
+                Ikuti Kami:
+              </span>
               <div className="flex gap-3">
                 {socialMedia.map((social) => {
                   const IconComponent = getIcon(social.icon);
@@ -315,8 +326,8 @@ export function Footer() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sidebar-foreground/80 hover:text-sidebar-accent transition-colors"
-                      style={{ 
-                        color: social.color ? undefined : undefined 
+                      style={{
+                        color: social.color ? undefined : undefined,
                       }}
                       onMouseEnter={(e) => {
                         if (social.color) {
@@ -324,7 +335,7 @@ export function Footer() {
                         }
                       }}
                       onMouseLeave={(e) => {
-                        (e.target as HTMLElement).style.color = '';
+                        (e.target as HTMLElement).style.color = "";
                       }}
                       aria-label={social.platform}
                     >
@@ -335,14 +346,23 @@ export function Footer() {
               </div>
             </div>
           )}
-          
+
           <div className="flex flex-col md:flex-row items-center gap-4 text-sm text-sidebar-foreground/80">
-            <p>&copy; {new Date().getFullYear()} {companyInfo?.name || 'Tekna'}. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} {companyInfo?.name || "Tekna"}.
+              All rights reserved.
+            </p>
             <div className="flex gap-4">
-              <Link href="/privacy" className="hover:text-sidebar-accent transition-colors">
+              <Link
+                href="/privacy"
+                className="hover:text-sidebar-accent transition-colors"
+              >
                 Privacy
               </Link>
-              <Link href="/terms" className="hover:text-sidebar-accent transition-colors">
+              <Link
+                href="/terms"
+                className="hover:text-sidebar-accent transition-colors"
+              >
                 Terms
               </Link>
             </div>

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { useSession } from './session-provider';
-import { useRouter } from 'next/navigation';
+import React, { useEffect } from "react";
+import { useSession } from "./session-provider";
+import { useRouter } from "next/navigation";
 
 interface DashboardAuthGuardProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export function DashboardAuthGuard({ children }: DashboardAuthGuardProps) {
 
   useEffect(() => {
     if (!sessionLoading && (!user || !session)) {
-      router.push('/auth/login');
+      router.push("/auth/login");
     }
   }, [user, session, sessionLoading, router]);
 

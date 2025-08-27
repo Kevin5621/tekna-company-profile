@@ -1,9 +1,14 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import Link from 'next/link';
+import { useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { AlertTriangle, Home, RefreshCw, Mail } from "lucide-react";
 
 export default function GlobalError({
@@ -15,7 +20,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Global error:', error);
+    console.error("Global error:", error);
   }, [error]);
 
   return (
@@ -36,13 +41,13 @@ export default function GlobalError({
                 Terjadi Kesalahan Sistem
               </CardTitle>
               <CardDescription className="text-lg text-muted-foreground max-w-md mx-auto">
-                Maaf, terjadi kesalahan yang tidak terduga pada sistem kami. 
-                Tim teknis telah diberitahu dan sedang menangani masalah ini.
+                Maaf, terjadi kesalahan yang tidak terduga pada sistem kami. Tim
+                teknis telah diberitahu dan sedang menangani masalah ini.
               </CardDescription>
             </div>
 
             {/* Error Details (Development only) */}
-            {process.env.NODE_ENV === 'development' && (
+            {process.env.NODE_ENV === "development" && (
               <div className="mb-6 p-4 bg-muted rounded-lg text-left">
                 <p className="text-sm font-mono text-muted-foreground break-all">
                   {error.message}
@@ -57,18 +62,14 @@ export default function GlobalError({
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                onClick={reset} 
-                size="lg" 
-                className="w-full sm:w-auto"
-              >
+              <Button onClick={reset} size="lg" className="w-full sm:w-auto">
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Coba Lagi
               </Button>
-              
-              <Button 
-                variant="outline" 
-                size="lg" 
+
+              <Button
+                variant="outline"
+                size="lg"
                 asChild
                 className="w-full sm:w-auto"
               >

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface Partner {
   id: string;
@@ -17,14 +17,14 @@ interface Partner {
 export function PartnersSection() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
-  const placeholderIds = ['ph1', 'ph2', 'ph3', 'ph4', 'ph5', 'ph6'];
+  const placeholderIds = ["ph1", "ph2", "ph3", "ph4", "ph5", "ph6"];
 
   useEffect(() => {
     const fetchPartners = async () => {
       try {
-        console.log('Fetching partners...');
-        const response = await fetch('/api/partners?limit=12');
-        console.log('Response status:', response.status);
+        console.log("Fetching partners...");
+        const response = await fetch("/api/partners?limit=12");
+        console.log("Response status:", response.status);
 
         type PartnersResponse = {
           success?: boolean;
@@ -35,17 +35,24 @@ export function PartnersSection() {
         let data: PartnersResponse = {};
         const text = await response.text();
         try {
-          data = text ? JSON.parse(text) as PartnersResponse : {};
+          data = text ? (JSON.parse(text) as PartnersResponse) : {};
         } catch (err) {
-          console.error('Failed to parse JSON from /api/partners:', err, 'raw:', text);
+          console.error(
+            "Failed to parse JSON from /api/partners:",
+            err,
+            "raw:",
+            text
+          );
           data = {};
         }
 
-        console.log('Partners data:', data);
+        console.log("Partners data:", data);
 
-  if (response.ok && data?.success) {
+        if (response.ok && data?.success) {
           // Filter active partners and remove duplicates
-          const activePartners = (data.partners || []).filter((partner: Partner) => partner.is_active);
+          const activePartners = (data.partners || []).filter(
+            (partner: Partner) => partner.is_active
+          );
           const uniquePartners: Partner[] = [];
           const seenIds = new Set<string>();
 
@@ -58,10 +65,13 @@ export function PartnersSection() {
 
           setPartners(uniquePartners.slice(0, 6)); // Limit to 6 partners
         } else {
-          console.warn('/api/partners returned no data or error', { status: response.status, data });
+          console.warn("/api/partners returned no data or error", {
+            status: response.status,
+            data,
+          });
         }
       } catch (error) {
-        console.error('Error fetching partners:', error);
+        console.error("Error fetching partners:", error);
       } finally {
         setLoading(false);
       }
@@ -76,8 +86,8 @@ export function PartnersSection() {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.45, ease: 'easeOut' as const }
-    }
+      transition: { duration: 0.45, ease: "easeOut" as const },
+    },
   };
 
   if (loading) {
@@ -90,14 +100,18 @@ export function PartnersSection() {
               Trusted by Industry Leaders
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground">
-              We collaborate with innovative companies worldwide to deliver exceptional digital solutions.
+              We collaborate with innovative companies worldwide to deliver
+              exceptional digital solutions.
             </p>
           </div>
 
           {/* Loading Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-12">
             {placeholderIds.map((id) => (
-              <div key={id} className="flex flex-col items-center text-center space-y-4 animate-pulse">
+              <div
+                key={id}
+                className="flex flex-col items-center text-center space-y-4 animate-pulse"
+              >
                 <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-200 rounded-2xl"></div>
                 <div className="space-y-2">
                   <div className="h-4 bg-gray-200 rounded w-20"></div>
@@ -115,12 +129,13 @@ export function PartnersSection() {
     <section className="w-full py-24 md:py-32 bg-background relative z-20 pointer-events-auto">
       <div className="container mx-auto px-4 md:px-6">
         {/* Section Header */}
-  <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Trusted by Industry Leaders
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground">
-            We collaborate with innovative companies worldwide to deliver exceptional digital solutions.
+            We collaborate with innovative companies worldwide to deliver
+            exceptional digital solutions.
           </p>
         </div>
 
@@ -132,16 +147,16 @@ export function PartnersSection() {
               variants={itemVariants}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-100px' }}
+              viewport={{ once: true, margin: "-100px" }}
               className="group"
             >
               <div className="flex flex-col items-center text-center space-y-4">
                 {/* Partner Logo */}
                 <motion.div
                   className="relative w-24 h-24 md:w-32 md:h-32 bg-card rounded-2xl p-4 shadow-lg border border-border/50 group-hover:shadow-xl transition-all duration-300 group-hover:scale-105"
-                  whileHover={{ 
+                  whileHover={{
                     y: -5,
-                    transition: { duration: 0.2 }
+                    transition: { duration: 0.2 },
                   }}
                 >
                   {partner.logo_url ? (
@@ -172,7 +187,7 @@ export function PartnersSection() {
             </motion.div>
           ))}
         </div>
-  </div>
+      </div>
     </section>
   );
 }

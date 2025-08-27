@@ -13,20 +13,20 @@ export function calculateReadingTime(
   text: string;
 } {
   // Strip HTML tags and get plain text
-  const plainText = content.replace(/<[^>]*>/g, '');
-  
+  const plainText = content.replace(/<[^>]*>/g, "");
+
   // Count words (split by whitespace and filter empty strings)
   const words = plainText
     .trim()
     .split(/\s+/)
-    .filter(word => word.length > 0).length;
-  
+    .filter((word) => word.length > 0).length;
+
   // Calculate reading time in minutes
   const minutes = Math.ceil(words / wordsPerMinute);
-  
+
   // Generate human-readable text
   const text = `${minutes} min read`;
-  
+
   return {
     minutes,
     words,
@@ -45,11 +45,11 @@ export function formatReadingTime(
   includeWordCount: boolean = false
 ): string {
   const { words, text } = calculateReadingTime(content);
-  
+
   if (includeWordCount) {
     return `${text} • ${words.toLocaleString()} words`;
   }
-  
+
   return text;
 }
 
@@ -58,10 +58,12 @@ export function formatReadingTime(
  * @param content HTML or plain text content
  * @returns Category: 'quick' | 'medium' | 'long'
  */
-export function getReadingTimeCategory(content: string): 'quick' | 'medium' | 'long' {
+export function getReadingTimeCategory(
+  content: string
+): "quick" | "medium" | "long" {
   const { minutes } = calculateReadingTime(content);
-  
-  if (minutes <= 3) return 'quick';
-  if (minutes <= 10) return 'medium';
-  return 'long';
+
+  if (minutes <= 3) return "quick";
+  if (minutes <= 10) return "medium";
+  return "long";
 }

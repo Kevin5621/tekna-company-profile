@@ -1,8 +1,13 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { ArrowLeft, Home, Search } from "lucide-react";
 
 export default function NotFound() {
@@ -31,8 +36,8 @@ export default function NotFound() {
                 Halaman Tidak Ditemukan
               </CardTitle>
               <CardDescription className="text-lg text-muted-foreground max-w-md mx-auto">
-                Maaf, halaman yang Anda cari tidak dapat ditemukan. 
-                Mungkin halaman telah dipindahkan atau URL salah.
+                Maaf, halaman yang Anda cari tidak dapat ditemukan. Mungkin
+                halaman telah dipindahkan atau URL salah.
               </CardDescription>
             </div>
 
@@ -44,10 +49,10 @@ export default function NotFound() {
                   Kembali ke Beranda
                 </Link>
               </Button>
-              
-              <Button 
-                variant="outline" 
-                size="lg" 
+
+              <Button
+                variant="outline"
+                size="lg"
                 onClick={() => window.history.back()}
                 className="w-full sm:w-auto"
               >

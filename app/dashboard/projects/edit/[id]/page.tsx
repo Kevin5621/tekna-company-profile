@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import { ProjectForm } from "@/components/project-form";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 interface EditProjectPageProps {
   params: Promise<{
@@ -34,10 +34,12 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
     async function getProject() {
       try {
         const resolvedParams = await params;
-        const projectData = await ClientDashboardService.getProjectById(resolvedParams.id);
+        const projectData = await ClientDashboardService.getProjectById(
+          resolvedParams.id
+        );
         setProject(projectData);
       } catch (error) {
-        console.error('Error fetching project:', error);
+        console.error("Error fetching project:", error);
         setError(true);
       } finally {
         setLoading(false);
@@ -60,13 +62,16 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-full dashboard-form-page">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Proyek", href: "/dashboard/projects" },
-          { label: "Edit Proyek", href: `/dashboard/projects/edit/${project.id}` },
-          { label: "Form Edit", isCurrentPage: true }
+          {
+            label: "Edit Proyek",
+            href: `/dashboard/projects/edit/${project.id}`,
+          },
+          { label: "Form Edit", isCurrentPage: true },
         ]}
       />
 
@@ -75,18 +80,20 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
         <BackButton href="/dashboard/projects" label="Kembali ke Projects" />
       </div>
 
-      <ProjectForm 
-        mode="edit" 
-        projectId={project.id}
-        initialData={{
-          name: project.name,
-          slug: project.slug,
-          project_url: project.project_url || '',
-          description: project.description || '',
-          featured_image_url: project.featured_image_url || '',
-          is_featured: project.is_featured || false,
-        }}
-      />
+      <div className="dashboard-form-container">
+        <ProjectForm
+          mode="edit"
+          projectId={project.id}
+          initialData={{
+            name: project.name,
+            slug: project.slug,
+            project_url: project.project_url || "",
+            description: project.description || "",
+            featured_image_url: project.featured_image_url || "",
+            is_featured: project.is_featured || false,
+          }}
+        />
+      </div>
     </div>
   );
 }

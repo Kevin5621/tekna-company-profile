@@ -1,12 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconPlus, IconUsers } from "@tabler/icons-react";
-import { AdminAuthService, type AdminUser } from "@/lib/services/admin-auth.service";
+import {
+  AdminAuthService,
+  type AdminUser,
+} from "@/lib/services/admin-auth.service";
 import { AdminUserModal } from "./admin-user-modal";
 import { AdminStats } from "./admin-stats";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
@@ -49,7 +58,9 @@ export default function AdminManagementPage() {
     loadAdminUsers();
   };
 
-  const getRoleBadgeVariant = (role: string): "default" | "destructive" | "secondary" | "outline" => {
+  const getRoleBadgeVariant = (
+    role: string
+  ): "default" | "destructive" | "secondary" | "outline" => {
     switch (role) {
       case "admin":
         return "destructive";
@@ -78,9 +89,9 @@ export default function AdminManagementPage() {
   const getFilteredUsers = () => {
     switch (activeTab) {
       case "active":
-        return adminUsers.filter(user => user.is_active);
+        return adminUsers.filter((user) => user.is_active);
       case "inactive":
-        return adminUsers.filter(user => !user.is_active);
+        return adminUsers.filter((user) => !user.is_active);
       default:
         return adminUsers;
     }
@@ -97,20 +108,25 @@ export default function AdminManagementPage() {
         >
           <div className="flex items-center gap-4">
             {(() => {
-              const display = user.display_name || user.profile?.first_name || user.email;
+              const display =
+                user.display_name || user.profile?.first_name || user.email;
               const initials = display
                 .split(" ")
-                .map(s => s[0])
-                .slice(0,2)
+                .map((s) => s[0])
+                .slice(0, 2)
                 .join("");
               return (
                 <>
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-semibold">{initials}</span>
+                    <span className="text-primary font-semibold">
+                      {initials}
+                    </span>
                   </div>
                   <div>
                     <div className="font-medium">{display}</div>
-                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {user.email}
+                    </div>
                   </div>
                 </>
               );
@@ -121,7 +137,7 @@ export default function AdminManagementPage() {
             <Badge variant={getRoleBadgeVariant(user.role)}>
               {getRoleDisplayName(user.role)}
             </Badge>
-            
+
             <div className="text-sm text-muted-foreground">
               {user.is_active ? (
                 <span className="text-primary">Active</span>
@@ -165,17 +181,19 @@ export default function AdminManagementPage() {
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Admin", href: "/dashboard/admin" },
-          { label: "Manajemen Admin", isCurrentPage: true }
+          { label: "Manajemen Admin", isCurrentPage: true },
         ]}
       />
 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Admin Management
+          </h1>
           <p className="text-muted-foreground">
             Manage admin users, roles, and system settings
           </p>
@@ -201,11 +219,21 @@ export default function AdminManagementPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">All Users ({adminUsers.length})</TabsTrigger>
-              <TabsTrigger value="active">Active ({adminUsers.filter(u => u.is_active).length})</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive ({adminUsers.filter(u => !u.is_active).length})</TabsTrigger>
+              <TabsTrigger value="all">
+                All Users ({adminUsers.length})
+              </TabsTrigger>
+              <TabsTrigger value="active">
+                Active ({adminUsers.filter((u) => u.is_active).length})
+              </TabsTrigger>
+              <TabsTrigger value="inactive">
+                Inactive ({adminUsers.filter((u) => !u.is_active).length})
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="mt-6">
@@ -213,15 +241,13 @@ export default function AdminManagementPage() {
             </TabsContent>
 
             <TabsContent value="active" className="mt-6">
-              {renderUserList(adminUsers.filter(u => u.is_active))}
+              {renderUserList(adminUsers.filter((u) => u.is_active))}
             </TabsContent>
 
             <TabsContent value="inactive" className="mt-6">
-              {renderUserList(adminUsers.filter(u => !u.is_active))}
+              {renderUserList(adminUsers.filter((u) => !u.is_active))}
             </TabsContent>
           </Tabs>
-
-
         </CardContent>
       </Card>
 
@@ -231,7 +257,7 @@ export default function AdminManagementPage() {
         onClose={handleModalClose}
         onSuccess={handleSuccess}
         user={editingUser}
-        mode={editingUser ? 'edit' : 'create'}
+        mode={editingUser ? "edit" : "create"}
       />
     </div>
   );

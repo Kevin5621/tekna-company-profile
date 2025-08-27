@@ -1,8 +1,11 @@
-'use client';
+"use client";
 
-import { Clock, Eye, Calendar, User, Tag } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { formatReadingTime, getReadingTimeCategory } from '@/lib/utils/reading-time';
+import { Clock, Eye, Calendar, User, Tag } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  formatReadingTime,
+  getReadingTimeCategory,
+} from "@/lib/utils/reading-time";
 
 interface BlogMetaProps {
   publishedAt: string;
@@ -16,7 +19,7 @@ interface BlogMetaProps {
   } | null;
   isFeatured?: boolean;
   className?: string;
-  layout?: 'horizontal' | 'vertical';
+  layout?: "horizontal" | "vertical";
   showReadingTime?: boolean;
   showViewCount?: boolean;
   showCategory?: boolean;
@@ -29,48 +32,53 @@ export function BlogMeta({
   content,
   category,
   isFeatured = false,
-  className = '',
-  layout = 'horizontal',
+  className = "",
+  layout = "horizontal",
   showReadingTime = true,
   showViewCount = true,
   showCategory = true,
 }: BlogMetaProps) {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
-  const readingTime = content && showReadingTime ? formatReadingTime(content) : null;
+  const readingTime =
+    content && showReadingTime ? formatReadingTime(content) : null;
   const readingCategory = content ? getReadingTimeCategory(content) : null;
 
   const getReadingTimeBadgeVariant = () => {
     switch (readingCategory) {
-      case 'quick': return 'default';
-      case 'medium': return 'secondary';
-      case 'long': return 'outline';
-      default: return 'secondary';
+      case "quick":
+        return "default";
+      case "medium":
+        return "secondary";
+      case "long":
+        return "outline";
+      default:
+        return "secondary";
     }
   };
 
   const metaItems = [
     {
       icon: Calendar,
-      label: 'Published date',
+      label: "Published date",
       value: formatDate(publishedAt),
       show: true,
     },
     {
       icon: User,
-      label: 'Author',
-      value: authorName || 'Admin',
+      label: "Author",
+      value: authorName || "Admin",
       show: !!authorName,
     },
     {
       icon: Clock,
-      label: 'Reading time',
+      label: "Reading time",
       value: readingTime,
       show: showReadingTime && !!readingTime,
       badge: true,
@@ -78,15 +86,16 @@ export function BlogMeta({
     },
     {
       icon: Eye,
-      label: 'View count',
+      label: "View count",
       value: viewCount ? `${viewCount.toLocaleString()} views` : null,
       show: showViewCount && !!viewCount,
     },
   ];
 
-  const containerClass = layout === 'vertical' 
-    ? 'flex flex-col space-y-3' 
-    : 'flex flex-wrap items-center gap-4';
+  const containerClass =
+    layout === "vertical"
+      ? "flex flex-col space-y-3"
+      : "flex flex-wrap items-center gap-4";
 
   return (
     <div className={`${containerClass} ${className}`}>
@@ -114,13 +123,16 @@ export function BlogMeta({
 
       {/* Meta Items */}
       {metaItems
-        .filter(item => item.show && item.value)
+        .filter((item) => item.show && item.value)
         .map((item, index) => (
-          <div key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div
+            key={index}
+            className="flex items-center gap-2 text-sm text-muted-foreground"
+          >
             <item.icon className="h-4 w-4" aria-hidden="true" />
             {item.badge ? (
-              <Badge 
-                variant={item.variant as 'default' | 'secondary' | 'outline'} 
+              <Badge
+                variant={item.variant as "default" | "secondary" | "outline"}
                 className="text-xs px-2 py-1"
               >
                 {item.value}

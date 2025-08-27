@@ -27,7 +27,10 @@ export default function Loading() {
             {/* Progress Bar */}
             <div className="mt-6">
               <div className="w-full bg-muted rounded-full h-1">
-                <div className="bg-primary h-1 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                <div
+                  className="bg-primary h-1 rounded-full animate-pulse"
+                  style={{ width: "60%" }}
+                ></div>
               </div>
             </div>
           </CardContent>

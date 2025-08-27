@@ -33,20 +33,11 @@ const ThemeSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="default" size={"icon"} className="rounded-full">
           {theme === "light" ? (
-            <Sun
-              key="light"
-              size={ICON_SIZE}
-            />
+            <Sun key="light" size={ICON_SIZE} />
           ) : theme === "dark" ? (
-            <Moon
-              key="dark"
-              size={ICON_SIZE}
-            />
+            <Moon key="dark" size={ICON_SIZE} />
           ) : (
-            <Laptop
-              key="system"
-              size={ICON_SIZE}
-            />
+            <Laptop key="system" size={ICON_SIZE} />
           )}
         </Button>
       </DropdownMenuTrigger>

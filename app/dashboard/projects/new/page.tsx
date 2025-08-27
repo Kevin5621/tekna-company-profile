@@ -1,15 +1,15 @@
 import { ProjectForm } from "@/components/project-form";
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 export default function NewProjectPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-full dashboard-form-page">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Proyek", href: "/dashboard/projects" },
-          { label: "Tambah Proyek Baru", isCurrentPage: true }
+          { label: "Tambah Proyek Baru", isCurrentPage: true },
         ]}
       />
 
@@ -18,7 +18,9 @@ export default function NewProjectPage() {
         <BackButton href="/dashboard/projects" label="Kembali ke Projects" />
       </div>
 
-      <ProjectForm mode="create" />
+      <div className="dashboard-form-container">
+        <ProjectForm mode="create" />
+      </div>
     </div>
   );
 }

@@ -1,10 +1,23 @@
-'use client'
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Plus, Settings, Link as LinkIcon, Share2, Phone, Mail } from "lucide-react"
-import Link from "next/link"
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Plus,
+  Settings,
+  Link as LinkIcon,
+  Share2,
+  Phone,
+  Mail,
+} from "lucide-react";
+import Link from "next/link";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 
 export default function FooterManagementPage() {
   const managementSections = [
@@ -14,7 +27,7 @@ export default function FooterManagementPage() {
       icon: Settings,
       href: "/dashboard/footer/sections",
       color: "bg-blue-500",
-      count: "4 sections"
+      count: "4 sections",
     },
     {
       title: "Footer Links",
@@ -22,7 +35,7 @@ export default function FooterManagementPage() {
       icon: LinkIcon,
       href: "/dashboard/footer/links",
       color: "bg-green-500",
-      count: "12 links"
+      count: "12 links",
     },
     {
       title: "Social Media",
@@ -30,7 +43,7 @@ export default function FooterManagementPage() {
       icon: Share2,
       href: "/dashboard/footer/social-media",
       color: "bg-purple-500",
-      count: "5 platforms"
+      count: "5 platforms",
     },
     {
       title: "Contact Information",
@@ -38,7 +51,7 @@ export default function FooterManagementPage() {
       icon: Phone,
       href: "/dashboard/footer/contact-info",
       color: "bg-orange-500",
-      count: "3 contacts"
+      count: "3 contacts",
     },
     {
       title: "Newsletter Settings",
@@ -46,23 +59,25 @@ export default function FooterManagementPage() {
       icon: Mail,
       href: "/dashboard/footer/newsletter",
       color: "bg-red-500",
-      count: "1 setting"
-    }
-  ]
+      count: "1 setting",
+    },
+  ];
 
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Footer", href: "/dashboard/footer" },
-          { label: "Manajemen Footer", isCurrentPage: true }
+          { label: "Manajemen Footer", isCurrentPage: true },
         ]}
       />
 
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Footer Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Footer Management
+          </h1>
           <p className="text-muted-foreground">
             Manage all footer-related content and settings
           </p>
@@ -71,7 +86,7 @@ export default function FooterManagementPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {managementSections.map((section) => {
-          const IconComponent = section.icon
+          const IconComponent = section.icon;
           return (
             <Card key={section.title} className="relative overflow-hidden">
               <CardHeader className="pb-2">
@@ -95,7 +110,7 @@ export default function FooterManagementPage() {
                 </Link>
               </CardContent>
             </Card>
-          )
+          );
         })}
       </div>
 
@@ -111,7 +126,9 @@ export default function FooterManagementPage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-blue-600">4</div>
-              <div className="text-sm text-muted-foreground">Active Sections</div>
+              <div className="text-sm text-muted-foreground">
+                Active Sections
+              </div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-green-600">12</div>
@@ -119,15 +136,19 @@ export default function FooterManagementPage() {
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-purple-600">5</div>
-              <div className="text-sm text-muted-foreground">Social Platforms</div>
+              <div className="text-sm text-muted-foreground">
+                Social Platforms
+              </div>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
               <div className="text-2xl font-bold text-orange-600">3</div>
-              <div className="text-sm text-muted-foreground">Contact Methods</div>
+              <div className="text-sm text-muted-foreground">
+                Contact Methods
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

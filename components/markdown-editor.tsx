@@ -1,12 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { IconEye, IconEyeOff, IconFileText, IconBold, IconItalic, IconList, IconLink, IconCode, IconQuote, IconHeading } from '@tabler/icons-react';
-import { ContentRenderer } from './content-renderer';
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  IconEye,
+  IconEyeOff,
+  IconFileText,
+  IconBold,
+  IconItalic,
+  IconList,
+  IconLink,
+  IconCode,
+  IconQuote,
+  IconHeading,
+} from "@tabler/icons-react";
+import { ContentRenderer } from "./content-renderer";
 
 interface MarkdownEditorProps {
   value: string;
@@ -15,81 +26,103 @@ interface MarkdownEditorProps {
   className?: string;
 }
 
-export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten artikel Anda di sini...", className = '' }: Readonly<MarkdownEditorProps>) {
+export function MarkdownEditor({
+  value,
+  onChange,
+  placeholder = "Tulis konten artikel Anda di sini...",
+  className = "",
+}: Readonly<MarkdownEditorProps>) {
   const [showPreview, setShowPreview] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Markdown toolbar actions
-  const insertMarkdown = useCallback((before: string, after: string = '', placeholder: string = '') => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  const insertMarkdown = useCallback(
+    (before: string, after: string = "", placeholder: string = "") => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = value.substring(start, end);
-    
-    const newText = value.substring(0, start) + before + (selectedText || placeholder) + after + value.substring(end);
-    onChange(newText);
-    
-    // Set cursor position
-    setTimeout(() => {
-      textarea.focus();
-      const newCursorPos = start + before.length + (selectedText || placeholder).length + after.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  }, [value, onChange]);
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selectedText = value.substring(start, end);
 
-  const toolbarActions = useMemo(() => [
-    {
-      icon: IconHeading,
-      label: 'Heading',
-      action: () => insertMarkdown('# ', '', 'Judul'),
-      shortcut: 'Ctrl+H'
+      const newText =
+        value.substring(0, start) +
+        before +
+        (selectedText || placeholder) +
+        after +
+        value.substring(end);
+      onChange(newText);
+
+      // Set cursor position
+      setTimeout(() => {
+        textarea.focus();
+        const newCursorPos =
+          start +
+          before.length +
+          (selectedText || placeholder).length +
+          after.length;
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }, 0);
     },
-    {
-      icon: IconBold,
-      label: 'Bold',
-      action: () => insertMarkdown('**', '**', 'teks tebal'),
-      shortcut: 'Ctrl+B'
-    },
-    {
-      icon: IconItalic,
-      label: 'Italic',
-      action: () => insertMarkdown('*', '*', 'teks miring'),
-      shortcut: 'Ctrl+I'
-    },
-    {
-      icon: IconList,
-      label: 'List',
-      action: () => insertMarkdown('- ', '', 'item list'),
-      shortcut: 'Ctrl+L'
-    },
-    {
-      icon: IconLink,
-      label: 'Link',
-      action: () => insertMarkdown('[', '](url)', 'teks link'),
-      shortcut: 'Ctrl+K'
-    },
-    {
-      icon: IconCode,
-      label: 'Code',
-      action: () => insertMarkdown('`', '`', 'kode'),
-      shortcut: 'Ctrl+`'
-    },
-    {
-      icon: IconQuote,
-      label: 'Quote',
-      action: () => insertMarkdown('> ', '', 'kutipan'),
-      shortcut: 'Ctrl+Q'
-    }
-  ], [insertMarkdown]);
+    [value, onChange]
+  );
+
+  const toolbarActions = useMemo(
+    () => [
+      {
+        icon: IconHeading,
+        label: "Heading",
+        action: () => insertMarkdown("# ", "", "Judul"),
+        shortcut: "Ctrl+H",
+      },
+      {
+        icon: IconBold,
+        label: "Bold",
+        action: () => insertMarkdown("**", "**", "teks tebal"),
+        shortcut: "Ctrl+B",
+      },
+      {
+        icon: IconItalic,
+        label: "Italic",
+        action: () => insertMarkdown("*", "*", "teks miring"),
+        shortcut: "Ctrl+I",
+      },
+      {
+        icon: IconList,
+        label: "List",
+        action: () => insertMarkdown("- ", "", "item list"),
+        shortcut: "Ctrl+L",
+      },
+      {
+        icon: IconLink,
+        label: "Link",
+        action: () => insertMarkdown("[", "](url)", "teks link"),
+        shortcut: "Ctrl+K",
+      },
+      {
+        icon: IconCode,
+        label: "Code",
+        action: () => insertMarkdown("`", "`", "kode"),
+        shortcut: "Ctrl+`",
+      },
+      {
+        icon: IconQuote,
+        label: "Quote",
+        action: () => insertMarkdown("> ", "", "kutipan"),
+        shortcut: "Ctrl+Q",
+      },
+    ],
+    [insertMarkdown]
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey) {
-        const action = toolbarActions.find(item => 
-          item.shortcut === `${e.ctrlKey ? 'Ctrl' : 'Cmd'}+${e.key.toUpperCase()}`
+        const action = toolbarActions.find(
+          (item) =>
+            item.shortcut ===
+            `${e.ctrlKey ? "Ctrl" : "Cmd"}+${e.key.toUpperCase()}`
         );
         if (action) {
           e.preventDefault();
@@ -98,8 +131,8 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [value, toolbarActions]);
 
   return (
@@ -124,7 +157,7 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
                 className="gap-2"
               >
                 {showPreview ? <IconEyeOff size={16} /> : <IconEye size={16} />}
-                {showPreview ? 'Edit' : 'Preview'}
+                {showPreview ? "Edit" : "Preview"}
               </Button>
             </div>
           </div>
@@ -151,7 +184,7 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
           {/* Editor/Preview Toggle */}
           {showPreview ? (
             <div className="min-h-[400px] p-4 border rounded-lg bg-background">
-              <ContentRenderer 
+              <ContentRenderer
                 content={value || placeholder}
                 contentType="markdown"
                 className="min-h-[400px]"
@@ -166,10 +199,11 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
                 placeholder={placeholder}
                 className="min-h-[400px] font-mono text-sm leading-relaxed resize-none"
                 style={{
-                  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace'
+                  fontFamily:
+                    'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
                 }}
               />
-              
+
               {/* Character count */}
               <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
                 {value.length} karakter
@@ -218,7 +252,7 @@ export function MarkdownEditor({ value, onChange, placeholder = "Tulis konten ar
                 <span className="text-muted-foreground">Inline code</span>
               </div>
               <div className="flex justify-between">
-                <code className="bg-muted px-1 rounded">{'>'} Quote</code>
+                <code className="bg-muted px-1 rounded">{">"} Quote</code>
                 <span className="text-muted-foreground">Blockquote</span>
               </div>
             </div>

@@ -5,7 +5,7 @@ async function getProjects() {
   try {
     return await DashboardService.getProjects();
   } catch (error) {
-    console.error('Error fetching projects:', error);
+    console.error("Error fetching projects:", error);
     return [];
   }
 }

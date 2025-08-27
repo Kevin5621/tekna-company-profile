@@ -1,15 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MediaService, type MediaFile } from '@/lib/services/media.service';
-import { IconUpload, IconX, IconCopy, IconDownload, IconLoader2 } from '@tabler/icons-react';
-import Image from 'next/image';
-import { useToast } from '@/hooks/use-toast'
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MediaService, type MediaFile } from "@/lib/services/media.service";
+import {
+  IconUpload,
+  IconX,
+  IconCopy,
+  IconDownload,
+  IconLoader2,
+} from "@tabler/icons-react";
+import Image from "next/image";
+import { useToast } from "@/hooks/use-toast";
 
 interface MediaLibraryProps {
   onSelect?: (file: MediaFile) => void;
@@ -18,12 +24,12 @@ interface MediaLibraryProps {
 
 export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   // Load media files on component mount
   const loadMediaFiles = async () => {
@@ -32,13 +38,15 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
       const files = await MediaService.getMediaFiles();
       setMediaFiles(files);
     } catch (error) {
-      console.error('Error loading media files:', error);
+      console.error("Error loading media files:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const files = event.target.files;
     if (!files || files.length === 0) {
       return;
@@ -51,28 +59,31 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
       for (const file of Array.from(files)) {
         const result = await MediaService.uploadFile(file);
         if (result.success && result.file) {
-          setMediaFiles(prev => [result.file!, ...prev]);
+          setMediaFiles((prev) => [result.file!, ...prev]);
           toast({
             title: "Upload Successful!",
             description: "File has been uploaded successfully.",
             variant: "success",
-          })
+          });
         } else {
-          console.error('Upload failed:', result.error);
+          console.error("Upload failed:", result.error);
           toast({
             title: "Upload Failed",
-            description: result.error || 'An error occurred during upload.',
+            description: result.error || "An error occurred during upload.",
             variant: "destructive",
-          })
+          });
         }
       }
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error("Upload error:", error);
       toast({
         title: "Upload Failed",
-        description: error instanceof Error ? error.message : 'An error occurred during upload.',
+        description:
+          error instanceof Error
+            ? error.message
+            : "An error occurred during upload.",
         variant: "destructive",
-      })
+      });
     } finally {
       setIsUploading(false);
     }
@@ -93,34 +104,34 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
   };
 
   const handleFileDelete = async (fileId: string) => {
-    if (!confirm('Are you sure you want to delete this file?')) {
+    if (!confirm("Are you sure you want to delete this file?")) {
       return;
     }
 
     try {
       const success = await MediaService.deleteMediaFile(fileId);
       if (success) {
-        setMediaFiles(prev => prev.filter(file => file.id !== fileId));
+        setMediaFiles((prev) => prev.filter((file) => file.id !== fileId));
         toast({
           title: "File Deleted!",
           description: "File has been deleted successfully.",
           variant: "success",
-        })
+        });
       } else {
-        alert('Failed to delete file');
+        alert("Failed to delete file");
         toast({
           title: "Delete Failed",
-          description: 'Failed to delete file',
+          description: "Failed to delete file",
           variant: "destructive",
-        })
+        });
       }
     } catch (error) {
-      console.error('Error deleting file:', error);
+      console.error("Error deleting file:", error);
       toast({
         title: "Delete Failed",
-        description: 'Failed to delete file',
+        description: "Failed to delete file",
         variant: "destructive",
-      })
+      });
     }
   };
 
@@ -130,21 +141,24 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
       title: "URL Copied!",
       description: "File URL copied successfully!",
       variant: "success",
-    })
+    });
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const filteredFiles = mediaFiles.filter(file =>
-    file.original_filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    file.alt_text?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    file.caption?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredFiles = mediaFiles.filter(
+    (file) =>
+      file.original_filename
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      file.alt_text?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      file.caption?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -176,7 +190,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
               <p className="text-muted-foreground mb-4">
                 Start by uploading your first file to the media library
               </p>
-              
+
               <Input
                 ref={fileInputRef}
                 type="file"
@@ -186,19 +200,19 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
                 className="hidden"
                 id="file-upload"
               />
-              
+
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
                 className="mb-4"
               >
                 <IconUpload className="h-4 w-4 mr-2" />
-                {isUploading ? 'Uploading...' : 'Pilih File'}
+                {isUploading ? "Uploading..." : "Pilih File"}
               </Button>
 
               {isUploading && (
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-primary h-2 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   />
@@ -230,7 +244,9 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
               <div className="text-center py-12">
                 <IconUpload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  {searchQuery ? 'Tidak ada file yang cocok dengan pencarian' : 'Belum ada file yang diupload'}
+                  {searchQuery
+                    ? "Tidak ada file yang cocok dengan pencarian"
+                    : "Belum ada file yang diupload"}
                 </p>
               </div>
             ) : (
@@ -247,7 +263,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
                           objectFit="cover"
                           className="group-hover:scale-105 transition-transform duration-200"
                         />
-                        
+
                         {/* Overlay Actions */}
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
                           <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
@@ -271,7 +287,10 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
 
                       {/* File Info */}
                       <div className="space-y-2">
-                        <p className="text-sm font-medium truncate" title={file.original_filename}>
+                        <p
+                          className="text-sm font-medium truncate"
+                          title={file.original_filename}
+                        >
                           {file.original_filename}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -297,7 +316,7 @@ export function MediaLibrary({ onSelect, onClose }: MediaLibraryProps) {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => window.open(file.file_url, '_blank')}
+                          onClick={() => window.open(file.file_url, "_blank")}
                           className="flex-1"
                         >
                           <IconDownload className="h-3 w-3" />

@@ -1,19 +1,22 @@
-'use client';
+"use client";
 
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { useMemo } from "react";
 
-const World = dynamic(() => import("@/components/ui/globe").then((m) => m.World), {
-  ssr: false,
-});
+const World = dynamic(
+  () => import("@/components/ui/globe").then((m) => m.World),
+  {
+    ssr: false,
+  }
+);
 
 export function GlobeBackground() {
   const { theme } = useTheme();
 
   // Konfigurasi globe yang responsif terhadap tema
   const getGlobeConfig = () => {
-    if (theme === 'dark') {
+    if (theme === "dark") {
       return {
         pointSize: 4,
         globeColor: "#062056",
@@ -64,12 +67,13 @@ export function GlobeBackground() {
   };
 
   const globeConfig = getGlobeConfig();
-  
+
   // Memoize sampleArcs to prevent Globe reset on content changes
   const sampleArcs = useMemo(() => {
-    const colors = theme === 'dark' 
-      ? ["#06b6d4", "#3b82f6", "#6366f1"] 
-      : ["#10b981", "#059669", "#047857"]; // Warna hijau neon yang terlihat jelas untuk arc
+    const colors =
+      theme === "dark"
+        ? ["#06b6d4", "#3b82f6", "#6366f1"]
+        : ["#10b981", "#059669", "#047857"]; // Warna hijau neon yang terlihat jelas untuk arc
 
     return [
       {
@@ -436,7 +440,7 @@ export function GlobeBackground() {
   }, [theme]); // Only recreate when theme changes
 
   return (
-    <div 
+    <div
       className="fixed inset-0 flex items-center justify-center"
       style={{ zIndex: 1 }}
     >

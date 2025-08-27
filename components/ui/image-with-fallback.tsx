@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface ImageWithFallbackProps {
   readonly src: string | null;
@@ -14,7 +14,7 @@ interface ImageWithFallbackProps {
   readonly className?: string;
   readonly unoptimized?: boolean;
   readonly priority?: boolean;
-  readonly size?: 'small' | 'medium' | 'large';
+  readonly size?: "small" | "medium" | "large";
 }
 
 export function ImageWithFallback({
@@ -27,13 +27,16 @@ export function ImageWithFallback({
   className,
   unoptimized = false,
   priority = false,
-  size = 'medium',
+  size = "medium",
   ...props
 }: ImageWithFallbackProps) {
   // Choose fallback based on size if not provided
-  const defaultFallback = fallbackSrc || 
-    (size === 'large' ? '/images/placeholder-blog-large.svg' : '/images/placeholder-blog.svg');
-  
+  const defaultFallback =
+    fallbackSrc ||
+    (size === "large"
+      ? "/images/placeholder-blog-large.svg"
+      : "/images/placeholder-blog.svg");
+
   const [imageSrc, setImageSrc] = useState(src || defaultFallback);
   const [hasError, setHasError] = useState(!src);
 
@@ -48,7 +51,7 @@ export function ImageWithFallback({
     ...props,
     src: imageSrc,
     alt,
-    className: cn(className, hasError && 'opacity-75'),
+    className: cn(className, hasError && "opacity-75"),
     onError: handleError,
     unoptimized: hasError || unoptimized,
     priority,
@@ -58,12 +61,5 @@ export function ImageWithFallback({
     return <Image {...imageProps} fill alt={alt} />;
   }
 
-  return (
-    <Image
-      {...imageProps}
-      width={width}
-      height={height}
-      alt={alt}
-    />
-  );
+  return <Image {...imageProps} width={width} height={height} alt={alt} />;
 }

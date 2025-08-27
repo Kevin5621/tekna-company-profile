@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
-import Image from 'next/image';
-import { IconSearch, IconX, IconCalendar } from '@tabler/icons-react';
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import Image from "next/image";
+import { IconSearch, IconX, IconCalendar } from "@tabler/icons-react";
 
 interface SearchResult {
   id: string;
@@ -23,7 +23,7 @@ interface SearchResult {
 }
 
 export function BlogSearch() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -37,20 +37,20 @@ export function BlogSearch() {
 
     setIsLoading(true);
     setHasSearched(true);
-    
+
     try {
       // Import the server action dynamically
-      const { searchBlogPosts } = await import('@/app/actions/blog');
-      
+      const { searchBlogPosts } = await import("@/app/actions/blog");
+
       const searchResults = await searchBlogPosts(searchQuery.trim());
       // Transform the results to match our interface
-      const transformedResults = searchResults.map(result => ({
+      const transformedResults = searchResults.map((result) => ({
         ...result,
         categories: result.categories?.[0] || null,
       }));
       setResults(transformedResults);
     } catch (error) {
-      console.error('Error searching posts:', error);
+      console.error("Error searching posts:", error);
       setResults([]);
     } finally {
       setIsLoading(false);
@@ -59,7 +59,7 @@ export function BlogSearch() {
 
   const handleInputChange = (value: string) => {
     setQuery(value);
-    
+
     // Debounced search
     const timer = setTimeout(() => {
       handleSearch(value);
@@ -69,16 +69,16 @@ export function BlogSearch() {
   };
 
   const clearSearch = () => {
-    setQuery('');
+    setQuery("");
     setResults([]);
     setHasSearched(false);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -89,7 +89,10 @@ export function BlogSearch() {
         <label htmlFor="search-input" className="sr-only">
           Search articles by title, content, or keywords
         </label>
-        <IconSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
+        <IconSearch
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground"
+          aria-hidden="true"
+        />
         <Input
           id="search-input"
           placeholder="Search articles..."
@@ -111,18 +114,19 @@ export function BlogSearch() {
             <IconX className="h-5 w-5" />
           </button>
         )}
-        
+
         {!query && !hasSearched && (
           <div id="search-help" className="sr-only">
             Type to search through articles by title, content, or keywords
           </div>
         )}
-        
+
         {query && (
           <div id="search-status" className="sr-only">
             {(() => {
               if (isLoading) return `Searching for ${query}...`;
-              if (hasSearched) return `Found ${results.length} results for ${query}`;
+              if (hasSearched)
+                return `Found ${results.length} results for ${query}`;
               return `Type to search for ${query}`;
             })()}
           </div>
@@ -147,7 +151,9 @@ export function BlogSearch() {
             <>
               <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
                 <p className="text-sm font-medium text-foreground">
-                  Found {results.length} article{results.length !== 1 ? 's' : ''} for <em>&quot;{query}&quot;</em>
+                  Found {results.length} article
+                  {results.length !== 1 ? "s" : ""} for{" "}
+                  <em>&quot;{query}&quot;</em>
                 </p>
                 <Button
                   variant="ghost"
@@ -159,7 +165,7 @@ export function BlogSearch() {
                   Clear
                 </Button>
               </div>
-              
+
               <div className="grid gap-6 md:grid-cols-2">
                 {results.map((result) => (
                   <article key={result.id}>
@@ -180,7 +186,7 @@ export function BlogSearch() {
                                 </div>
                               </div>
                             )}
-                            
+
                             {/* Enhanced Content */}
                             <div className="flex-1 min-w-0 space-y-3">
                               <h3 className="font-semibold text-lg line-clamp-2 group-hover:text-primary transition-colors leading-tight">
@@ -192,14 +198,22 @@ export function BlogSearch() {
                                 </p>
                               )}
                               <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 border-t border-muted/50">
-                                <time dateTime={result.published_at} className="flex items-center gap-1">
-                                  <IconCalendar className="h-3 w-3" aria-hidden="true" />
+                                <time
+                                  dateTime={result.published_at}
+                                  className="flex items-center gap-1"
+                                >
+                                  <IconCalendar
+                                    className="h-3 w-3"
+                                    aria-hidden="true"
+                                  />
                                   {formatDate(result.published_at)}
                                 </time>
                                 {result.categories && (
                                   <>
                                     <span>•</span>
-                                    <span className="font-medium">{result.categories.name}</span>
+                                    <span className="font-medium">
+                                      {result.categories.name}
+                                    </span>
                                   </>
                                 )}
                                 {result.author_name && (
@@ -227,7 +241,8 @@ export function BlogSearch() {
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold">No articles found</h3>
                   <p className="text-muted-foreground">
-                    We couldn&apos;t find any articles matching <strong>&quot;{query}&quot;</strong>.
+                    We couldn&apos;t find any articles matching{" "}
+                    <strong>&quot;{query}&quot;</strong>.
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Try different keywords or browse all articles.
@@ -259,10 +274,18 @@ export function BlogSearch() {
             </CardHeader>
             <CardContent className="space-y-6">
               <p className="text-muted-foreground text-center">
-                Search through our articles by title, content, or keywords. Try one of these popular topics:
+                Search through our articles by title, content, or keywords. Try
+                one of these popular topics:
               </p>
               <div className="flex flex-wrap justify-center gap-3">
-                {['Technology', 'Web Development', 'AI & Machine Learning', 'Innovation', 'Design Systems', 'User Experience'].map((term) => (
+                {[
+                  "Technology",
+                  "Web Development",
+                  "AI & Machine Learning",
+                  "Innovation",
+                  "Design Systems",
+                  "User Experience",
+                ].map((term) => (
                   <Button
                     key={term}
                     variant="outline"
@@ -277,10 +300,12 @@ export function BlogSearch() {
                   </Button>
                 ))}
               </div>
-              
+
               {/* Search Tips */}
               <div className="bg-muted/30 rounded-lg p-4 space-y-3">
-                <h4 className="font-medium text-sm text-foreground">Search Tips:</h4>
+                <h4 className="font-medium text-sm text-foreground">
+                  Search Tips:
+                </h4>
                 <ul className="text-xs text-muted-foreground space-y-1">
                   <li>• Use specific keywords for better results</li>
                   <li>• Try different variations of your search terms</li>

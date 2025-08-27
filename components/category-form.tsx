@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ClientDashboardService } from '@/lib/services/client-dashboard.service';
-import { IconDeviceFloppy, IconX, IconPalette } from '@tabler/icons-react';
-import { useToast } from '@/hooks/use-toast'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import { IconDeviceFloppy, IconX, IconPalette } from "@tabler/icons-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface CategoryFormProps {
   categoryId?: string;
@@ -42,19 +42,24 @@ interface ValidationErrors {
   sort_order?: string;
 }
 
-export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: CategoryFormProps) {
+export function CategoryForm({
+  categoryId,
+  initialData,
+  onSuccess,
+  onCancel,
+}: CategoryFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    name: initialData?.name || '',
-    slug: initialData?.slug || '',
-    description: initialData?.description || '',
-    color: initialData?.color || '#3B82F6',
+    name: initialData?.name || "",
+    slug: initialData?.slug || "",
+    description: initialData?.description || "",
+    color: initialData?.color || "#3B82F6",
     is_active: initialData?.is_active ?? true,
     sort_order: initialData?.sort_order || 0,
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   // Auto-generate slug when name changes
   useEffect(() => {
@@ -62,11 +67,11 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
       const autoSlug = formData.name
         .toLowerCase()
         .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      
-      setFormData(prev => ({ ...prev, slug: autoSlug }));
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s_-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+      setFormData((prev) => ({ ...prev, slug: autoSlug }));
     }
   }, [formData.name, categoryId]);
 
@@ -76,36 +81,37 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
 
     // Name validation
     if (!formData.name.trim()) {
-      newErrors.name = 'Nama kategori wajib diisi';
+      newErrors.name = "Nama kategori wajib diisi";
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Nama kategori minimal 2 karakter';
+      newErrors.name = "Nama kategori minimal 2 karakter";
     } else if (formData.name.trim().length > 100) {
-      newErrors.name = 'Nama kategori maksimal 100 karakter';
+      newErrors.name = "Nama kategori maksimal 100 karakter";
     }
 
     // Slug validation
     if (!formData.slug.trim()) {
-      newErrors.slug = 'Slug wajib diisi';
+      newErrors.slug = "Slug wajib diisi";
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung';
+      newErrors.slug =
+        "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung";
     } else if (formData.slug.length < 2) {
-      newErrors.slug = 'Slug minimal 2 karakter';
+      newErrors.slug = "Slug minimal 2 karakter";
     } else if (formData.slug.length > 100) {
-      newErrors.slug = 'Slug maksimal 100 karakter';
+      newErrors.slug = "Slug maksimal 100 karakter";
     }
 
     // Color validation
     if (!formData.color) {
-      newErrors.color = 'Warna wajib dipilih';
+      newErrors.color = "Warna wajib dipilih";
     } else if (!/^#[0-9A-F]{6}$/i.test(formData.color)) {
-      newErrors.color = 'Format warna tidak valid (gunakan hex color)';
+      newErrors.color = "Format warna tidak valid (gunakan hex color)";
     }
 
     // Sort order validation
     if (formData.sort_order < 0) {
-      newErrors.sort_order = 'Urutan tidak boleh negatif';
+      newErrors.sort_order = "Urutan tidak boleh negatif";
     } else if (formData.sort_order > 999) {
-      newErrors.sort_order = 'Urutan maksimal 999';
+      newErrors.sort_order = "Urutan maksimal 999";
     }
 
     setErrors(newErrors);
@@ -114,7 +120,7 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -128,40 +134,44 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
           title: "Category Updated!",
           description: "Category has been updated successfully.",
           variant: "success",
-        })
+        });
       } else {
         await ClientDashboardService.createCategory(formData);
         toast({
           title: "Category Created!",
           description: "Category has been created successfully.",
           variant: "success",
-        })
+        });
       }
-      
+
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push('/dashboard/categories');
+        router.push("/dashboard/categories");
         router.refresh();
       }
     } catch (error) {
-      console.error('Error saving category:', error);
+      console.error("Error saving category:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : 'Terjadi kesalahan',
+        description:
+          error instanceof Error ? error.message : "Terjadi kesalahan",
         variant: "destructive",
-      })
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: keyof FormData, value: string | number | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+  const handleInputChange = (
+    field: keyof FormData,
+    value: string | number | boolean
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field as keyof ValidationErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -178,7 +188,7 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconPalette className="h-5 w-5" />
-          {categoryId ? 'Edit Kategori' : 'Tambah Kategori Baru'}
+          {categoryId ? "Edit Kategori" : "Tambah Kategori Baru"}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -190,9 +200,9 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
               id="name"
               type="text"
               value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
+              onChange={(e) => handleInputChange("name", e.target.value)}
               placeholder="Masukkan nama kategori"
-              className={errors.name ? 'border-destructive' : ''}
+              className={errors.name ? "border-destructive" : ""}
             />
             {errors.name && (
               <p className="text-sm text-destructive">{errors.name}</p>
@@ -206,9 +216,9 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
               id="slug"
               type="text"
               value={formData.slug}
-              onChange={(e) => handleInputChange('slug', e.target.value)}
+              onChange={(e) => handleInputChange("slug", e.target.value)}
               placeholder="url-friendly-slug"
-              className={errors.slug ? 'border-destructive' : ''}
+              className={errors.slug ? "border-destructive" : ""}
             />
             {errors.slug && (
               <p className="text-sm text-destructive">{errors.slug}</p>
@@ -224,7 +234,7 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(e) => handleInputChange("description", e.target.value)}
               placeholder="Deskripsi kategori (opsional)"
               rows={3}
             />
@@ -238,15 +248,15 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
                 id="color"
                 type="color"
                 value={formData.color}
-                onChange={(e) => handleInputChange('color', e.target.value)}
-                className={errors.color ? 'border-destructive' : ''}
+                onChange={(e) => handleInputChange("color", e.target.value)}
+                className={errors.color ? "border-destructive" : ""}
               />
               <Input
                 type="text"
                 value={formData.color}
-                onChange={(e) => handleInputChange('color', e.target.value)}
+                onChange={(e) => handleInputChange("color", e.target.value)}
                 placeholder="#3B82F6"
-                className={errors.color ? 'border-destructive' : ''}
+                className={errors.color ? "border-destructive" : ""}
               />
             </div>
             {errors.color && (
@@ -261,11 +271,13 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
               id="sort_order"
               type="number"
               value={formData.sort_order}
-              onChange={(e) => handleInputChange('sort_order', parseInt(e.target.value) || 0)}
+              onChange={(e) =>
+                handleInputChange("sort_order", parseInt(e.target.value) || 0)
+              }
               placeholder="0"
               min="0"
               max="999"
-              className={errors.sort_order ? 'border-destructive' : ''}
+              className={errors.sort_order ? "border-destructive" : ""}
             />
             {errors.sort_order && (
               <p className="text-sm text-destructive">{errors.sort_order}</p>
@@ -280,7 +292,9 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
             <Checkbox
               id="is_active"
               checked={formData.is_active}
-              onCheckedChange={(checked) => handleInputChange('is_active', !!checked)}
+              onCheckedChange={(checked) =>
+                handleInputChange("is_active", !!checked)
+              }
             />
             <Label htmlFor="is_active">Kategori Aktif</Label>
           </div>
@@ -299,10 +313,13 @@ export function CategoryForm({ categoryId, initialData, onSuccess, onCancel }: C
             </Button>
             <Button type="submit" disabled={isLoading} className="flex-1">
               <IconDeviceFloppy className="h-4 w-4 mr-2" />
-              {isLoading 
-                ? (categoryId ? 'Menyimpan...' : 'Membuat...') 
-                : (categoryId ? 'Simpan Perubahan' : 'Buat Kategori')
-              }
+              {isLoading
+                ? categoryId
+                  ? "Menyimpan..."
+                  : "Membuat..."
+                : categoryId
+                ? "Simpan Perubahan"
+                : "Buat Kategori"}
             </Button>
           </div>
         </form>

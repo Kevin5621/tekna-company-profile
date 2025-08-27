@@ -143,9 +143,9 @@ export function Globe({ globeConfig, data }: WorldProps) {
       (v, i, a) =>
         a.findIndex((v2) =>
           ["lat", "lng"].every(
-            (k) => v2[k as "lat" | "lng"] === v[k as "lat" | "lng"],
-          ),
-        ) === i,
+            (k) => v2[k as "lat" | "lng"] === v[k as "lat" | "lng"]
+          )
+        ) === i
     );
 
     globeRef.current
@@ -185,7 +185,7 @@ export function Globe({ globeConfig, data }: WorldProps) {
       .ringMaxRadius(defaultProps.maxRings)
       .ringPropagationSpeed(RING_PROPAGATION_SPEED)
       .ringRepeatPeriod(
-        (defaultProps.arcTime * defaultProps.arcLength) / defaultProps.rings,
+        (defaultProps.arcTime * defaultProps.arcLength) / defaultProps.rings
       );
   }, [
     isInitialized,
@@ -211,7 +211,7 @@ export function Globe({ globeConfig, data }: WorldProps) {
       const newNumbersOfRings = genRandomNumbers(
         0,
         data.length,
-        Math.floor((data.length * 4) / 5),
+        Math.floor((data.length * 4) / 5)
       );
 
       const ringsData = data
@@ -247,23 +247,27 @@ export function WebGLRendererConfig() {
 
 export function World(props: WorldProps) {
   const { globeConfig } = props;
-  
+
   // Gunakan useMemo untuk scene dan camera yang persisten
   const sceneRef = useRef<Scene | null>(null);
   const cameraRef = useRef<PerspectiveCamera | null>(null);
-  
+
   // Buat scene dan camera hanya sekali
   if (!sceneRef.current) {
     sceneRef.current = new Scene();
     sceneRef.current.fog = new Fog(0xffffff, 400, 2000);
   }
-  
+
   if (!cameraRef.current) {
     cameraRef.current = new PerspectiveCamera(50, aspect, 180, 1800);
   }
-  
+
   return (
-    <Canvas scene={sceneRef.current} camera={cameraRef.current} style={{ pointerEvents: 'auto' }}>
+    <Canvas
+      scene={sceneRef.current}
+      camera={cameraRef.current}
+      style={{ pointerEvents: "auto" }}
+    >
       <WebGLRendererConfig />
       <ambientLight color={globeConfig.ambientLight} intensity={0.6} />
       <directionalLight

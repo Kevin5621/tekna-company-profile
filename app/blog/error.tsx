@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { ErrorPage } from '@/components/error-page';
+import { ErrorPage } from "@/components/error-page";
 
 export default function BlogError({
   error,
@@ -10,7 +10,7 @@ export default function BlogError({
   reset: () => void;
 }) {
   return (
-    <ErrorPage 
+    <ErrorPage
       error={error}
       reset={reset}
       title="Kesalahan Blog"

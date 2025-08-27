@@ -7,7 +7,7 @@ export class DashboardService {
    */
   static async getDashboardData(): Promise<DashboardData> {
     const supabase = await createClient();
-    
+
     try {
       // Get all data in parallel for better performance
       const [
@@ -17,45 +17,46 @@ export class DashboardService {
         testimonialsCountResult,
         servicesCountResult,
         recentProjectsResult,
-        recentPostsResult
+        recentPostsResult,
       ] = await Promise.all([
         // Team members count (from posts authors)
         supabase
-          .from('posts')
-          .select('author_name', { count: 'exact', head: true })
-          .not('author_name', 'is', null)
-          .not('author_name', 'eq', '')
-          .eq('is_active', true),
-        
+          .from("posts")
+          .select("author_name", { count: "exact", head: true })
+          .not("author_name", "is", null)
+          .not("author_name", "eq", "")
+          .eq("is_active", true),
+
         // Active projects count
         supabase
-          .from('projects')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true),
-        
+          .from("projects")
+          .select("*", { count: "exact", head: true })
+          .eq("is_active", true),
+
         // Published posts count
         supabase
-          .from('posts')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'published')
-          .eq('is_active', true),
-        
+          .from("posts")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "published")
+          .eq("is_active", true),
+
         // Testimonials count
         supabase
-          .from('testimonials')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true),
-        
+          .from("testimonials")
+          .select("*", { count: "exact", head: true })
+          .eq("is_active", true),
+
         // Services count
         supabase
-          .from('services')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true),
-        
+          .from("services")
+          .select("*", { count: "exact", head: true })
+          .eq("is_active", true),
+
         // Recent projects
         supabase
-          .from('projects')
-          .select(`
+          .from("projects")
+          .select(
+            `
             id,
             name,
             client_name,
@@ -65,25 +66,28 @@ export class DashboardService {
             project_translations!inner(
               short_description
             )
-          `)
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
+          `
+          )
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
           .limit(3),
-        
+
         // Recent posts
         supabase
-          .from('posts')
-          .select(`
+          .from("posts")
+          .select(
+            `
             id,
             title,
             status,
             view_count,
             published_at,
             author_name
-          `)
-          .eq('is_active', true)
-          .order('created_at', { ascending: false })
-          .limit(3)
+          `
+          )
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(3),
       ]);
 
       // Extract data from results
@@ -102,49 +106,50 @@ export class DashboardService {
             value: teamCount.toString(),
             description: "Anggota tim aktif",
             change: "+2",
-            changeType: "positive" as const
+            changeType: "positive" as const,
           },
           {
             title: "Proyek Aktif",
             value: projectsCount.toString(),
             description: "Proyek sedang berjalan",
             change: "+1",
-            changeType: "positive" as const
+            changeType: "positive" as const,
           },
           {
             title: "Artikel Blog",
             value: postsCount.toString(),
             description: "Artikel diterbitkan",
             change: "+3",
-            changeType: "positive" as const
+            changeType: "positive" as const,
           },
           {
             title: "Testimonial",
             value: testimonialsCount.toString(),
             description: "Ulasan klien",
             change: "+2",
-            changeType: "positive" as const
-          }
+            changeType: "positive" as const,
+          },
         ],
-        recentProjects: recentProjects.map(project => ({
+        recentProjects: recentProjects.map((project) => ({
           id: project.id,
           name: project.name,
           status: project.status as ProjectStatus,
-          description: project.project_translations?.[0]?.short_description || ''
+          description:
+            project.project_translations?.[0]?.short_description || "",
         })),
-        recentPosts: recentPosts.map(post => ({
+        recentPosts: recentPosts.map((post) => ({
           id: post.id,
           title: post.title,
-          author: post.author_name || 'Admin',
-          status: post.status as 'draft' | 'published' | 'archived',
+          author: post.author_name || "Admin",
+          status: post.status as "draft" | "published" | "archived",
           views: post.view_count || 0,
-          publishedAt: post.published_at
+          publishedAt: post.published_at,
         })),
-        servicesCount
+        servicesCount,
       };
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      throw new Error('Gagal mengambil data dashboard');
+      console.error("Error fetching dashboard data:", error);
+      throw new Error("Gagal mengambil data dashboard");
     }
   }
 
@@ -153,34 +158,36 @@ export class DashboardService {
    */
   static async getTeamMembers() {
     const supabase = await createClient();
-    
+
     try {
       // Get unique authors from existing posts
       const { data, error } = await supabase
-        .from('posts')
-        .select('author_name')
-        .not('author_name', 'is', null)
-        .not('author_name', 'eq', '')
-        .eq('is_active', true);
+        .from("posts")
+        .select("author_name")
+        .not("author_name", "is", null)
+        .not("author_name", "eq", "")
+        .eq("is_active", true);
 
       if (error) throw error;
-      
+
       // Create unique authors list with generated IDs
-      const uniqueAuthors = [...new Set(data?.map(post => post.author_name) || [])];
-      
+      const uniqueAuthors = [
+        ...new Set(data?.map((post) => post.author_name) || []),
+      ];
+
       return uniqueAuthors.map((name, index) => ({
         id: `author-${index + 1}`,
-        first_name: name.split(' ')[0] || name,
-        last_name: name.split(' ').slice(1).join(' ') || '',
-        email: `${name.toLowerCase().replace(/\s+/g, '.')}@tekna.com`,
-        position: 'Author',
-        department: 'Content',
+        first_name: name.split(" ")[0] || name,
+        last_name: name.split(" ").slice(1).join(" ") || "",
+        email: `${name.toLowerCase().replace(/\s+/g, ".")}@tekna.com`,
+        position: "Author",
+        department: "Content",
         avatar_url: null,
-        is_active: true
+        is_active: true,
       }));
     } catch (error) {
-      console.error('Error fetching team members:', error);
-      throw new Error('Gagal mengambil data tim');
+      console.error("Error fetching team members:", error);
+      throw new Error("Gagal mengambil data tim");
     }
   }
 
@@ -189,26 +196,28 @@ export class DashboardService {
    */
   static async getProjects() {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
-        .select(`
+        .from("projects")
+        .select(
+          `
           id,
           name,
           description,
           is_featured,
           is_active,
           featured_image_url
-        `)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching projects:', error);
-      throw new Error('Gagal mengambil data proyek');
+      console.error("Error fetching projects:", error);
+      throw new Error("Gagal mengambil data proyek");
     }
   }
 
@@ -217,11 +226,12 @@ export class DashboardService {
    */
   static async getProjectById(projectId: string) {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
-        .select(`
+        .from("projects")
+        .select(
+          `
           id,
           name,
           slug,
@@ -230,16 +240,17 @@ export class DashboardService {
           featured_image_url,
           is_featured,
           is_active
-        `)
-        .eq('id', projectId)
-        .eq('is_active', true)
+        `
+        )
+        .eq("id", projectId)
+        .eq("is_active", true)
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching project:', error);
-      throw new Error('Gagal mengambil data proyek');
+      console.error("Error fetching project:", error);
+      throw new Error("Gagal mengambil data proyek");
     }
   }
 
@@ -255,13 +266,13 @@ export class DashboardService {
     is_featured?: boolean;
   }) {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
+        .from("projects")
         .insert({
           ...projectData,
-          is_active: true
+          is_active: true,
         })
         .select()
         .single();
@@ -269,8 +280,8 @@ export class DashboardService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error creating project:', error);
-      throw new Error('Gagal membuat proyek baru');
+      console.error("Error creating project:", error);
+      throw new Error("Gagal membuat proyek baru");
     }
   }
 
@@ -278,7 +289,7 @@ export class DashboardService {
    * Update existing project
    */
   static async updateProject(
-    projectId: string, 
+    projectId: string,
     projectData: {
       name?: string;
       slug?: string;
@@ -289,21 +300,21 @@ export class DashboardService {
     }
   ) {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
+        .from("projects")
         .update(projectData)
-        .eq('id', projectId)
-        .eq('is_active', true)
+        .eq("id", projectId)
+        .eq("is_active", true)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating project:', error);
-      throw new Error('Gagal mengupdate proyek');
+      console.error("Error updating project:", error);
+      throw new Error("Gagal mengupdate proyek");
     }
   }
 
@@ -312,20 +323,20 @@ export class DashboardService {
    */
   static async deleteProject(projectId: string) {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('projects')
+        .from("projects")
         .update({ is_active: false })
-        .eq('id', projectId)
+        .eq("id", projectId)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error deleting project:', error);
-      throw new Error('Gagal menghapus proyek');
+      console.error("Error deleting project:", error);
+      throw new Error("Gagal menghapus proyek");
     }
   }
 
@@ -334,12 +345,13 @@ export class DashboardService {
    */
   static async getBlogPostById(postId: string) {
     const supabase = await createClient();
-    
+
     try {
       // Get main post data
       const { data: post, error: postError } = await supabase
-        .from('posts')
-        .select(`
+        .from("posts")
+        .select(
+          `
           id,
           title,
           slug,
@@ -355,13 +367,14 @@ export class DashboardService {
           view_count,
           created_at,
           updated_at
-        `)
-        .eq('id', postId)
-        .eq('is_active', true)
+        `
+        )
+        .eq("id", postId)
+        .eq("is_active", true)
         .single();
 
       if (postError) {
-        console.error('Post query error:', postError);
+        console.error("Post query error:", postError);
         throw postError;
       }
 
@@ -372,46 +385,48 @@ export class DashboardService {
       // Get content from translations
       try {
         const { data: defaultLanguage } = await supabase
-          .from('languages')
-          .select('id')
-          .eq('is_default', true)
-          .eq('is_active', true)
+          .from("languages")
+          .select("id")
+          .eq("is_default", true)
+          .eq("is_active", true)
           .single();
 
-        const defaultLangId = defaultLanguage?.id || 'en';
+        const defaultLangId = defaultLanguage?.id || "en";
 
         const { data: translation } = await supabase
-          .from('post_translations')
-          .select(`
+          .from("post_translations")
+          .select(
+            `
             content,
             meta_title,
             meta_description,
             meta_keywords
-          `)
-          .eq('post_id', post.id)
-          .eq('language_id', defaultLangId)
+          `
+          )
+          .eq("post_id", post.id)
+          .eq("language_id", defaultLangId)
           .single();
 
         return {
           ...post,
-          content: translation?.content || '',
+          content: translation?.content || "",
           meta_title: translation?.meta_title || post.title,
           meta_description: translation?.meta_description || post.excerpt,
-          meta_keywords: translation?.meta_keywords || ''
+          meta_keywords: translation?.meta_keywords || "",
         };
       } catch (error) {
         console.log(`Error fetching translation for post ${post.id}:`, error);
         // Return post without translation content
         return {
           ...post,
-          content: '',
+          content: "",
           meta_title: post.title,
           meta_description: post.excerpt,
-          meta_keywords: ''
+          meta_keywords: "",
         };
       }
     } catch (error) {
-      console.error('Error fetching blog post:', error);
+      console.error("Error fetching blog post:", error);
       throw error;
     }
   }
@@ -421,14 +436,15 @@ export class DashboardService {
    */
   static async getBlogPosts() {
     const supabase = await createClient();
-    
+
     try {
-      console.log('Fetching blog posts...');
-      
+      console.log("Fetching blog posts...");
+
       // Get main posts data
       const { data: posts, error: postsError } = await supabase
-        .from('posts')
-        .select(`
+        .from("posts")
+        .select(
+          `
           id,
           title,
           slug,
@@ -443,12 +459,13 @@ export class DashboardService {
           view_count,
           created_at,
           updated_at
-        `)
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+        `
+        )
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
 
       if (postsError) {
-        console.error('Posts query error:', postsError);
+        console.error("Posts query error:", postsError);
         throw postsError;
       }
 
@@ -458,74 +475,82 @@ export class DashboardService {
       if (posts && posts.length > 0) {
         // Get default language ID first
         const { data: defaultLanguage, error: langError } = await supabase
-          .from('languages')
-          .select('id')
-          .eq('is_default', true)
-          .eq('is_active', true)
+          .from("languages")
+          .select("id")
+          .eq("is_default", true)
+          .eq("is_active", true)
           .single();
 
         if (langError) {
-          console.error('Language query error:', langError);
+          console.error("Language query error:", langError);
           // Continue without translations
-          return posts.map(post => ({
+          return posts.map((post) => ({
             ...post,
-            content: '',
+            content: "",
             meta_title: post.title,
             meta_description: post.excerpt,
-            meta_keywords: ''
+            meta_keywords: "",
           }));
         }
 
-        const defaultLangId = defaultLanguage?.id || 'en';
-        console.log('Default language ID:', defaultLangId);
+        const defaultLangId = defaultLanguage?.id || "en";
+        console.log("Default language ID:", defaultLangId);
 
         const postsWithContent = await Promise.all(
           posts.map(async (post) => {
             try {
               const { data: translation, error: transError } = await supabase
-                .from('post_translations')
-                .select(`
+                .from("post_translations")
+                .select(
+                  `
                   content,
                   meta_title,
                   meta_description,
                   meta_keywords
-                `)
-                .eq('post_id', post.id)
-                .eq('language_id', defaultLangId)
+                `
+                )
+                .eq("post_id", post.id)
+                .eq("language_id", defaultLangId)
                 .single();
 
               if (transError) {
-                console.log(`No translation found for post ${post.id}:`, transError.message);
+                console.log(
+                  `No translation found for post ${post.id}:`,
+                  transError.message
+                );
               }
 
               return {
                 ...post,
-                content: translation?.content || '',
+                content: translation?.content || "",
                 meta_title: translation?.meta_title || post.title,
                 meta_description: translation?.meta_description || post.excerpt,
-                meta_keywords: translation?.meta_keywords || ''
+                meta_keywords: translation?.meta_keywords || "",
               };
             } catch (error) {
-              console.log(`Error fetching translation for post ${post.id}:`, error);
+              console.log(
+                `Error fetching translation for post ${post.id}:`,
+                error
+              );
               // If translation not found, return post without content
               return {
                 ...post,
-                content: '',
+                content: "",
                 meta_title: post.title,
                 meta_description: post.excerpt,
-                meta_keywords: ''
+                meta_keywords: "",
               };
             }
           })
         );
 
-        console.log('Posts with content processed successfully');
+        console.log("Posts with content processed successfully");
         return postsWithContent;
       }
 
       return posts || [];
     } catch (error) {
-      console.error('Error fetching blog posts:', error);
+      console.error("Error fetching blog posts:", error);
       // Return empty array instead of throwing to prevent page crash
       return [];
     }
@@ -536,26 +561,28 @@ export class DashboardService {
    */
   static async getServices() {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('services')
-        .select(`
+        .from("services")
+        .select(
+          `
           id,
           name,
           slug,
           icon,
           image_url,
           is_active
-        `)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+        `
+        )
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching services:', error);
-      throw new Error('Gagal mengambil data layanan');
+      console.error("Error fetching services:", error);
+      throw new Error("Gagal mengambil data layanan");
     }
   }
 
@@ -564,11 +591,12 @@ export class DashboardService {
    */
   static async getTestimonials() {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('testimonials')
-        .select(`
+        .from("testimonials")
+        .select(
+          `
           id,
           client_name,
           client_position,
@@ -576,15 +604,16 @@ export class DashboardService {
           rating,
           is_active,
           is_featured
-        `)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+        `
+        )
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching testimonials:', error);
-      throw new Error('Failed to fetch testimonials data');
+      console.error("Error fetching testimonials:", error);
+      throw new Error("Failed to fetch testimonials data");
     }
   }
 
@@ -593,11 +622,12 @@ export class DashboardService {
    */
   static async getCategories() {
     const supabase = await createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('categories')
-        .select(`
+        .from("categories")
+        .select(
+          `
           id,
           name,
           slug,
@@ -607,56 +637,59 @@ export class DashboardService {
           sort_order,
           created_at,
           updated_at
-        `)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+        `
+        )
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      throw new Error('Failed to fetch categories data');
+      console.error("Error fetching categories:", error);
+      throw new Error("Failed to fetch categories data");
     }
   }
 
   /**
    * Get chart data for analytics (currently using mock data for cost optimization)
-   * 
+   *
    * NOTE: AnalyticsService is commented out to reduce costs
    * Uncomment the code below when you want to enable real analytics tracking
    */
   static async getChartData(days: number = 30) {
     // NOTE: AnalyticsService is currently disabled for cost optimization
     // Return mock data instead
-    
-    console.log(`📊 [DashboardService] Using mock chart data for ${days} days (analytics disabled)`);
-    
+
+    console.log(
+      `📊 [DashboardService] Using mock chart data for ${days} days (analytics disabled)`
+    );
+
     // Generate mock data for now
     const mockData = [];
     const today = new Date();
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
-      const dateKey = date.toISOString().split('T')[0];
-      
+      const dateKey = date.toISOString().split("T")[0];
+
       // Generate realistic-looking mock data
       const baseWebsiteViews = 100 + Math.floor(Math.random() * 200);
       const baseBlogViews = 30 + Math.floor(Math.random() * 80);
       const baseCareerViews = 15 + Math.floor(Math.random() * 40);
       const baseCareerApplications = 3 + Math.floor(Math.random() * 12);
-      
+
       mockData.push({
         date: dateKey,
         website_views: baseWebsiteViews,
         blog_views: baseBlogViews,
         career_applications: baseCareerApplications,
-        career_views: baseCareerViews
+        career_views: baseCareerViews,
       });
     }
-    
+
     return mockData;
-    
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     

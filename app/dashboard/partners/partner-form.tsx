@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { ImageUpload } from '@/components/ui/image-upload';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save } from 'lucide-react';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { ImageUpload } from "@/components/ui/image-upload";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Save } from "lucide-react";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,7 +25,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from "@/components/ui/breadcrumb";
 
 interface PartnerFormData {
   name: string;
@@ -38,10 +44,10 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PartnerFormData>({
-    name: '',
-    logo_url: '',
-    description: '',
-    website: '',
+    name: "",
+    logo_url: "",
+    description: "",
+    website: "",
     is_active: true,
   });
 
@@ -54,27 +60,27 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
         try {
           const response = await fetch(`/api/partners/${partnerId}`);
           const data = await response.json();
-          
+
           if (data.success) {
             const partner = data.partner;
             setFormData({
-              name: partner.name || '',
-              logo_url: partner.logo_url || '',
-              description: partner.description || '',
-              website: partner.website || '',
+              name: partner.name || "",
+              logo_url: partner.logo_url || "",
+              description: partner.description || "",
+              website: partner.website || "",
               is_active: partner.is_active,
             });
           } else {
-            throw new Error(data.error || 'Failed to fetch partner');
+            throw new Error(data.error || "Failed to fetch partner");
           }
         } catch (error) {
-          console.error('Error fetching partner:', error);
+          console.error("Error fetching partner:", error);
           toast({
-            title: 'Error',
-            description: 'Failed to fetch partner data',
-            variant: 'destructive',
+            title: "Error",
+            description: "Failed to fetch partner data",
+            variant: "destructive",
           });
-          router.push('/dashboard/partners');
+          router.push("/dashboard/partners");
         }
       };
 
@@ -84,12 +90,12 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       toast({
-        title: 'Error',
-        description: 'Partner name is required',
-        variant: 'destructive',
+        title: "Error",
+        description: "Partner name is required",
+        variant: "destructive",
       });
       return;
     }
@@ -97,13 +103,13 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
     setLoading(true);
 
     try {
-      const url = isEdit ? `/api/partners/${partnerId}` : '/api/partners';
-      const method = isEdit ? 'PUT' : 'POST';
+      const url = isEdit ? `/api/partners/${partnerId}` : "/api/partners";
+      const method = isEdit ? "PUT" : "POST";
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -112,27 +118,32 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
 
       if (data.success) {
         toast({
-          title: 'Success',
-          description: `Partner ${isEdit ? 'updated' : 'created'} successfully`,
+          title: "Success",
+          description: `Partner ${isEdit ? "updated" : "created"} successfully`,
         });
-        router.push('/dashboard/partners');
+        router.push("/dashboard/partners");
       } else {
-        throw new Error(data.error || `Failed to ${isEdit ? 'update' : 'create'} partner`);
+        throw new Error(
+          data.error || `Failed to ${isEdit ? "update" : "create"} partner`
+        );
       }
     } catch (error) {
-      console.error('Error saving partner:', error);
+      console.error("Error saving partner:", error);
       toast({
-        title: 'Error',
-        description: `Failed to ${isEdit ? 'update' : 'create'} partner`,
-        variant: 'destructive',
+        title: "Error",
+        description: `Failed to ${isEdit ? "update" : "create"} partner`,
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (field: keyof PartnerFormData, value: string | boolean) => {
-    setFormData(prev => ({
+  const handleChange = (
+    field: keyof PartnerFormData,
+    value: string | boolean
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -152,7 +163,9 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{isEdit ? 'Edit Partner' : 'New Partner'}</BreadcrumbPage>
+            <BreadcrumbPage>
+              {isEdit ? "Edit Partner" : "New Partner"}
+            </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -167,10 +180,12 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
         </Button>
         <div>
           <h1 className="text-3xl font-bold">
-            {isEdit ? 'Edit Partner' : 'Add New Partner'}
+            {isEdit ? "Edit Partner" : "Add New Partner"}
           </h1>
           <p className="text-muted-foreground">
-            {isEdit ? 'Update partner information' : 'Create a new partner with logo, name, and description'}
+            {isEdit
+              ? "Update partner information"
+              : "Create a new partner with logo, name, and description"}
           </p>
         </div>
       </div>
@@ -195,7 +210,7 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
                   id="name"
                   type="text"
                   value={formData.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
+                  onChange={(e) => handleChange("name", e.target.value)}
                   placeholder="Enter partner name"
                   required
                 />
@@ -205,13 +220,14 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
               <div className="space-y-2">
                 <ImageUpload
                   value={formData.logo_url}
-                  onChange={(url) => handleChange('logo_url', url)}
+                  onChange={(url) => handleChange("logo_url", url)}
                   bucket="media"
                   path="partners"
                   placeholder="Upload partner logo"
                 />
                 <p className="text-sm text-muted-foreground">
-                  Upload the partner&apos;s logo image (JPG, PNG, WebP, SVG - max 5MB)
+                  Upload the partner&apos;s logo image (JPG, PNG, WebP, SVG -
+                  max 5MB)
                 </p>
               </div>
 
@@ -221,7 +237,7 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => handleChange('description', e.target.value)}
+                  onChange={(e) => handleChange("description", e.target.value)}
                   placeholder="Brief description of the partner"
                   rows={4}
                 />
@@ -237,7 +253,7 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
                   id="website"
                   type="url"
                   value={formData.website}
-                  onChange={(e) => handleChange('website', e.target.value)}
+                  onChange={(e) => handleChange("website", e.target.value)}
                   placeholder="https://partner-website.com"
                 />
                 <p className="text-sm text-muted-foreground">
@@ -250,7 +266,9 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
                 <Switch
                   id="is_active"
                   checked={formData.is_active}
-                  onCheckedChange={(checked) => handleChange('is_active', checked)}
+                  onCheckedChange={(checked) =>
+                    handleChange("is_active", checked)
+                  }
                 />
                 <Label htmlFor="is_active">Active Partner</Label>
               </div>
@@ -259,7 +277,11 @@ export default function PartnerForm({ partnerId }: PartnerFormProps) {
               <div className="flex gap-4 pt-6">
                 <Button type="submit" disabled={loading}>
                   <Save className="w-4 h-4 mr-2" />
-                  {loading ? 'Saving...' : isEdit ? 'Update Partner' : 'Create Partner'}
+                  {loading
+                    ? "Saving..."
+                    : isEdit
+                    ? "Update Partner"
+                    : "Create Partner"}
                 </Button>
                 <Button type="button" variant="outline" asChild>
                   <Link href="/dashboard/partners">Cancel</Link>

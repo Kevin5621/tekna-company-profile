@@ -13,14 +13,14 @@ export default function LandingPage() {
       <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
         <AppHeader />
       </div>
-      
+
       {/* Globe Background - Fixed dan terlihat di semua section */}
       <GlobeBackground />
-      
-    {/* Main content with sticky hero and overlapping sections */}
-    {/* Make main opt-out for pointer events so background globe can receive drag events.
+
+      {/* Main content with sticky hero and overlapping sections */}
+      {/* Make main opt-out for pointer events so background globe can receive drag events.
       Interactive sections must opt-in with pointer-events-auto on their root. */}
-    <main className="flex-1 relative z-20 pointer-events-none">
+      <main className="flex-1 relative z-20 pointer-events-none">
         <div id="home">
           <HeroSection />
         </div>
@@ -34,7 +34,7 @@ export default function LandingPage() {
           <TestimonialsSection />
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

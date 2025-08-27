@@ -1,5 +1,5 @@
-import { PublicLayout } from '@/components/layout/public-layout';
-import { BlogSearch } from '@/components/blog/blog-search';
+import { PublicLayout } from "@/components/layout/public-layout";
+import { BlogSearch } from "@/components/blog/blog-search";
 
 export default async function SearchPage() {
   return (
@@ -12,10 +12,11 @@ export default async function SearchPage() {
               Search Articles
             </h1>
             <p className="mt-6 max-w-3xl mx-auto text-lg sm:text-xl text-muted-foreground leading-relaxed">
-              Find articles on topics that interest you. Search by title, content, keywords, or browse by categories and authors.
+              Find articles on topics that interest you. Search by title,
+              content, keywords, or browse by categories and authors.
             </p>
           </div>
-          
+
           {/* Enhanced visual indicator */}
           <div className="flex items-center justify-center gap-2 pt-6 text-sm text-muted-foreground">
             <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>

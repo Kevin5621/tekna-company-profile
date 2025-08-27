@@ -1,22 +1,26 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  IconUsers, 
-  IconFolder, 
-  IconArticle, 
+import {
+  IconUsers,
+  IconFolder,
+  IconArticle,
   IconMessageCircle,
   IconTrendingUp,
   IconEye,
   IconCalendar,
-  IconBriefcase
+  IconBriefcase,
 } from "@tabler/icons-react";
 import { DashboardService } from "@/lib/services/dashboard.service";
 import { CareerService } from "@/lib/services/career";
 import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 import { DashboardChart } from "@/components/dashboard-chart";
-
-
 
 // Function to get total career applications
 async function getTotalCareerApplications(): Promise<number> {
@@ -25,7 +29,7 @@ async function getTotalCareerApplications(): Promise<number> {
     const applications = await careerService.getAllApplications();
     return applications.length;
   } catch (error) {
-    console.error('Error fetching career applications:', error);
+    console.error("Error fetching career applications:", error);
     return 0;
   }
 }
@@ -34,7 +38,7 @@ async function getTotalCareerApplications(): Promise<number> {
 async function getDashboardData(): Promise<DashboardData> {
   try {
     const data = await DashboardService.getDashboardData();
-    
+
     // Add icons to stats
     return {
       ...data,
@@ -42,11 +46,11 @@ async function getDashboardData(): Promise<DashboardData> {
         { ...data.stats[0], icon: IconUsers },
         { ...data.stats[1], icon: IconFolder },
         { ...data.stats[2], icon: IconArticle },
-        { ...data.stats[3], icon: IconMessageCircle }
-      ]
+        { ...data.stats[3], icon: IconMessageCircle },
+      ],
     };
   } catch (error) {
-    console.error('Error fetching dashboard data:', error);
+    console.error("Error fetching dashboard data:", error);
     // Return fallback data if there's an error
     return {
       stats: [
@@ -56,7 +60,7 @@ async function getDashboardData(): Promise<DashboardData> {
           description: "Anggota tim aktif",
           icon: IconUsers,
           change: "0",
-          changeType: "default"
+          changeType: "default",
         },
         {
           title: "Proyek Aktif",
@@ -64,7 +68,7 @@ async function getDashboardData(): Promise<DashboardData> {
           description: "Proyek sedang berjalan",
           icon: IconFolder,
           change: "0",
-          changeType: "default"
+          changeType: "default",
         },
         {
           title: "Artikel Blog",
@@ -72,7 +76,7 @@ async function getDashboardData(): Promise<DashboardData> {
           description: "Artikel diterbitkan",
           icon: IconArticle,
           change: "0",
-          changeType: "default"
+          changeType: "default",
         },
         {
           title: "Testimonial",
@@ -80,12 +84,12 @@ async function getDashboardData(): Promise<DashboardData> {
           description: "Ulasan klien",
           icon: IconMessageCircle,
           change: "0",
-          changeType: "default"
-        }
+          changeType: "default",
+        },
       ],
       recentProjects: [],
       recentPosts: [],
-      servicesCount: 0
+      servicesCount: 0,
     };
   }
 }
@@ -93,21 +97,21 @@ async function getDashboardData(): Promise<DashboardData> {
 export default async function DashboardPage() {
   const [dashboardData, totalApplications] = await Promise.all([
     getDashboardData(),
-    getTotalCareerApplications()
+    getTotalCareerApplications(),
   ]);
 
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
-        items={[
-          { label: "Beranda", isCurrentPage: true }
-        ]}
+      <DashboardBreadcrumb
+        items={[{ label: "Beranda", isCurrentPage: true }]}
       />
 
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Selamat Datang di Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Selamat Datang di Dashboard
+        </h1>
         <p className="text-muted-foreground mt-2">
           Kelola website company profile Tekna Company dengan mudah dan efisien.
         </p>
@@ -121,7 +125,9 @@ export default async function DashboardPage() {
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              {stat.icon && <stat.icon className="h-4 w-4 text-muted-foreground" />}
+              {stat.icon && (
+                <stat.icon className="h-4 w-4 text-muted-foreground" />
+              )}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
@@ -129,7 +135,11 @@ export default async function DashboardPage() {
                 {stat.description}
               </p>
               <div className="flex items-center pt-2">
-                <Badge variant={stat.changeType === "positive" ? "default" : "secondary"}>
+                <Badge
+                  variant={
+                    stat.changeType === "positive" ? "default" : "secondary"
+                  }
+                >
                   {stat.change}
                 </Badge>
                 <span className="text-xs text-muted-foreground ml-2">
@@ -148,7 +158,9 @@ export default async function DashboardPage() {
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Lamaran Karir</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Lamaran Karir
+            </CardTitle>
             <IconBriefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -157,27 +169,27 @@ export default async function DashboardPage() {
               Total lamaran yang diterima
             </p>
             <div className="flex items-center pt-2">
-              <Badge variant="default">
-                Aktif
-              </Badge>
+              <Badge variant="default">Aktif</Badge>
             </div>
           </CardContent>
         </Card>
 
         <Card className="opacity-60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Analytics Lainnya</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Analytics Lainnya
+            </CardTitle>
             <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-muted-foreground">Coming Soon</div>
+            <div className="text-2xl font-bold text-muted-foreground">
+              Coming Soon
+            </div>
             <p className="text-xs text-muted-foreground">
               Fitur analitik mendalam
             </p>
             <div className="flex items-center pt-2">
-              <Badge variant="secondary">
-                Q1 2025
-              </Badge>
+              <Badge variant="secondary">Q1 2025</Badge>
             </div>
           </CardContent>
         </Card>
@@ -188,14 +200,14 @@ export default async function DashboardPage() {
             <IconEye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-muted-foreground">Coming Soon</div>
+            <div className="text-2xl font-bold text-muted-foreground">
+              Coming Soon
+            </div>
             <p className="text-xs text-muted-foreground">
               Business intelligence
             </p>
             <div className="flex items-center pt-2">
-              <Badge variant="secondary">
-                Segera hadir
-              </Badge>
+              <Badge variant="secondary">Segera hadir</Badge>
             </div>
           </CardContent>
         </Card>
@@ -217,14 +229,20 @@ export default async function DashboardPage() {
                 {dashboardData.recentPosts.map((post) => (
                   <div key={post.id} className="flex items-center space-x-4">
                     <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium leading-none">{post.title}</p>
+                      <p className="text-sm font-medium leading-none">
+                        {post.title}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         Oleh {post.author} • {post.views} views
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant={post.status === 'published' ? 'default' : 'outline'}>
-                        {post.status === 'published' ? 'Diterbitkan' : 'Draft'}
+                      <Badge
+                        variant={
+                          post.status === "published" ? "default" : "outline"
+                        }
+                      >
+                        {post.status === "published" ? "Diterbitkan" : "Draft"}
                       </Badge>
                     </div>
                   </div>
@@ -243,25 +261,35 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Aksi Cepat</CardTitle>
-            <CardDescription>
-              Akses cepat ke fitur-fitur utama
-            </CardDescription>
+            <CardDescription>Akses cepat ke fitur-fitur utama</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
-              <a href="/dashboard/projects" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+              <a
+                href="/dashboard/projects"
+                className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
+              >
                 <IconFolder className="h-6 w-6" />
                 <span className="text-sm font-medium">Kelola Proyek</span>
               </a>
-              <a href="/dashboard/blog" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+              <a
+                href="/dashboard/blog"
+                className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
+              >
                 <IconArticle className="h-6 w-6" />
                 <span className="text-sm font-medium">Kelola Blog</span>
               </a>
-              <a href="/dashboard/career" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+              <a
+                href="/dashboard/career"
+                className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
+              >
                 <IconUsers className="h-6 w-6" />
                 <span className="text-sm font-medium">Kelola Karir</span>
               </a>
-              <a href="/dashboard/settings" className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors">
+              <a
+                href="/dashboard/settings"
+                className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
+              >
                 <IconTrendingUp className="h-6 w-6" />
                 <span className="text-sm font-medium">Pengaturan</span>
               </a>
@@ -278,7 +306,9 @@ export default async function DashboardPage() {
             <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.servicesCount}</div>
+            <div className="text-2xl font-bold">
+              {dashboardData.servicesCount}
+            </div>
             <p className="text-xs text-muted-foreground">
               Layanan yang tersedia
             </p>
@@ -292,29 +322,29 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardData.recentPosts.reduce((total, post) => total + post.views, 0).toLocaleString()}
+              {dashboardData.recentPosts
+                .reduce((total, post) => total + post.views, 0)
+                .toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Total views artikel
-            </p>
+            <p className="text-xs text-muted-foreground">Total views artikel</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Update Terakhir</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Update Terakhir
+            </CardTitle>
             <IconCalendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {new Date().toLocaleDateString('id-ID', { 
-                day: 'numeric', 
-                month: 'short' 
+              {new Date().toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
               })}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Hari ini
-            </p>
+            <p className="text-xs text-muted-foreground">Hari ini</p>
           </CardContent>
         </Card>
       </div>

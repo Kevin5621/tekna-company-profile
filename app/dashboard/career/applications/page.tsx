@@ -1,128 +1,160 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { CareerService, CareerApplication } from '@/lib/services/career'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Eye, FileText, ExternalLink, MessageSquare, Calendar, User, Filter, Search } from 'lucide-react'
-import { toast } from 'sonner'
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { CareerService, CareerApplication } from "@/lib/services/career";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Eye,
+  FileText,
+  ExternalLink,
+  MessageSquare,
+  Calendar,
+  User,
+  Filter,
+  Search,
+} from "lucide-react";
+import { toast } from "sonner";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 const statusColors = {
-  submitted: 'bg-blue-100 text-blue-800',
-  reviewing: 'bg-yellow-100 text-yellow-800',
-  interview_scheduled: 'bg-purple-100 text-purple-800',
-  interview_completed: 'bg-indigo-100 text-indigo-800',
-  offered: 'bg-green-100 text-green-800',
-  accepted: 'bg-emerald-100 text-emerald-800',
-  rejected: 'bg-red-100 text-red-800',
-  withdrawn: 'bg-gray-100 text-gray-800'
-}
+  submitted: "bg-blue-100 text-blue-800",
+  reviewing: "bg-yellow-100 text-yellow-800",
+  interview_scheduled: "bg-purple-100 text-purple-800",
+  interview_completed: "bg-indigo-100 text-indigo-800",
+  offered: "bg-green-100 text-green-800",
+  accepted: "bg-emerald-100 text-emerald-800",
+  rejected: "bg-red-100 text-red-800",
+  withdrawn: "bg-gray-100 text-gray-800",
+};
 
 const statusLabels = {
-  submitted: 'Submitted',
-  reviewing: 'Under Review',
-  interview_scheduled: 'Interview Scheduled',
-  interview_completed: 'Interview Completed',
-  offered: 'Offer Extended',
-  accepted: 'Offer Accepted',
-  rejected: 'Rejected',
-  withdrawn: 'Withdrawn'
-}
+  submitted: "Submitted",
+  reviewing: "Under Review",
+  interview_scheduled: "Interview Scheduled",
+  interview_completed: "Interview Completed",
+  offered: "Offer Extended",
+  accepted: "Offer Accepted",
+  rejected: "Rejected",
+  withdrawn: "Withdrawn",
+};
 
 export default function ApplicationsPage() {
-  const [applications, setApplications] = useState<CareerApplication[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedApp, setSelectedApp] = useState<CareerApplication | null>(null)
-  const [showDetails, setShowDetails] = useState(false)
-  const [filterStatus, setFilterStatus] = useState<string>('all')
-  const [searchTerm, setSearchTerm] = useState('')
+  const [applications, setApplications] = useState<CareerApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedApp, setSelectedApp] = useState<CareerApplication | null>(
+    null
+  );
+  const [showDetails, setShowDetails] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [statusUpdate, setStatusUpdate] = useState({
-    status: '',
-    notes: ''
-  })
+    status: "",
+    notes: "",
+  });
 
-  const careerService = useMemo(() => new CareerService(), [])
+  const careerService = useMemo(() => new CareerService(), []);
 
   const loadApplications = useCallback(async () => {
     try {
-      const data = await careerService.getAllApplications()
-      setApplications(data)
+      const data = await careerService.getAllApplications();
+      setApplications(data);
     } catch (error) {
-      console.error('Error loading applications:', error)
-      toast.error('Failed to load applications')
+      console.error("Error loading applications:", error);
+      toast.error("Failed to load applications");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [careerService])
+  }, [careerService]);
 
   useEffect(() => {
-    loadApplications()
-  }, [loadApplications])
+    loadApplications();
+  }, [loadApplications]);
 
   const filteredApplications = useMemo(() => {
-    return applications.filter(app => {
-      const matchesStatus = filterStatus === 'all' || app.status === filterStatus
-      const matchesSearch = !searchTerm || 
+    return applications.filter((app) => {
+      const matchesStatus =
+        filterStatus === "all" || app.status === filterStatus;
+      const matchesSearch =
+        !searchTerm ||
         app.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.position?.title.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      return matchesStatus && matchesSearch
-    })
-  }, [applications, filterStatus, searchTerm])
+        app.position?.title.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [applications, filterStatus, searchTerm]);
 
   const handleViewDetails = (application: CareerApplication) => {
-    setSelectedApp(application)
+    setSelectedApp(application);
     setStatusUpdate({
       status: application.status,
-      notes: ''
-    })
-    setShowDetails(true)
-  }
+      notes: "",
+    });
+    setShowDetails(true);
+  };
 
   const handleStatusUpdate = async () => {
-    if (!selectedApp) return
+    if (!selectedApp) return;
 
     try {
       await careerService.updateApplicationStatus(
         selectedApp.id,
-        statusUpdate.status as CareerApplication['status'],
+        statusUpdate.status as CareerApplication["status"],
         statusUpdate.notes
-      )
-      
-      toast.success('Application status updated successfully')
-      setShowDetails(false)
-      loadApplications()
+      );
+
+      toast.success("Application status updated successfully");
+      setShowDetails(false);
+      loadApplications();
     } catch (error) {
-      console.error('Error updating application status:', error)
-      toast.error('Failed to update application status')
+      console.error("Error updating application status:", error);
+      toast.error("Failed to update application status");
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const getApplicationStats = () => {
     const stats = applications.reduce((acc, app) => {
-      acc[app.status] = (acc[app.status] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
+      acc[app.status] = (acc[app.status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
     return {
       total: applications.length,
@@ -133,11 +165,11 @@ export default function ApplicationsPage() {
       offered: stats.offered || 0,
       accepted: stats.accepted || 0,
       rejected: stats.rejected || 0,
-      withdrawn: stats.withdrawn || 0
-    }
-  }
+      withdrawn: stats.withdrawn || 0,
+    };
+  };
 
-  const stats = getApplicationStats()
+  const stats = getApplicationStats();
 
   if (loading) {
     return (
@@ -147,17 +179,17 @@ export default function ApplicationsPage() {
           <p className="mt-2 text-muted-foreground">Loading applications...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Karir", href: "/dashboard/career" },
           { label: "Applications", href: "/dashboard/career/applications" },
-          { label: "Daftar Lamaran", isCurrentPage: true }
+          { label: "Daftar Lamaran", isCurrentPage: true },
         ]}
       />
 
@@ -169,7 +201,9 @@ export default function ApplicationsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Career Applications</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Career Applications
+          </h1>
           <p className="text-muted-foreground">
             Manage and review job applications
           </p>
@@ -186,43 +220,57 @@ export default function ApplicationsPage() {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.submitted}</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {stats.submitted}
+            </div>
             <p className="text-xs text-muted-foreground">Submitted</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">{stats.reviewing}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {stats.reviewing}
+            </div>
             <p className="text-xs text-muted-foreground">Reviewing</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">{stats.interview_scheduled}</div>
+            <div className="text-2xl font-bold text-purple-600">
+              {stats.interview_scheduled}
+            </div>
             <p className="text-xs text-muted-foreground">Interview</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-indigo-600">{stats.interview_completed}</div>
+            <div className="text-2xl font-bold text-indigo-600">
+              {stats.interview_completed}
+            </div>
             <p className="text-xs text-muted-foreground">Completed</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">{stats.offered}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.offered}
+            </div>
             <p className="text-xs text-muted-foreground">Offered</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-emerald-600">{stats.accepted}</div>
+            <div className="text-2xl font-bold text-emerald-600">
+              {stats.accepted}
+            </div>
             <p className="text-xs text-muted-foreground">Accepted</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.rejected}
+            </div>
             <p className="text-xs text-muted-foreground">Rejected</p>
           </CardContent>
         </Card>
@@ -251,8 +299,12 @@ export default function ApplicationsPage() {
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="submitted">Submitted</SelectItem>
                   <SelectItem value="reviewing">Under Review</SelectItem>
-                  <SelectItem value="interview_scheduled">Interview Scheduled</SelectItem>
-                  <SelectItem value="interview_completed">Interview Completed</SelectItem>
+                  <SelectItem value="interview_scheduled">
+                    Interview Scheduled
+                  </SelectItem>
+                  <SelectItem value="interview_completed">
+                    Interview Completed
+                  </SelectItem>
                   <SelectItem value="offered">Offer Extended</SelectItem>
                   <SelectItem value="accepted">Offer Accepted</SelectItem>
                   <SelectItem value="rejected">Rejected</SelectItem>
@@ -267,7 +319,10 @@ export default function ApplicationsPage() {
       {/* Applications List */}
       <div className="space-y-4">
         {filteredApplications.map((application) => (
-          <Card key={application.id} className="hover:shadow-md transition-shadow">
+          <Card
+            key={application.id}
+            className="hover:shadow-md transition-shadow"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -284,7 +339,7 @@ export default function ApplicationsPage() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">Position:</span>
-                        {application.position?.title || 'Unknown Position'}
+                        {application.position?.title || "Unknown Position"}
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="font-medium">Email:</span>
@@ -298,7 +353,9 @@ export default function ApplicationsPage() {
                       )}
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3 w-3" />
-                        <span className="text-xs">Applied: {formatDate(application.applied_at)}</span>
+                        <span className="text-xs">
+                          Applied: {formatDate(application.applied_at)}
+                        </span>
                       </div>
                     </div>
                   </CardDescription>
@@ -332,9 +389,9 @@ export default function ApplicationsPage() {
             <CardContent className="py-8">
               <div className="text-center">
                 <p className="text-muted-foreground">
-                  {searchTerm || filterStatus !== 'all' 
-                    ? 'No applications found matching your filters.' 
-                    : 'No applications found.'}
+                  {searchTerm || filterStatus !== "all"
+                    ? "No applications found matching your filters."
+                    : "No applications found."}
                 </p>
               </div>
             </CardContent>
@@ -347,10 +404,12 @@ export default function ApplicationsPage() {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Application Details: {selectedApp?.first_name} {selectedApp?.last_name}
+              Application Details: {selectedApp?.first_name}{" "}
+              {selectedApp?.last_name}
             </DialogTitle>
             <DialogDescription>
-              Applied for {selectedApp?.position?.title} on {selectedApp && formatDate(selectedApp.applied_at)}
+              Applied for {selectedApp?.position?.title} on{" "}
+              {selectedApp && formatDate(selectedApp.applied_at)}
             </DialogDescription>
           </DialogHeader>
 
@@ -358,11 +417,15 @@ export default function ApplicationsPage() {
             <div className="space-y-6">
               {/* Personal Information */}
               <div>
-                <h3 className="text-lg font-semibold mb-3">Personal Information</h3>
+                <h3 className="text-lg font-semibold mb-3">
+                  Personal Information
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Full Name</Label>
-                    <p className="text-sm mt-1">{selectedApp.first_name} {selectedApp.last_name}</p>
+                    <p className="text-sm mt-1">
+                      {selectedApp.first_name} {selectedApp.last_name}
+                    </p>
                   </div>
                   <div>
                     <Label>Email</Label>
@@ -424,7 +487,9 @@ export default function ApplicationsPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Cover Letter</h3>
                   <div className="bg-muted p-4 rounded-lg">
-                    <p className="text-sm whitespace-pre-wrap">{selectedApp.cover_letter}</p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {selectedApp.cover_letter}
+                    </p>
                   </div>
                 </div>
               )}
@@ -468,15 +533,24 @@ export default function ApplicationsPage() {
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="status">Status</Label>
-                    <Select value={statusUpdate.status} onValueChange={(value) => setStatusUpdate({...statusUpdate, status: value})}>
+                    <Select
+                      value={statusUpdate.status}
+                      onValueChange={(value) =>
+                        setStatusUpdate({ ...statusUpdate, status: value })
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="submitted">Submitted</SelectItem>
                         <SelectItem value="reviewing">Under Review</SelectItem>
-                        <SelectItem value="interview_scheduled">Interview Scheduled</SelectItem>
-                        <SelectItem value="interview_completed">Interview Completed</SelectItem>
+                        <SelectItem value="interview_scheduled">
+                          Interview Scheduled
+                        </SelectItem>
+                        <SelectItem value="interview_completed">
+                          Interview Completed
+                        </SelectItem>
                         <SelectItem value="offered">Offer Extended</SelectItem>
                         <SelectItem value="accepted">Offer Accepted</SelectItem>
                         <SelectItem value="rejected">Rejected</SelectItem>
@@ -489,7 +563,12 @@ export default function ApplicationsPage() {
                     <Textarea
                       id="notes"
                       value={statusUpdate.notes}
-                      onChange={(e) => setStatusUpdate({...statusUpdate, notes: e.target.value})}
+                      onChange={(e) =>
+                        setStatusUpdate({
+                          ...statusUpdate,
+                          notes: e.target.value,
+                        })
+                      }
                       placeholder="Add notes about this status update..."
                       rows={3}
                     />
@@ -502,7 +581,9 @@ export default function ApplicationsPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Current Notes</h3>
                   <div className="bg-muted p-4 rounded-lg">
-                    <p className="text-sm whitespace-pre-wrap">{selectedApp.notes}</p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {selectedApp.notes}
+                    </p>
                   </div>
                 </div>
               )}
@@ -513,9 +594,12 @@ export default function ApplicationsPage() {
             <Button variant="outline" onClick={() => setShowDetails(false)}>
               Close
             </Button>
-            <Button 
+            <Button
               onClick={handleStatusUpdate}
-              disabled={!statusUpdate.status || statusUpdate.status === selectedApp?.status}
+              disabled={
+                !statusUpdate.status ||
+                statusUpdate.status === selectedApp?.status
+              }
             >
               <MessageSquare className="h-4 w-4 mr-2" />
               Update Status
@@ -524,5 +608,5 @@ export default function ApplicationsPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

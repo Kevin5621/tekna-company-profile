@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,19 +10,21 @@ import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    message: ''
+    name: "",
+    email: "",
+    company: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -31,19 +33,19 @@ export function ContactSection() {
     setIsSubmitting(true);
 
     // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     setIsSubmitting(false);
     setIsSubmitted(true);
-    
+
     // Reset form after 3 seconds
     setTimeout(() => {
       setIsSubmitted(false);
       setFormData({
-        name: '',
-        email: '',
-        company: '',
-        message: ''
+        name: "",
+        email: "",
+        company: "",
+        message: "",
       });
     }, 3000);
   };
@@ -53,35 +55,35 @@ export function ContactSection() {
       icon: Mail,
       label: "Email",
       value: "hello@tekna.co.id",
-      href: "mailto:hello@tekna.co.id"
+      href: "mailto:hello@tekna.co.id",
     },
     {
       icon: Phone,
       label: "Telepon",
       value: "+62 21 1234 5678",
-      href: "tel:+622112345678"
+      href: "tel:+622112345678",
     },
     {
       icon: MapPin,
       label: "Alamat",
       value: "Jakarta, Indonesia",
-      href: "#"
-    }
+      href: "#",
+    },
   ];
 
   return (
     <section className="w-full py-24 md:py-32 lg:py-40 bg-background relative z-30 pointer-events-auto">
       {/* Smooth transition gradient from top */}
       <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-background via-background/95 to-transparent" />
-      
+
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-foreground">
             Mari Berkolaborasi
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Punya proyek yang menarik? Kami siap membantu mewujudkan visi digital Anda. 
-            Hubungi kami untuk diskusi lebih lanjut.
+            Punya proyek yang menarik? Kami siap membantu mewujudkan visi
+            digital Anda. Hubungi kami untuk diskusi lebih lanjut.
           </p>
         </div>
 
@@ -99,16 +101,20 @@ export function ContactSection() {
                       <item.icon className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">{item.label}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.label}
+                      </p>
                       {item.href !== "#" ? (
-                        <a 
+                        <a
                           href={item.href}
                           className="text-foreground hover:text-primary transition-colors font-medium"
                         >
                           {item.value}
                         </a>
                       ) : (
-                        <p className="text-foreground font-medium">{item.value}</p>
+                        <p className="text-foreground font-medium">
+                          {item.value}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -123,8 +129,8 @@ export function ContactSection() {
                   Konsultasi Gratis
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Dapatkan konsultasi gratis untuk proyek Anda. Kami akan membantu 
-                  menganalisis kebutuhan dan memberikan solusi terbaik.
+                  Dapatkan konsultasi gratis untuk proyek Anda. Kami akan
+                  membantu menganalisis kebutuhan dan memberikan solusi terbaik.
                 </p>
               </CardContent>
             </Card>
@@ -133,9 +139,7 @@ export function ContactSection() {
           {/* Contact Form */}
           <Card className="bg-card shadow-lg">
             <CardHeader>
-              <CardTitle className="text-foreground">
-                Kirim Pesan
-              </CardTitle>
+              <CardTitle className="text-foreground">Kirim Pesan</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {isSubmitted ? (
@@ -145,7 +149,8 @@ export function ContactSection() {
                     Pesan Terkirim!
                   </h3>
                   <p className="text-muted-foreground">
-                    Terima kasih atas pesan Anda. Tim kami akan segera menghubungi Anda.
+                    Terima kasih atas pesan Anda. Tim kami akan segera
+                    menghubungi Anda.
                   </p>
                 </div>
               ) : (
@@ -177,7 +182,7 @@ export function ContactSection() {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="email">Email *</Label>
                     <Input
@@ -191,7 +196,7 @@ export function ContactSection() {
                       disabled={isSubmitting}
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="message">Pesan *</Label>
                     <Textarea
@@ -205,10 +210,10 @@ export function ContactSection() {
                       disabled={isSubmitting}
                     />
                   </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
+
+                  <Button
+                    type="submit"
+                    className="w-full"
                     size="lg"
                     disabled={isSubmitting}
                   >

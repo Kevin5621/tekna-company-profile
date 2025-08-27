@@ -1,6 +1,6 @@
-'use server';
+"use server";
 
-import { PublicService } from '@/lib/services/public.service';
+import { PublicService } from "@/lib/services/public.service";
 
 export async function getPaginatedBlogPosts(params: {
   page?: number;
@@ -12,7 +12,7 @@ export async function getPaginatedBlogPosts(params: {
   try {
     return await PublicService.getPaginatedPublishedPosts(params);
   } catch (error) {
-    console.error('Error fetching paginated blog posts:', error);
+    console.error("Error fetching paginated blog posts:", error);
     return {
       data: [],
       pagination: {
@@ -31,7 +31,7 @@ export async function searchBlogPosts(query: string) {
   try {
     return await PublicService.searchPosts(query);
   } catch (error) {
-    console.error('Error searching blog posts:', error);
+    console.error("Error searching blog posts:", error);
     return [];
   }
 }
@@ -40,7 +40,7 @@ export async function getBlogCategories() {
   try {
     return await PublicService.getActiveCategories();
   } catch (error) {
-    console.error('Error fetching blog categories:', error);
+    console.error("Error fetching blog categories:", error);
     return [];
   }
 }

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { AuthorForm } from '@/components/author-form';
-import { ClientDashboardService } from '@/lib/services/client-dashboard.service';
-import Link from 'next/link';
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { AuthorForm } from "@/components/author-form";
+import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import Link from "next/link";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 export default function EditAuthorPage() {
   const params = useParams();
@@ -34,22 +34,24 @@ export default function EditAuthorPage() {
         const author = await ClientDashboardService.getAuthorById(authorId);
         if (author) {
           setInitialData({
-            first_name: author.first_name || '',
-            last_name: author.last_name || '',
-            email: '',
-            phone: '',
-            position: author.position || '',
-            department: author.department || '',
-            avatar_url: author.avatar_url || '',
-            linkedin_url: '',
-            twitter_url: '',
-            github_url: '',
+            first_name: author.first_name || "",
+            last_name: author.last_name || "",
+            email: "",
+            phone: "",
+            position: author.position || "",
+            department: author.department || "",
+            avatar_url: author.avatar_url || "",
+            linkedin_url: "",
+            twitter_url: "",
+            github_url: "",
             is_active: author.is_active ?? true,
             sort_order: 0,
           });
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Gagal memuat data author');
+        setError(
+          err instanceof Error ? err.message : "Gagal memuat data author"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -94,11 +96,14 @@ export default function EditAuthorPage() {
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Penulis", href: "/dashboard/authors" },
-          { label: "Edit Penulis", href: `/dashboard/authors/edit/${authorId}` },
-          { label: "Form Edit", isCurrentPage: true }
+          {
+            label: "Edit Penulis",
+            href: `/dashboard/authors/edit/${authorId}`,
+          },
+          { label: "Form Edit", isCurrentPage: true },
         ]}
       />
 
@@ -108,10 +113,7 @@ export default function EditAuthorPage() {
       </div>
 
       {initialData && (
-        <AuthorForm 
-          authorId={authorId}
-          initialData={initialData}
-        />
+        <AuthorForm authorId={authorId} initialData={initialData} />
       )}
     </div>
   );
