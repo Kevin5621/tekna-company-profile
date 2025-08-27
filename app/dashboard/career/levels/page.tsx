@@ -1,79 +1,85 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { CareerService, CareerLevel } from '@/lib/services/career'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Pencil, Trash2, Plus, Save, X, TrendingUp } from 'lucide-react'
-import { toast } from 'sonner'
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { CareerService, CareerLevel } from "@/lib/services/career";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Trash2, Plus, Save, X, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 interface Level extends CareerLevel {
-  positions_count?: number
+  positions_count?: number;
 }
 
 export default function LevelsPage() {
-  const [levels, setLevels] = useState<Level[]>([])
-  const [loading, setLoading] = useState(true)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [showAddForm, setShowAddForm] = useState(false)
+  const [levels, setLevels] = useState<Level[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    years_min: '',
-    years_max: ''
-  })
+    name: "",
+    description: "",
+    years_min: "",
+    years_max: "",
+  });
 
-  const careerService = useMemo(() => new CareerService(), [])
+  const careerService = useMemo(() => new CareerService(), []);
 
   const loadLevels = useCallback(async () => {
     try {
-      const data = await careerService.getAllLevels()
+      const data = await careerService.getAllLevels();
       // Get position counts for each level
       const levelsWithCounts = await Promise.all(
         data.map(async (level: CareerLevel) => {
-          const positions = await careerService.getPositionsByLevel(level.id)
+          const positions = await careerService.getPositionsByLevel(level.id);
           return {
             ...level,
-            positions_count: positions.length
-          }
+            positions_count: positions.length,
+          };
         })
-      )
-      setLevels(levelsWithCounts)
+      );
+      setLevels(levelsWithCounts);
     } catch (error) {
-      console.error('Error loading levels:', error)
-      toast.error('Failed to load levels')
+      console.error("Error loading levels:", error);
+      toast.error("Failed to load levels");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [careerService])
+  }, [careerService]);
 
   useEffect(() => {
-    loadLevels()
-  }, [loadLevels])
+    loadLevels();
+  }, [loadLevels]);
 
   const handleAdd = async () => {
     if (!formData.name.trim() || !formData.years_min.trim()) {
-      toast.error('Level name and minimum years are required')
-      return
+      toast.error("Level name and minimum years are required");
+      return;
     }
 
-    const yearsMin = parseInt(formData.years_min)
-    const yearsMax = formData.years_max ? parseInt(formData.years_max) : null
+    const yearsMin = parseInt(formData.years_min);
+    const yearsMax = formData.years_max ? parseInt(formData.years_max) : null;
 
     if (isNaN(yearsMin) || yearsMin < 0) {
-      toast.error('Minimum years must be a valid number')
-      return
+      toast.error("Minimum years must be a valid number");
+      return;
     }
 
     if (yearsMax !== null && (isNaN(yearsMax) || yearsMax < yearsMin)) {
-      toast.error('Maximum years must be greater than minimum years')
-      return
+      toast.error("Maximum years must be greater than minimum years");
+      return;
     }
 
     try {
@@ -81,39 +87,39 @@ export default function LevelsPage() {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
         years_min: yearsMin,
-        years_max: yearsMax
-      })
-      
-      toast.success('Level created successfully')
-      setFormData({ name: '', description: '', years_min: '', years_max: '' })
-      setShowAddForm(false)
-      loadLevels()
+        years_max: yearsMax,
+      });
+
+      toast.success("Level created successfully");
+      setFormData({ name: "", description: "", years_min: "", years_max: "" });
+      setShowAddForm(false);
+      loadLevels();
     } catch (error) {
-      console.error('Error creating level:', error)
-      toast.error('Failed to create level')
+      console.error("Error creating level:", error);
+      toast.error("Failed to create level");
     }
-  }
+  };
 
   const handleEdit = async (id: string) => {
-    const level = levels.find(l => l.id === id)
-    if (!level) return
+    const level = levels.find((l) => l.id === id);
+    if (!level) return;
 
     if (!formData.name.trim() || !formData.years_min.trim()) {
-      toast.error('Level name and minimum years are required')
-      return
+      toast.error("Level name and minimum years are required");
+      return;
     }
 
-    const yearsMin = parseInt(formData.years_min)
-    const yearsMax = formData.years_max ? parseInt(formData.years_max) : null
+    const yearsMin = parseInt(formData.years_min);
+    const yearsMax = formData.years_max ? parseInt(formData.years_max) : null;
 
     if (isNaN(yearsMin) || yearsMin < 0) {
-      toast.error('Minimum years must be a valid number')
-      return
+      toast.error("Minimum years must be a valid number");
+      return;
     }
 
     if (yearsMax !== null && (isNaN(yearsMax) || yearsMax < yearsMin)) {
-      toast.error('Maximum years must be greater than minimum years')
-      return
+      toast.error("Maximum years must be greater than minimum years");
+      return;
     }
 
     try {
@@ -121,68 +127,70 @@ export default function LevelsPage() {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
         years_min: yearsMin,
-        years_max: yearsMax
-      })
+        years_max: yearsMax,
+      });
 
-      toast.success('Level updated successfully')
-      setEditingId(null)
-      setFormData({ name: '', description: '', years_min: '', years_max: '' })
-      loadLevels()
+      toast.success("Level updated successfully");
+      setEditingId(null);
+      setFormData({ name: "", description: "", years_min: "", years_max: "" });
+      loadLevels();
     } catch (error) {
-      console.error('Error updating level:', error)
-      toast.error('Failed to update level')
+      console.error("Error updating level:", error);
+      toast.error("Failed to update level");
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    const level = levels.find(l => l.id === id)
-    if (!level) return
+    const level = levels.find((l) => l.id === id);
+    if (!level) return;
 
     if (level.positions_count && level.positions_count > 0) {
-      toast.error(`Cannot delete level. It has ${level.positions_count} positions.`)
-      return
+      toast.error(
+        `Cannot delete level. It has ${level.positions_count} positions.`
+      );
+      return;
     }
 
-    if (!confirm(`Are you sure you want to delete "${level.name}"?`)) return
+    if (!confirm(`Are you sure you want to delete "${level.name}"?`)) return;
 
     try {
-      await careerService.deleteLevel(id)
-      toast.success('Level deleted successfully')
-      loadLevels()
+      await careerService.deleteLevel(id);
+      toast.success("Level deleted successfully");
+      loadLevels();
     } catch (error) {
-      console.error('Error deleting level:', error)
-      toast.error('Failed to delete level')
+      console.error("Error deleting level:", error);
+      toast.error("Failed to delete level");
     }
-  }
+  };
 
   const startEdit = (level: Level) => {
-    setEditingId(level.id)
+    setEditingId(level.id);
     setFormData({
       name: level.name,
-      description: level.description || '',
+      description: level.description || "",
       years_min: level.years_min.toString(),
-      years_max: level.years_max?.toString() || ''
-    })
-    setShowAddForm(false)
-  }
+      years_max: level.years_max?.toString() || "",
+    });
+    setShowAddForm(false);
+  };
 
   const cancelEdit = () => {
-    setEditingId(null)
-    setFormData({ name: '', description: '', years_min: '', years_max: '' })
-  }
+    setEditingId(null);
+    setFormData({ name: "", description: "", years_min: "", years_max: "" });
+  };
 
   const startAdd = () => {
-    setShowAddForm(true)
-    setEditingId(null)
-    setFormData({ name: '', description: '', years_min: '', years_max: '' })
-  }
+    setShowAddForm(true);
+    setEditingId(null);
+    setFormData({ name: "", description: "", years_min: "", years_max: "" });
+  };
 
   const formatExperience = (yearsMin: number, yearsMax?: number | null) => {
     if (yearsMax) {
-      return `${yearsMin}-${yearsMax} years`
+      return `${yearsMin}-${yearsMax} years`;
     }
-    return `${yearsMin}+ years`
-  }
+    return `${yearsMin}+ years`;
+  };
 
   if (loading) {
     return (
@@ -192,17 +200,17 @@ export default function LevelsPage() {
           <p className="mt-2 text-muted-foreground">Loading levels...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Karir", href: "/dashboard/career" },
           { label: "Level Karir", href: "/dashboard/career/levels" },
-          { label: "Manajemen Level", isCurrentPage: true }
+          { label: "Manajemen Level", isCurrentPage: true },
         ]}
       />
 
@@ -238,7 +246,9 @@ export default function LevelsPage() {
               <Input
                 id="add-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Enter level name (e.g., Entry Level, Senior)"
               />
             </div>
@@ -247,31 +257,41 @@ export default function LevelsPage() {
               <Textarea
                 id="add-description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Enter level description (optional)"
                 rows={3}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="add-years-min">Minimum Years of Experience *</Label>
+                <Label htmlFor="add-years-min">
+                  Minimum Years of Experience *
+                </Label>
                 <Input
                   id="add-years-min"
                   type="number"
                   min="0"
                   value={formData.years_min}
-                  onChange={(e) => setFormData({ ...formData, years_min: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, years_min: e.target.value })
+                  }
                   placeholder="0"
                 />
               </div>
               <div>
-                <Label htmlFor="add-years-max">Maximum Years of Experience</Label>
+                <Label htmlFor="add-years-max">
+                  Maximum Years of Experience
+                </Label>
                 <Input
                   id="add-years-max"
                   type="number"
                   min="0"
                   value={formData.years_max}
-                  onChange={(e) => setFormData({ ...formData, years_max: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, years_max: e.target.value })
+                  }
                   placeholder="Leave empty for no maximum"
                 />
               </div>
@@ -281,10 +301,19 @@ export default function LevelsPage() {
                 <Save className="h-4 w-4" />
                 Save
               </Button>
-              <Button variant="outline" onClick={() => {
-                setShowAddForm(false)
-                setFormData({ name: '', description: '', years_min: '', years_max: '' })
-              }} className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddForm(false);
+                  setFormData({
+                    name: "",
+                    description: "",
+                    years_min: "",
+                    years_max: "",
+                  });
+                }}
+                className="flex items-center gap-2"
+              >
                 <X className="h-4 w-4" />
                 Cancel
               </Button>
@@ -304,12 +333,19 @@ export default function LevelsPage() {
                     <div className="space-y-2">
                       <Input
                         value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
                         placeholder="Level name"
                       />
                       <Textarea
                         value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            description: e.target.value,
+                          })
+                        }
                         placeholder="Level description (optional)"
                         rows={2}
                       />
@@ -318,14 +354,24 @@ export default function LevelsPage() {
                           type="number"
                           min="0"
                           value={formData.years_min}
-                          onChange={(e) => setFormData({ ...formData, years_min: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              years_min: e.target.value,
+                            })
+                          }
                           placeholder="Min years"
                         />
                         <Input
                           type="number"
                           min="0"
                           value={formData.years_max}
-                          onChange={(e) => setFormData({ ...formData, years_max: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              years_max: e.target.value,
+                            })
+                          }
                           placeholder="Max years"
                         />
                       </div>
@@ -348,7 +394,11 @@ export default function LevelsPage() {
                 <div className="flex gap-1 ml-2">
                   {editingId === level.id ? (
                     <>
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(level.id)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(level.id)}
+                      >
                         <Save className="h-3 w-3" />
                       </Button>
                       <Button size="sm" variant="outline" onClick={cancelEdit}>
@@ -357,14 +407,20 @@ export default function LevelsPage() {
                     </>
                   ) : (
                     <>
-                      <Button size="sm" variant="outline" onClick={() => startEdit(level)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => startEdit(level)}
+                      >
                         <Pencil className="h-3 w-3" />
                       </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => handleDelete(level.id)}
-                        disabled={Boolean(level.positions_count && level.positions_count > 0)}
+                        disabled={Boolean(
+                          level.positions_count && level.positions_count > 0
+                        )}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -400,5 +456,5 @@ export default function LevelsPage() {
         </Card>
       )}
     </div>
-  )
+  );
 }

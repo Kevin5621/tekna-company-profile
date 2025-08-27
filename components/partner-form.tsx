@@ -1,19 +1,31 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
 interface PartnerFormData {
   name: string;
@@ -48,30 +60,33 @@ interface PartnerFormProps {
 }
 
 const partnershipTypes = [
-  { value: 'client', label: 'Client' },
-  { value: 'technology', label: 'Technology Partner' },
-  { value: 'strategic', label: 'Strategic Partner' },
-  { value: 'vendor', label: 'Vendor' }
+  { value: "client", label: "Client" },
+  { value: "technology", label: "Technology Partner" },
+  { value: "strategic", label: "Strategic Partner" },
+  { value: "vendor", label: "Vendor" },
 ];
 
-export default function PartnerForm({ partnerId, initialData }: PartnerFormProps) {
+export default function PartnerForm({
+  partnerId,
+  initialData,
+}: PartnerFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [formData, setFormData] = useState<PartnerFormData>({
-    name: '',
-    slug: '',
-    logo_url: '',
-    website: '',
-    email: '',
-    phone: '',
-    industry: '',
-    partnership_type: 'client',
-    partnership_since: '',
+    name: "",
+    slug: "",
+    logo_url: "",
+    website: "",
+    email: "",
+    phone: "",
+    industry: "",
+    partnership_type: "client",
+    partnership_since: "",
     is_featured: false,
     sort_order: 0,
-    translations: []
+    translations: [],
   });
 
   const isEditing = Boolean(partnerId);
@@ -80,27 +95,27 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
     // Fetch languages
     const fetchLanguages = async () => {
       try {
-        const response = await fetch('/api/admin/languages');
+        const response = await fetch("/api/admin/languages");
         const data = await response.json();
         if (data.success) {
           setLanguages(data.languages);
-          
+
           // Initialize translations for all languages if creating new partner
           if (!isEditing) {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               translations: data.languages.map((lang: Language) => ({
                 language_code: lang.code,
-                title: '',
-                description: '',
-                short_description: '',
-                partnership_details: ''
-              }))
+                title: "",
+                description: "",
+                short_description: "",
+                partnership_details: "",
+              })),
             }));
           }
         }
       } catch (error) {
-        console.error('Error fetching languages:', error);
+        console.error("Error fetching languages:", error);
       }
     };
 
@@ -109,10 +124,10 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
 
   useEffect(() => {
     if (initialData) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         ...initialData,
-        translations: initialData.translations || prev.translations
+        translations: initialData.translations || prev.translations,
       }));
     }
   }, [initialData]);
@@ -122,24 +137,29 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
     if (formData.name && !isEditing) {
       const slug = formData.name
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      setFormData(prev => ({ ...prev, slug }));
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      setFormData((prev) => ({ ...prev, slug }));
     }
   }, [formData.name, isEditing]);
 
-  const handleInputChange = (field: keyof PartnerFormData, value: string | number | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (
+    field: keyof PartnerFormData,
+    value: string | number | boolean
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleTranslationChange = (languageCode: string, field: string, value: string) => {
-    setFormData(prev => ({
+  const handleTranslationChange = (
+    languageCode: string,
+    field: string,
+    value: string
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      translations: prev.translations.map(t => 
-        t.language_code === languageCode 
-          ? { ...t, [field]: value }
-          : t
-      )
+      translations: prev.translations.map((t) =>
+        t.language_code === languageCode ? { ...t, [field]: value } : t
+      ),
     }));
   };
 
@@ -150,16 +170,16 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
     try {
       // Validate required fields
       if (!formData.name || !formData.slug) {
-        throw new Error('Name and slug are required');
+        throw new Error("Name and slug are required");
       }
 
-      const url = isEditing ? `/api/partners/${partnerId}` : '/api/partners';
-      const method = isEditing ? 'PUT' : 'POST';
+      const url = isEditing ? `/api/partners/${partnerId}` : "/api/partners";
+      const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -168,19 +188,26 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
 
       if (data.success) {
         toast({
-          title: 'Success',
-          description: `Partner ${isEditing ? 'updated' : 'created'} successfully`,
+          title: "Success",
+          description: `Partner ${
+            isEditing ? "updated" : "created"
+          } successfully`,
         });
-        router.push('/dashboard/partners');
+        router.push("/dashboard/partners");
       } else {
-        throw new Error(data.error || `Failed to ${isEditing ? 'update' : 'create'} partner`);
+        throw new Error(
+          data.error || `Failed to ${isEditing ? "update" : "create"} partner`
+        );
       }
     } catch (error) {
-      console.error('Error saving partner:', error);
+      console.error("Error saving partner:", error);
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : `Failed to ${isEditing ? 'update' : 'create'} partner`,
-        variant: 'destructive',
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : `Failed to ${isEditing ? "update" : "create"} partner`,
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -199,10 +226,12 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
         </Button>
         <div>
           <h1 className="text-3xl font-bold">
-            {isEditing ? 'Edit Partner' : 'Add New Partner'}
+            {isEditing ? "Edit Partner" : "Add New Partner"}
           </h1>
           <p className="text-muted-foreground">
-            {isEditing ? 'Update partner information and translations' : 'Create a new partner with multilingual content'}
+            {isEditing
+              ? "Update partner information and translations"
+              : "Create a new partner with multilingual content"}
           </p>
         </div>
       </div>
@@ -225,7 +254,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                     <Input
                       id="name"
                       value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
                       placeholder="Partner name"
                       required
                     />
@@ -235,7 +266,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                     <Input
                       id="slug"
                       value={formData.slug}
-                      onChange={(e) => handleInputChange('slug', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("slug", e.target.value)
+                      }
                       placeholder="partner-slug"
                       required
                     />
@@ -249,7 +282,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("email", e.target.value)
+                      }
                       placeholder="contact@partner.com"
                     />
                   </div>
@@ -258,7 +293,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                     <Input
                       id="phone"
                       value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("phone", e.target.value)
+                      }
                       placeholder="+1 (555) 123-4567"
                     />
                   </div>
@@ -270,7 +307,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                     id="website"
                     type="url"
                     value={formData.website}
-                    onChange={(e) => handleInputChange('website', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("website", e.target.value)
+                    }
                     placeholder="https://partner.com"
                   />
                 </div>
@@ -280,7 +319,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                   <Input
                     id="industry"
                     value={formData.industry}
-                    onChange={(e) => handleInputChange('industry', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("industry", e.target.value)
+                    }
                     placeholder="Technology, Manufacturing, etc."
                   />
                 </div>
@@ -290,7 +331,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                   <Input
                     id="logo_url"
                     value={formData.logo_url}
-                    onChange={(e) => handleInputChange('logo_url', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("logo_url", e.target.value)
+                    }
                     placeholder="/images/partners/logo.png"
                   />
                   {formData.logo_url && (
@@ -325,7 +368,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                   <Label htmlFor="partnership_type">Partnership Type</Label>
                   <Select
                     value={formData.partnership_type}
-                    onValueChange={(value) => handleInputChange('partnership_type', value)}
+                    onValueChange={(value) =>
+                      handleInputChange("partnership_type", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select type" />
@@ -346,7 +391,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                     id="partnership_since"
                     type="date"
                     value={formData.partnership_since}
-                    onChange={(e) => handleInputChange('partnership_since', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("partnership_since", e.target.value)
+                    }
                   />
                 </div>
 
@@ -356,7 +403,12 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                     id="sort_order"
                     type="number"
                     value={formData.sort_order}
-                    onChange={(e) => handleInputChange('sort_order', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "sort_order",
+                        parseInt(e.target.value) || 0
+                      )
+                    }
                     placeholder="0"
                   />
                 </div>
@@ -365,7 +417,9 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                   <Switch
                     id="is_featured"
                     checked={formData.is_featured}
-                    onCheckedChange={(checked) => handleInputChange('is_featured', checked)}
+                    onCheckedChange={(checked) =>
+                      handleInputChange("is_featured", checked)
+                    }
                   />
                   <Label htmlFor="is_featured">Featured Partner</Label>
                 </div>
@@ -383,7 +437,7 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue={languages[0]?.code || 'en'}>
+            <Tabs defaultValue={languages[0]?.code || "en"}>
               <TabsList className="grid w-full grid-cols-2">
                 {languages.map((language) => (
                   <TabsTrigger key={language.code} value={language.code}>
@@ -391,49 +445,85 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
                   </TabsTrigger>
                 ))}
               </TabsList>
-              
+
               {languages.map((language) => {
-                const translation = formData.translations.find(t => t.language_code === language.code);
-                
+                const translation = formData.translations.find(
+                  (t) => t.language_code === language.code
+                );
+
                 return (
-                  <TabsContent key={language.code} value={language.code} className="space-y-4">
+                  <TabsContent
+                    key={language.code}
+                    value={language.code}
+                    className="space-y-4"
+                  >
                     <div>
                       <Label htmlFor={`title_${language.code}`}>Title</Label>
                       <Input
                         id={`title_${language.code}`}
-                        value={translation?.title || ''}
-                        onChange={(e) => handleTranslationChange(language.code, 'title', e.target.value)}
+                        value={translation?.title || ""}
+                        onChange={(e) =>
+                          handleTranslationChange(
+                            language.code,
+                            "title",
+                            e.target.value
+                          )
+                        }
                         placeholder={`Partner title in ${language.name}`}
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor={`short_description_${language.code}`}>Short Description</Label>
+                      <Label htmlFor={`short_description_${language.code}`}>
+                        Short Description
+                      </Label>
                       <Input
                         id={`short_description_${language.code}`}
-                        value={translation?.short_description || ''}
-                        onChange={(e) => handleTranslationChange(language.code, 'short_description', e.target.value)}
+                        value={translation?.short_description || ""}
+                        onChange={(e) =>
+                          handleTranslationChange(
+                            language.code,
+                            "short_description",
+                            e.target.value
+                          )
+                        }
                         placeholder={`Brief description in ${language.name}`}
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor={`description_${language.code}`}>Description</Label>
+                      <Label htmlFor={`description_${language.code}`}>
+                        Description
+                      </Label>
                       <Textarea
                         id={`description_${language.code}`}
-                        value={translation?.description || ''}
-                        onChange={(e) => handleTranslationChange(language.code, 'description', e.target.value)}
+                        value={translation?.description || ""}
+                        onChange={(e) =>
+                          handleTranslationChange(
+                            language.code,
+                            "description",
+                            e.target.value
+                          )
+                        }
                         placeholder={`Full description in ${language.name}`}
                         rows={4}
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor={`partnership_details_${language.code}`}>Partnership Details</Label>
+                      <Label htmlFor={`partnership_details_${language.code}`}>
+                        Partnership Details
+                      </Label>
                       <Textarea
                         id={`partnership_details_${language.code}`}
-                        value={translation?.partnership_details || ''}
-                        onChange={(e) => handleTranslationChange(language.code, 'partnership_details', e.target.value)}
+                        value={translation?.partnership_details || ""}
+                        onChange={(e) =>
+                          handleTranslationChange(
+                            language.code,
+                            "partnership_details",
+                            e.target.value
+                          )
+                        }
                         placeholder={`Partnership details in ${language.name}`}
                         rows={6}
                       />
@@ -448,7 +538,11 @@ export default function PartnerForm({ partnerId, initialData }: PartnerFormProps
         {/* Submit Button */}
         <div className="flex items-center gap-4">
           <Button type="submit" disabled={loading}>
-            {loading ? 'Saving...' : (isEditing ? 'Update Partner' : 'Create Partner')}
+            {loading
+              ? "Saving..."
+              : isEditing
+              ? "Update Partner"
+              : "Create Partner"}
           </Button>
           <Button type="button" variant="outline" asChild>
             <Link href="/dashboard/partners">Cancel</Link>

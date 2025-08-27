@@ -6,17 +6,17 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  IconDashboard, 
-  IconArticle, 
-  IconFolder, 
-  IconUsers, 
-  IconSettings, 
+import {
+  IconDashboard,
+  IconArticle,
+  IconFolder,
+  IconUsers,
+  IconSettings,
   IconLetterA,
   IconChevronLeft,
   IconChevronRight,
   IconLogout,
-  IconBriefcase
+  IconBriefcase,
 } from "@tabler/icons-react";
 import { AdminAuthService, AdminUser } from "@/lib/services/admin-auth.service";
 
@@ -24,9 +24,9 @@ interface NavItem {
   title: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
-  requiredRole: 'admin' | 'editor' | 'hr';
+  requiredRole: "admin" | "editor" | "hr";
   badge?: string;
-  children?: Omit<NavItem, 'children'>[];
+  children?: Omit<NavItem, "children">[];
 }
 
 const navigationItems: NavItem[] = [
@@ -34,7 +34,7 @@ const navigationItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: IconDashboard,
-    requiredRole: "editor"
+    requiredRole: "editor",
   },
   {
     title: "Blog Posts",
@@ -46,15 +46,15 @@ const navigationItems: NavItem[] = [
         title: "All Posts",
         href: "/dashboard/blog",
         icon: IconArticle,
-        requiredRole: "editor"
+        requiredRole: "editor",
       },
       {
         title: "New Post",
         href: "/dashboard/blog/new",
         icon: IconArticle,
-        requiredRole: "editor"
-      }
-    ]
+        requiredRole: "editor",
+      },
+    ],
   },
   {
     title: "Projects",
@@ -66,15 +66,15 @@ const navigationItems: NavItem[] = [
         title: "All Projects",
         href: "/dashboard/projects",
         icon: IconFolder,
-        requiredRole: "editor"
+        requiredRole: "editor",
       },
       {
         title: "New Project",
         href: "/dashboard/projects/new",
         icon: IconFolder,
-        requiredRole: "editor"
-      }
-    ]
+        requiredRole: "editor",
+      },
+    ],
   },
   {
     title: "Career Management",
@@ -86,54 +86,54 @@ const navigationItems: NavItem[] = [
         title: "All Positions",
         href: "/dashboard/career",
         icon: IconBriefcase,
-        requiredRole: "admin"
+        requiredRole: "admin",
       },
       {
         title: "New Position",
         href: "/dashboard/career/new",
         icon: IconBriefcase,
-        requiredRole: "admin"
+        requiredRole: "admin",
       },
       {
         title: "Applications",
         href: "/dashboard/career/applications",
         icon: IconUsers,
-        requiredRole: "admin"
+        requiredRole: "admin",
       },
       {
         title: "Categories",
         href: "/dashboard/career/categories",
         icon: IconFolder,
-        requiredRole: "admin"
+        requiredRole: "admin",
       },
       {
         title: "Locations",
         href: "/dashboard/career/locations",
         icon: IconFolder,
-        requiredRole: "admin"
-      }
-    ]
+        requiredRole: "admin",
+      },
+    ],
   },
   {
     title: "Admin Management",
     href: "/dashboard/admin",
     icon: IconUsers,
     requiredRole: "admin",
-    badge: "Admin Only"
+    badge: "Admin Only",
   },
   {
     title: "Newsletter",
     href: "/dashboard/newsletter",
     icon: IconLetterA,
     requiredRole: "admin",
-    badge: "Admin Only"
+    badge: "Admin Only",
   },
   {
     title: "Settings",
     href: "/dashboard/settings",
     icon: IconSettings,
-    requiredRole: "admin"
-  }
+    requiredRole: "admin",
+  },
 ];
 
 export function AdminSidebar() {
@@ -157,19 +157,19 @@ export function AdminSidebar() {
     }
   };
 
-  const hasPermission = (requiredRole: 'admin' | 'editor' | 'hr') => {
+  const hasPermission = (requiredRole: "admin" | "editor" | "hr") => {
     if (!currentUser) return false;
-    
+
     const roleHierarchy = {
-      'admin': 3,
-      'editor': 2,
-      'hr': 1
+      admin: 3,
+      editor: 2,
+      hr: 1,
     };
 
     return roleHierarchy[currentUser.role] >= roleHierarchy[requiredRole];
   };
 
-  const filteredNavigation = navigationItems.filter(item => 
+  const filteredNavigation = navigationItems.filter((item) =>
     hasPermission(item.requiredRole)
   );
 
@@ -198,21 +198,25 @@ export function AdminSidebar() {
   }
 
   return (
-    <div className={cn(
-      "flex h-full flex-col border-r bg-background transition-all duration-300",
-      isCollapsed ? "w-16" : "w-64"
-    )}>
+    <div
+      className={cn(
+        "flex h-full flex-col border-r bg-background transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64"
+      )}
+    >
       {/* Header */}
       <div className="flex h-16 items-center justify-between border-b px-4">
         {!isCollapsed && (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">T</span>
+              <span className="text-primary-foreground font-bold text-sm">
+                T
+              </span>
             </div>
             <span className="font-semibold">Tekna Admin</span>
           </div>
         )}
-        
+
         <Button
           variant="ghost"
           size="sm"
@@ -233,7 +237,7 @@ export function AdminSidebar() {
           {filteredNavigation.map((item) => {
             const isActive = isActiveRoute(item.href);
             const hasChildren = item.children && item.children.length > 0;
-            
+
             return (
               <div key={item.href}>
                 <Link href={item.href}>
@@ -291,21 +295,23 @@ export function AdminSidebar() {
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                 <span className="text-primary font-semibold text-sm">
-                  {currentUser.profile?.first_name?.[0] || ''}{currentUser.profile?.last_name?.[0] || ''}
+                  {currentUser.profile?.first_name?.[0] || ""}
+                  {currentUser.profile?.last_name?.[0] || ""}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
-                  {currentUser.profile?.first_name || ''} {currentUser.profile?.last_name || ''}
+                  {currentUser.profile?.first_name || ""}{" "}
+                  {currentUser.profile?.last_name || ""}
                 </p>
                 <p className="text-xs text-muted-foreground truncate capitalize">
-                  {currentUser.role.replace('_', ' ')}
+                  {currentUser.role.replace("_", " ")}
                 </p>
               </div>
             </div>
           </div>
         )}
-        
+
         <Button
           variant="ghost"
           size="sm"

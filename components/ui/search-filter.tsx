@@ -4,7 +4,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { IconSearch, IconFilter, IconX } from "@tabler/icons-react";
 
 interface SearchFilterProps {
@@ -30,7 +36,7 @@ export function SearchFilter({
   placeholder = "Search...",
   filters = [],
   showClearButton = true,
-  className = ""
+  className = "",
 }: SearchFilterProps) {
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -50,7 +56,9 @@ export function SearchFilter({
     onSearchChange("");
   };
 
-  const hasActiveFilters = filters.some(filter => filter.value && filter.value !== "all");
+  const hasActiveFilters = filters.some(
+    (filter) => filter.value && filter.value !== "all"
+  );
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -96,18 +104,18 @@ export function SearchFilter({
               Filters
               {hasActiveFilters && (
                 <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                  {filters.filter(f => f.value && f.value !== "all").length}
+                  {filters.filter((f) => f.value && f.value !== "all").length}
                 </span>
               )}
             </Button>
-            
+
             {hasActiveFilters && (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  filters.forEach(filter => filter.onChange("all"));
+                  filters.forEach((filter) => filter.onChange("all"));
                 }}
                 className="text-muted-foreground hover:text-foreground"
               >
@@ -123,12 +131,11 @@ export function SearchFilter({
                   <Label htmlFor={filter.key} className="text-sm font-medium">
                     {filter.label}
                   </Label>
-                  <Select
-                    value={filter.value}
-                    onValueChange={filter.onChange}
-                  >
+                  <Select value={filter.value} onValueChange={filter.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={`Select ${filter.label.toLowerCase()}`} />
+                      <SelectValue
+                        placeholder={`Select ${filter.label.toLowerCase()}`}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {filter.options.map((option) => (
@@ -153,8 +160,11 @@ export function CompactSearch({
   searchQuery,
   onSearchChange,
   placeholder = "Search...",
-  className = ""
-}: Pick<SearchFilterProps, 'searchQuery' | 'onSearchChange' | 'placeholder' | 'className'>) {
+  className = "",
+}: Pick<
+  SearchFilterProps,
+  "searchQuery" | "onSearchChange" | "placeholder" | "className"
+>) {
   return (
     <div className={`relative ${className}`}>
       <IconSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -173,13 +183,13 @@ export function CompactSearch({
 export function AdvancedSearch({
   searchFields,
   onSearch,
-  className = ""
+  className = "",
 }: {
   searchFields: {
     key: string;
     label: string;
     placeholder?: string;
-    type?: 'text' | 'select';
+    type?: "text" | "select";
     options?: { value: string; label: string }[];
   }[];
   onSearch: (values: Record<string, string>) => void;
@@ -197,9 +207,9 @@ export function AdvancedSearch({
   };
 
   const updateSearchValue = (key: string, value: string) => {
-    setSearchValues(prev => ({
+    setSearchValues((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -211,14 +221,18 @@ export function AdvancedSearch({
             <Label htmlFor={field.key} className="text-sm font-medium">
               {field.label}
             </Label>
-            
-            {field.type === 'select' && field.options ? (
+
+            {field.type === "select" && field.options ? (
               <Select
                 value={searchValues[field.key] || ""}
                 onValueChange={(value) => updateSearchValue(field.key, value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={field.placeholder || `Select ${field.label.toLowerCase()}`} />
+                  <SelectValue
+                    placeholder={
+                      field.placeholder || `Select ${field.label.toLowerCase()}`
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="">All</SelectItem>
@@ -233,7 +247,9 @@ export function AdvancedSearch({
               <Input
                 id={field.key}
                 type="text"
-                placeholder={field.placeholder || `Search ${field.label.toLowerCase()}`}
+                placeholder={
+                  field.placeholder || `Search ${field.label.toLowerCase()}`
+                }
                 value={searchValues[field.key] || ""}
                 onChange={(e) => updateSearchValue(field.key, e.target.value)}
               />

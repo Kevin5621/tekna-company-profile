@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { AdminAuthService, type AdminUser } from '@/lib/services/admin-auth.service';
+import { useEffect, useState } from "react";
+import {
+  AdminAuthService,
+  type AdminUser,
+} from "@/lib/services/admin-auth.service";
 
 export function usePermissions() {
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
@@ -14,7 +17,7 @@ export function usePermissions() {
         const user = await AdminAuthService.getCurrentAdmin();
         setCurrentUser(user);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch user');
+        setError(err instanceof Error ? err.message : "Failed to fetch user");
         setCurrentUser(null);
       } finally {
         setIsLoading(false);
@@ -24,12 +27,12 @@ export function usePermissions() {
     fetchUser();
   }, []);
 
-  const hasPermission = (requiredRole: 'admin' | 'editor'): boolean => {
+  const hasPermission = (requiredRole: "admin" | "editor"): boolean => {
     if (!currentUser) return false;
-    
+
     const roleHierarchy: Record<string, number> = {
-      'admin': 2,
-      'editor': 1
+      admin: 2,
+      editor: 1,
     };
 
     const userRoleLevel = roleHierarchy[currentUser.role] || 0;
@@ -38,11 +41,11 @@ export function usePermissions() {
     return userRoleLevel >= requiredRoleLevel;
   };
 
-  const canManageUsers = (): boolean => hasPermission('admin');
-  const canManageSettings = (): boolean => hasPermission('admin');
-  const canManageContent = (): boolean => hasPermission('editor');
-  const canAccessAdminPanel = (): boolean => hasPermission('admin');
-  const canAccessNewsletter = (): boolean => hasPermission('admin');
+  const canManageUsers = (): boolean => hasPermission("admin");
+  const canManageSettings = (): boolean => hasPermission("admin");
+  const canManageContent = (): boolean => hasPermission("editor");
+  const canAccessAdminPanel = (): boolean => hasPermission("admin");
+  const canAccessNewsletter = (): boolean => hasPermission("admin");
 
   const refreshUser = async () => {
     setIsLoading(true);
@@ -51,7 +54,7 @@ export function usePermissions() {
       setCurrentUser(user);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to refresh user');
+      setError(err instanceof Error ? err.message : "Failed to refresh user");
       setCurrentUser(null);
     } finally {
       setIsLoading(false);
@@ -68,12 +71,12 @@ export function usePermissions() {
     canManageContent,
     canAccessAdminPanel,
     canAccessNewsletter,
-    refreshUser
+    refreshUser,
   };
 }
 
 export function usePermissionGuard(config: {
-  requiredRole?: 'admin' | 'editor';
+  requiredRole?: "admin" | "editor";
   redirectTo?: string;
   onUnauthorized?: () => void;
 }) {
@@ -90,12 +93,19 @@ export function usePermissionGuard(config: {
         }
       }
     }
-  }, [currentUser, isLoading, hasPermission, requiredRole, redirectTo, onUnauthorized]);
+  }, [
+    currentUser,
+    isLoading,
+    hasPermission,
+    requiredRole,
+    redirectTo,
+    onUnauthorized,
+  ]);
 
   return {
     currentUser,
     isLoading,
-    hasPermission: requiredRole ? hasPermission(requiredRole) : true
+    hasPermission: requiredRole ? hasPermission(requiredRole) : true,
   };
 }
 
@@ -104,25 +114,36 @@ export function useRoleBasedUI() {
 
   const getRoleDisplayName = (role: string): string => {
     switch (role) {
-      case 'admin': return 'Admin';
-      case 'editor': return 'Editor';
-      default: return role;
+      case "admin":
+        return "Admin";
+      case "editor":
+        return "Editor";
+      default:
+        return role;
     }
   };
 
-  const getRoleBadgeVariant = (role: string): 'default' | 'secondary' | 'destructive' => {
+  const getRoleBadgeVariant = (
+    role: string
+  ): "default" | "secondary" | "destructive" => {
     switch (role) {
-      case 'admin': return 'default';
-      case 'editor': return 'secondary';
-      default: return 'default';
+      case "admin":
+        return "default";
+      case "editor":
+        return "secondary";
+      default:
+        return "default";
     }
   };
 
   const getRoleColor = (role: string): string => {
     switch (role) {
-      case 'admin': return 'text-primary';
-      case 'editor': return 'text-secondary-foreground';
-      default: return 'text-muted-foreground';
+      case "admin":
+        return "text-primary";
+      case "editor":
+        return "text-secondary-foreground";
+      default:
+        return "text-muted-foreground";
     }
   };
 
@@ -130,6 +151,6 @@ export function useRoleBasedUI() {
     currentUser,
     getRoleDisplayName,
     getRoleBadgeVariant,
-    getRoleColor
+    getRoleColor,
   };
 }

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { gsap } from 'gsap';
+import { useEffect, useRef, useCallback } from "react";
+import { gsap } from "gsap";
 
 export function useNavbarAnimation(config?: {
   onFloatingStart?: () => void;
@@ -9,12 +9,18 @@ export function useNavbarAnimation(config?: {
   const logoRef = useRef<HTMLAnchorElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const themeSwitcherRef = useRef<HTMLDivElement>(null);
-  
+
   const isFloating = useRef(false);
   const animationTween = useRef<gsap.core.Tween | null>(null);
 
   const animateToFloating = useCallback(() => {
-    if (!navbarRef.current || !logoRef.current || !navRef.current || !themeSwitcherRef.current) return;
+    if (
+      !navbarRef.current ||
+      !logoRef.current ||
+      !navRef.current ||
+      !themeSwitcherRef.current
+    )
+      return;
 
     // Kill any existing animation
     if (animationTween.current) {
@@ -22,13 +28,14 @@ export function useNavbarAnimation(config?: {
     }
 
     const navbar = navbarRef.current;
-    
+
     const viewportWidth = window.innerWidth;
     const targetWidth = Math.min(1200, viewportWidth * 0.9);
     const targetX = (viewportWidth - targetWidth) / 2;
 
     // Use fromTo for explicit control over start and end states
-    animationTween.current = gsap.fromTo(navbar, 
+    animationTween.current = gsap.fromTo(
+      navbar,
       {
         // FROM - current state (explicit)
         height: "5rem", // 80px
@@ -40,7 +47,7 @@ export function useNavbarAnimation(config?: {
         marginTop: "0",
         borderRadius: "0",
         scale: 1,
-        immediateRender: false
+        immediateRender: false,
       },
       {
         // TO - target floating state
@@ -53,17 +60,17 @@ export function useNavbarAnimation(config?: {
         marginTop: "0", // Keep margin consistent
         borderRadius: "2rem",
         scale: 1, // No scaling to prevent shrinking effect
-        
+
         // Visual styling
         backgroundColor: "rgba(var(--background), 0.9)",
         backdropFilter: "blur(20px)",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08)",
+        boxShadow:
+          "0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08)",
         border: "1px solid rgba(var(--border), 0.1)",
-        
+
         // Animation settings
         duration: 0.6, // Slightly longer for smoother feel
         ease: "power2.out", // Natural easing
-        
       }
     );
 
@@ -73,13 +80,18 @@ export function useNavbarAnimation(config?: {
       opacity: 1,
       duration: 0.4,
       ease: "power2.out",
-      stagger: 0.05 // Slight stagger for polish
+      stagger: 0.05, // Slight stagger for polish
     });
-
   }, []);
 
   const animateToNormal = useCallback(() => {
-    if (!navbarRef.current || !logoRef.current || !navRef.current || !themeSwitcherRef.current) return;
+    if (
+      !navbarRef.current ||
+      !logoRef.current ||
+      !navRef.current ||
+      !themeSwitcherRef.current
+    )
+      return;
 
     // Kill any existing animation
     if (animationTween.current) {
@@ -90,7 +102,8 @@ export function useNavbarAnimation(config?: {
     const currentRect = navbar.getBoundingClientRect();
 
     // Use fromTo for explicit control
-    animationTween.current = gsap.fromTo(navbar,
+    animationTween.current = gsap.fromTo(
+      navbar,
       {
         // FROM - current floating state
         height: "4rem",
@@ -101,7 +114,7 @@ export function useNavbarAnimation(config?: {
         paddingRight: "2rem",
         borderRadius: "2rem",
         scale: 1,
-        immediateRender: false
+        immediateRender: false,
       },
       {
         // TO - normal state
@@ -114,14 +127,14 @@ export function useNavbarAnimation(config?: {
         marginTop: "0",
         borderRadius: "0",
         scale: 1, // No scaling
-        
+
         // Visual styling back to normal
         backgroundColor: "rgba(var(--background), 0.95)",
         backdropFilter: "blur(8px)",
         boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
         border: "none",
         borderBottom: "1px solid rgba(var(--border), 0.2)",
-        
+
         // Animation settings
         duration: 0.6,
         ease: "power2.out",
@@ -134,9 +147,8 @@ export function useNavbarAnimation(config?: {
       opacity: 1,
       duration: 0.4,
       ease: "power2.out",
-      stagger: 0.05
+      stagger: 0.05,
     });
-
   }, []);
 
   useEffect(() => {
@@ -166,7 +178,7 @@ export function useNavbarAnimation(config?: {
 
       // Clear previous timeout
       clearTimeout(scrollTimeout);
-      
+
       // Set new timeout for scroll end detection
       scrollTimeout = setTimeout(() => {
         // Optional: handle scroll end
@@ -174,11 +186,11 @@ export function useNavbarAnimation(config?: {
     };
 
     // Add scroll listener
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Cleanup
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
       if (animationTween.current) {
         animationTween.current.kill();
       }

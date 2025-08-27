@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, X } from "lucide-react"
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, X } from "lucide-react";
 
 interface AppLayoutProps {
-  readonly children: React.ReactNode
-  readonly sidebar: React.ReactNode
-  readonly header?: React.ReactNode
+  readonly children: React.ReactNode;
+  readonly sidebar: React.ReactNode;
+  readonly header?: React.ReactNode;
 }
 
 export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false)
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
     <div className="flex h-screen bg-background dashboard-layout">
@@ -38,7 +38,9 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
         <SheetContent side="left" className="p-0 w-64">
           <div className="flex flex-col h-full bg-sidebar">
             <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-              <h2 className="text-lg font-semibold text-sidebar-foreground">Menu</h2>
+              <h2 className="text-lg font-semibold text-sidebar-foreground">
+                Menu
+              </h2>
               <Button
                 variant="ghost"
                 size="icon"
@@ -56,9 +58,7 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
       <div className="flex flex-col flex-1 dashboard-main">
         {/* Header */}
         {header && (
-          <div className="border-b border-border bg-background">
-            {header}
-          </div>
+          <div className="border-b border-border bg-background">{header}</div>
         )}
 
         {/* Page Content */}
@@ -69,5 +69,5 @@ export function AppLayout({ children, sidebar, header }: AppLayoutProps) {
         </main>
       </div>
     </div>
-  )
+  );
 }

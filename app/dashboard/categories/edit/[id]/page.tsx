@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { CategoryForm } from '@/components/category-form';
-import { ClientDashboardService } from '@/lib/services/client-dashboard.service';
-import Link from 'next/link';
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { CategoryForm } from "@/components/category-form";
+import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import Link from "next/link";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 export default function EditCategoryPage() {
   const params = useParams();
@@ -25,17 +25,21 @@ export default function EditCategoryPage() {
   useEffect(() => {
     async function fetchCategory() {
       try {
-        const category = await ClientDashboardService.getCategoryById(categoryId);
+        const category = await ClientDashboardService.getCategoryById(
+          categoryId
+        );
         setInitialData({
-          name: category.name || '',
-          slug: category.slug || '',
-          description: category.description || '',
-          color: category.color || '#3B82F6',
+          name: category.name || "",
+          slug: category.slug || "",
+          description: category.description || "",
+          color: category.color || "#3B82F6",
           is_active: category.is_active ?? true,
           sort_order: category.sort_order || 0,
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Gagal memuat data kategori');
+        setError(
+          err instanceof Error ? err.message : "Gagal memuat data kategori"
+        );
       } finally {
         setIsLoading(false);
       }
@@ -80,24 +84,27 @@ export default function EditCategoryPage() {
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Kategori", href: "/dashboard/categories" },
-          { label: "Edit Kategori", href: `/dashboard/categories/edit/${categoryId}` },
-          { label: "Form Edit", isCurrentPage: true }
+          {
+            label: "Edit Kategori",
+            href: `/dashboard/categories/edit/${categoryId}`,
+          },
+          { label: "Form Edit", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/categories" label="Kembali ke Categories" />
+        <BackButton
+          href="/dashboard/categories"
+          label="Kembali ke Categories"
+        />
       </div>
 
       {initialData && (
-        <CategoryForm 
-          categoryId={categoryId}
-          initialData={initialData}
-        />
+        <CategoryForm categoryId={categoryId} initialData={initialData} />
       )}
     </div>
   );

@@ -5,30 +5,30 @@ const nextConfig: NextConfig = {
     // Handle GLB and GLTF files
     config.module.rules.push({
       test: /\.(glb|gltf)$/,
-      type: 'asset/resource',
+      type: "asset/resource",
     });
-    
+
     // Exclude Deno/Supabase functions from compilation
     config.externals = config.externals || {};
-    config.externals['supabase/functions'] = 'commonjs supabase/functions';
-    
+    config.externals["supabase/functions"] = "commonjs supabase/functions";
+
     return config;
   },
   // Exclude supabase functions from TypeScript checking
   typescript: {
     ignoreBuildErrors: false,
-    tsconfigPath: './tsconfig.json'
+    tsconfigPath: "./tsconfig.json",
   },
   // Image optimization
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
       {
-        protocol: 'http',
-        hostname: 'localhost',
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
     dangerouslyAllowSVG: true,
@@ -38,59 +38,59 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*).glb',
+        source: "/(.*).glb",
         headers: [
           {
-            key: 'Content-Type',
-            value: 'model/gltf-binary',
+            key: "Content-Type",
+            value: "model/gltf-binary",
           },
         ],
       },
       {
-        source: '/(.*).gltf',
+        source: "/(.*).gltf",
         headers: [
           {
-            key: 'Content-Type',
-            value: 'model/gltf+json',
+            key: "Content-Type",
+            value: "model/gltf+json",
           },
         ],
       },
       {
-        source: '/images/(.*)',
+        source: "/images/(.*)",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
       {
-        source: '/blog/(.*)',
+        source: "/blog/(.*)",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=3600, s-maxage=86400',
+            key: "Cache-Control",
+            value: "public, max-age=3600, s-maxage=86400",
           },
         ],
       },
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            key: "Referrer-Policy",
+            value: "origin-when-cross-origin",
           },
         ],
       },

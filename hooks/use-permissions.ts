@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { AdminAuthService, AdminUser } from '@/lib/services/admin-auth.service';
+import { useState, useEffect } from "react";
+import { AdminAuthService, AdminUser } from "@/lib/services/admin-auth.service";
 
 export interface PermissionConfig {
-  requiredRole: 'admin' | 'editor' | 'hr';
+  requiredRole: "admin" | "editor" | "hr";
   fallback?: React.ReactNode;
   redirectTo?: string;
 }
@@ -23,43 +23,43 @@ export function usePermissions() {
       const user = await AdminAuthService.getCurrentAdmin();
       setCurrentUser(user);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load user');
+      setError(err instanceof Error ? err.message : "Failed to load user");
       setCurrentUser(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const hasPermission = (requiredRole: 'admin' | 'editor' | 'hr'): boolean => {
+  const hasPermission = (requiredRole: "admin" | "editor" | "hr"): boolean => {
     if (!currentUser) return false;
-    
+
     const roleHierarchy = {
-      'admin': 3,
-      'editor': 2,
-      'hr': 1
+      admin: 3,
+      editor: 2,
+      hr: 1,
     };
 
     return roleHierarchy[currentUser.role] >= roleHierarchy[requiredRole];
   };
 
   const canManageUsers = (): boolean => {
-    return hasPermission('admin');
+    return hasPermission("admin");
   };
 
   const canManageSettings = (): boolean => {
-    return hasPermission('admin');
+    return hasPermission("admin");
   };
 
   const canManageContent = (): boolean => {
-    return hasPermission('editor');
+    return hasPermission("editor");
   };
 
   const canAccessAdminPanel = (): boolean => {
-    return hasPermission('admin');
+    return hasPermission("admin");
   };
 
   const canAccessNewsletter = (): boolean => {
-    return hasPermission('admin');
+    return hasPermission("admin");
   };
 
   const refreshUser = () => {
@@ -76,7 +76,7 @@ export function usePermissions() {
     canManageContent,
     canAccessAdminPanel,
     canAccessNewsletter,
-    refreshUser
+    refreshUser,
   };
 }
 
@@ -96,7 +96,7 @@ export function usePermissionGuard(config: PermissionConfig) {
   return {
     hasAccess,
     isLoading,
-    fallback: fallback || null
+    fallback: fallback || null,
   };
 }
 
@@ -106,40 +106,42 @@ export function useRoleBasedUI() {
 
   const getRoleDisplayName = (role: string): string => {
     switch (role) {
-      case 'admin':
-        return 'Admin';
-      case 'editor':
-        return 'Editor';
-      case 'hr':
-        return 'HR';
+      case "admin":
+        return "Admin";
+      case "editor":
+        return "Editor";
+      case "hr":
+        return "HR";
       default:
         return role;
     }
   };
 
-  const getRoleBadgeVariant = (role: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getRoleBadgeVariant = (
+    role: string
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (role) {
-      case 'admin':
-        return 'destructive';
-      case 'editor':
-        return 'secondary';
-      case 'hr':
-        return 'default';
+      case "admin":
+        return "destructive";
+      case "editor":
+        return "secondary";
+      case "hr":
+        return "default";
       default:
-        return 'outline';
+        return "outline";
     }
   };
 
   const getRoleColor = (role: string): string => {
     switch (role) {
-      case 'admin':
-        return 'text-destructive';
-      case 'editor':
-        return 'text-secondary-foreground';
-      case 'hr':
-        return 'text-primary';
+      case "admin":
+        return "text-destructive";
+      case "editor":
+        return "text-secondary-foreground";
+      case "hr":
+        return "text-primary";
       default:
-        return 'text-muted-foreground';
+        return "text-muted-foreground";
     }
   };
 
@@ -148,6 +150,6 @@ export function useRoleBasedUI() {
     hasPermission,
     getRoleDisplayName,
     getRoleBadgeVariant,
-    getRoleColor
+    getRoleColor,
   };
 }

@@ -1,12 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Edit, Trash2, ExternalLink, Building2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Plus, Edit, Trash2, ExternalLink, Building2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
+import Image from "next/image";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,7 +20,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
+} from "@/components/ui/breadcrumb";
 
 interface Partner {
   id: string;
@@ -36,20 +42,20 @@ export default function PartnersClient() {
 
   const fetchPartners = useCallback(async () => {
     try {
-      const response = await fetch('/api/partners');
+      const response = await fetch("/api/partners");
       const data = await response.json();
-      
+
       if (data.success) {
         setPartners(data.partners);
       } else {
-        throw new Error(data.error || 'Failed to fetch partners');
+        throw new Error(data.error || "Failed to fetch partners");
       }
     } catch (error) {
-      console.error('Error fetching partners:', error);
+      console.error("Error fetching partners:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to fetch partners',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to fetch partners",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -62,29 +68,29 @@ export default function PartnersClient() {
     }
 
     setDeleting(id);
-    
+
     try {
       const response = await fetch(`/api/partners/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
-        setPartners(partners.filter(p => p.id !== id));
+        setPartners(partners.filter((p) => p.id !== id));
         toast({
-          title: 'Success',
-          description: 'Partner deleted successfully',
+          title: "Success",
+          description: "Partner deleted successfully",
         });
       } else {
-        throw new Error(data.error || 'Failed to delete partner');
+        throw new Error(data.error || "Failed to delete partner");
       }
     } catch (error) {
-      console.error('Error deleting partner:', error);
+      console.error("Error deleting partner:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to delete partner',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to delete partner",
+        variant: "destructive",
       });
     } finally {
       setDeleting(null);
@@ -166,7 +172,9 @@ export default function PartnersClient() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Partners</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Partners
+            </CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -175,12 +183,14 @@ export default function PartnersClient() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Partners</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Partners
+            </CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {partners.filter(p => p.is_active).length}
+              {partners.filter((p) => p.is_active).length}
             </div>
           </CardContent>
         </Card>
@@ -189,13 +199,16 @@ export default function PartnersClient() {
       {/* Partners Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {partners.map((partner) => (
-          <Card key={partner.id} className="group hover:shadow-lg transition-shadow">
+          <Card
+            key={partner.id}
+            className="group hover:shadow-lg transition-shadow"
+          >
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <CardTitle className="text-lg">{partner.name}</CardTitle>
                   <CardDescription className="line-clamp-2">
-                    {partner.description || 'No description provided'}
+                    {partner.description || "No description provided"}
                   </CardDescription>
                 </div>
                 {partner.logo_url && (
@@ -215,9 +228,9 @@ export default function PartnersClient() {
               <div className="space-y-3">
                 {partner.website && (
                   <div className="text-sm">
-                    <a 
-                      href={partner.website} 
-                      target="_blank" 
+                    <a
+                      href={partner.website}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:underline flex items-center gap-1"
                     >
@@ -234,15 +247,15 @@ export default function PartnersClient() {
                       Edit
                     </Link>
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleDelete(partner.id, partner.name)}
                     disabled={deleting === partner.id}
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4 mr-1" />
-                    {deleting === partner.id ? 'Deleting...' : 'Delete'}
+                    {deleting === partner.id ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
               </div>

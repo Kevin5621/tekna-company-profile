@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { BlogFilters } from '@/components/blog/blog-filters';
-import { Pagination, PaginationInfo } from '@/components/blog/pagination';
-import { BlogCard } from '@/components/blog/blog-card';
-import { IconSearch, IconX } from '@tabler/icons-react';
+import { useState, useCallback, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BlogFilters } from "@/components/blog/blog-filters";
+import { Pagination, PaginationInfo } from "@/components/blog/pagination";
+import { BlogCard } from "@/components/blog/blog-card";
+import { IconSearch, IconX } from "@tabler/icons-react";
 
 interface BlogPost {
   id: string;
@@ -50,82 +50,99 @@ interface BlogGridProps {
     search?: string;
     category?: string;
     featured?: boolean;
-    sortBy?: 'newest' | 'oldest' | 'popular';
+    sortBy?: "newest" | "oldest" | "popular";
   };
 }
 
-export function BlogGrid({ 
-  initialPosts, 
-  initialCategories, 
+export function BlogGrid({
+  initialPosts,
+  initialCategories,
   initialPagination,
-  initialFilters = {}
+  initialFilters = {},
 }: BlogGridProps) {
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts);
   const [categories] = useState<Category[]>(initialCategories);
   const [pagination, setPagination] = useState(initialPagination);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
-    search: initialFilters.search || '',
-    category: initialFilters.category || '',
+    search: initialFilters.search || "",
+    category: initialFilters.category || "",
     featured: initialFilters.featured || false,
-    sortBy: initialFilters.sortBy || 'newest' as const,
+    sortBy: initialFilters.sortBy || ("newest" as const),
   });
-  const [lastFetchKey, setLastFetchKey] = useState('');
+  const [lastFetchKey, setLastFetchKey] = useState("");
 
-  const fetchPosts = useCallback(async (newFilters = filters, page = 1) => {
-    // Create a unique key for this fetch request
-    const fetchKey = `${newFilters.search}-${newFilters.category}-${newFilters.featured}-${newFilters.sortBy}-${page}`;
-    
-    // Prevent duplicate requests
-    if (fetchKey === lastFetchKey && !isLoading) {
-      return;
-    }
-    
-    setLastFetchKey(fetchKey);
-    setIsLoading(true);
-    
-    try {
-      // Import the server action dynamically
-      const { getPaginatedBlogPosts } = await import('@/app/actions/blog');
-      
-      const result = await getPaginatedBlogPosts({
-        page,
-        limit: pagination.limit,
-        search: newFilters.search,
-        category: newFilters.category,
-        featured: newFilters.featured,
-      });
-      
-      // Transform the data to match our BlogPost interface
-      const transformedPosts = result.data.map(post => {
-        // Fix: categories is already an object, not an array
-        const categoryData = post.categories && typeof post.categories === 'object' && !Array.isArray(post.categories)
-          ? post.categories as { id: string; name: string; slug: string; color: string }
-          : null;
-        
-        return {
-          ...post,
-          categories: categoryData,
-        };
-      });
-      
-      setPosts(transformedPosts);
-      setPagination(result.pagination);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [filters, pagination.limit, lastFetchKey, isLoading]);
+  const fetchPosts = useCallback(
+    async (newFilters = filters, page = 1) => {
+      // Create a unique key for this fetch request
+      const fetchKey = `${newFilters.search}-${newFilters.category}-${newFilters.featured}-${newFilters.sortBy}-${page}`;
 
-  const handleFilterChange = useCallback((newFilters: typeof filters) => {
-    setFilters(newFilters);
-    fetchPosts(newFilters, 1);
-  }, [fetchPosts]);
+      // Prevent duplicate requests
+      if (fetchKey === lastFetchKey && !isLoading) {
+        return;
+      }
 
-  const handlePageChange = useCallback((page: number) => {
-    fetchPosts(filters, page);
-  }, [fetchPosts, filters]);
+      setLastFetchKey(fetchKey);
+      setIsLoading(true);
+
+      try {
+        // Import the server action dynamically
+        const { getPaginatedBlogPosts } = await import("@/app/actions/blog");
+
+        const result = await getPaginatedBlogPosts({
+          page,
+          limit: pagination.limit,
+          search: newFilters.search,
+          category: newFilters.category,
+          featured: newFilters.featured,
+        });
+
+        // Transform the data to match our BlogPost interface
+        const transformedPosts = result.data.map((post) => {
+          // Fix: categories is already an object, not an array
+          const categoryData =
+            post.categories &&
+            typeof post.categories === "object" &&
+            !Array.isArray(post.categories)
+              ? (post.categories as {
+                  id: string;
+                  name: string;
+                  slug: string;
+                  color: string;
+                })
+              : null;
+
+          return {
+            ...post,
+            categories: categoryData,
+          };
+        });
+
+        setPosts(transformedPosts);
+        setPagination(result.pagination);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [filters, pagination.limit, lastFetchKey, isLoading]
+  );
+
+  const handleFilterChange = useCallback(
+    (newFilters: typeof filters) => {
+      setFilters(newFilters);
+      fetchPosts(newFilters, 1);
+    },
+    [fetchPosts]
+  );
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      fetchPosts(filters, page);
+    },
+    [fetchPosts, filters]
+  );
 
   // Initial fetch
   useEffect(() => {
@@ -151,12 +168,14 @@ export function BlogGrid({
           totalItems={pagination.total}
           itemsPerPage={pagination.limit}
         />
-        
       </div>
 
       {/* Enhanced Loading State */}
       {isLoading ? (
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3" aria-label="Loading blog articles">
+        <div
+          className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+          aria-label="Loading blog articles"
+        >
           {Array.from({ length: pagination.limit }).map((_, index) => (
             <div key={`skeleton-${index}`} className="flex flex-col">
               <Skeleton className="aspect-video w-full" />
@@ -180,7 +199,10 @@ export function BlogGrid({
       ) : (
         <>
           {posts.length > 0 ? (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3" aria-label="Blog articles">
+            <div
+              className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+              aria-label="Blog articles"
+            >
               {posts.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}
@@ -196,19 +218,20 @@ export function BlogGrid({
                   <p className="text-muted-foreground">
                     {filters.search || filters.category || filters.featured
                       ? "Try adjusting your filters to see more results."
-                      : "No articles have been published yet. Please check back later!"
-                    }
+                      : "No articles have been published yet. Please check back later!"}
                   </p>
                 </div>
                 {(filters.search || filters.category || filters.featured) && (
                   <Button
                     variant="outline"
-                    onClick={() => handleFilterChange({
-                      search: '',
-                      category: '',
-                      featured: false,
-                      sortBy: 'newest',
-                    })}
+                    onClick={() =>
+                      handleFilterChange({
+                        search: "",
+                        category: "",
+                        featured: false,
+                        sortBy: "newest",
+                      })
+                    }
                     className="gap-2"
                   >
                     <IconX className="h-4 w-4" />

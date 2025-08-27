@@ -33,20 +33,27 @@ export function LoginForm({
 
     try {
       // identifier can be email or display name
-      const result = await AdminAuthService.authenticateAdmin(identifier, password);
+      const result = await AdminAuthService.authenticateAdmin(
+        identifier,
+        password
+      );
 
       // AdminAuthService.authenticateAdmin throws on error or returns an object with `user`
       const hasUser = (res: unknown): res is { user: unknown } => {
-        return typeof res === 'object' && res !== null && 'user' in (res as Record<string, unknown>);
+        return (
+          typeof res === "object" &&
+          res !== null &&
+          "user" in (res as Record<string, unknown>)
+        );
       };
 
       if (hasUser(result)) {
-        router.push('/dashboard');
+        router.push("/dashboard");
       } else {
-        router.push('/dashboard');
+        router.push("/dashboard");
       }
     } catch (error: unknown) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);

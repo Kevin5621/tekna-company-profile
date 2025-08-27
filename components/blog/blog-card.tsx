@@ -1,12 +1,18 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-import { CompactShareButton } from '@/components/blog/share-button';
-import Link from 'next/link';
-import { IconCalendar, IconEye, IconStar } from '@tabler/icons-react';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import { CompactShareButton } from "@/components/blog/share-button";
+import Link from "next/link";
+import { IconCalendar, IconEye, IconStar } from "@tabler/icons-react";
 
 interface BlogPost {
   id: string;
@@ -33,27 +39,31 @@ interface BlogCardProps {
   className?: string;
 }
 
-export function BlogCard({ post, showShareButton = true, className = '' }: BlogCardProps) {
+export function BlogCard({
+  post,
+  showShareButton = true,
+  className = "",
+}: BlogCardProps) {
   const getAuthorInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const getCurrentUrl = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return `${window.location.origin}/blog/${post.slug}`;
     }
     return `/blog/${post.slug}`;
@@ -72,7 +82,7 @@ export function BlogCard({ post, showShareButton = true, className = '' }: BlogC
                 className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
               />
             </div>
-            
+
             {/* Enhanced Feature Badge with better contrast */}
             {post.is_featured && (
               <div className="absolute top-4 left-4">
@@ -87,8 +97,8 @@ export function BlogCard({ post, showShareButton = true, className = '' }: BlogC
             {/* Enhanced Category Badge with better styling */}
             {post.categories && (
               <div className="absolute top-4 right-4">
-                <Badge 
-                  variant="secondary" 
+                <Badge
+                  variant="secondary"
                   className="text-white border-0 shadow-lg font-medium"
                   style={{ backgroundColor: post.categories.color }}
                 >
@@ -115,12 +125,12 @@ export function BlogCard({ post, showShareButton = true, className = '' }: BlogC
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8 ring-2 ring-muted">
                   <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
-                    {getAuthorInitials(post.author_name || '')}
+                    {getAuthorInitials(post.author_name || "")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-foreground text-sm">
-                    {post.author_name || 'Admin'}
+                    {post.author_name || "Admin"}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Content Writer
@@ -136,7 +146,7 @@ export function BlogCard({ post, showShareButton = true, className = '' }: BlogC
                     {formatDate(post.published_at)}
                   </time>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                   {post.view_count && (
                     <div className="flex items-center gap-1">
@@ -144,12 +154,10 @@ export function BlogCard({ post, showShareButton = true, className = '' }: BlogC
                       <span>{post.view_count.toLocaleString()} views</span>
                     </div>
                   )}
-                  
+
                   {/* Share Button - positioned inside the card */}
                   {showShareButton && (
-                    <CompactShareButton
-                      url={getCurrentUrl()}
-                    />
+                    <CompactShareButton url={getCurrentUrl()} />
                   )}
                 </div>
               </div>

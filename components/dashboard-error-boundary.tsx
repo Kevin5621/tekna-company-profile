@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -13,7 +13,7 @@ interface State {
 
 export class DashboardErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
   };
 
   public static getDerivedStateFromError(error: Error): State {
@@ -21,13 +21,19 @@ export class DashboardErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Dashboard Error Boundary caught an error:', error, errorInfo);
-    
+    console.error(
+      "Dashboard Error Boundary caught an error:",
+      error,
+      errorInfo
+    );
+
     // If it's an auth error, redirect to login
-    if (error.message.includes('Admin access required') || 
-        error.message.includes('Not authenticated') ||
-        error.message.includes('User not authorized')) {
-      window.location.href = '/auth/login';
+    if (
+      error.message.includes("Admin access required") ||
+      error.message.includes("Not authenticated") ||
+      error.message.includes("User not authorized")
+    ) {
+      window.location.href = "/auth/login";
     }
   }
 
@@ -41,8 +47,8 @@ export class DashboardErrorBoundary extends Component<Props, State> {
               Terjadi Kesalahan
             </h1>
             <p className="text-muted-foreground max-w-md">
-              Maaf, terjadi kesalahan saat memuat dashboard. 
-              Silakan coba refresh halaman atau hubungi administrator.
+              Maaf, terjadi kesalahan saat memuat dashboard. Silakan coba
+              refresh halaman atau hubungi administrator.
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -51,7 +57,7 @@ export class DashboardErrorBoundary extends Component<Props, State> {
               Refresh Halaman
             </button>
             <button
-              onClick={() => window.location.href = '/auth/login'}
+              onClick={() => (window.location.href = "/auth/login")}
               className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90"
             >
               Kembali ke Login
@@ -64,4 +70,3 @@ export class DashboardErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-

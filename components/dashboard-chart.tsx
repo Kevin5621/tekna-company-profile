@@ -1,48 +1,71 @@
-"use client"
+"use client";
 
-import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { TrendingUp, Clock } from "lucide-react"
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { TrendingUp, Clock } from "lucide-react";
 
 interface DashboardChartProps {
   totalApplications?: number;
 }
 
 export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
-  const [timeRange, setTimeRange] = React.useState("30d")
+  const [timeRange, setTimeRange] = React.useState("30d");
 
   // Generate chart data with only career applications (real data) and placeholder for others
   const chartData = React.useMemo(() => {
-    const data = []
-    const today = new Date()
-    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90
+    const data = [];
+    const today = new Date();
+    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
 
     for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
-      
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+
       data.push({
-        date: date.toISOString().split('T')[0],
-        career_applications: i === 0 ? totalApplications : Math.floor(totalApplications * (1 - i / days)), // Real data trend
+        date: date.toISOString().split("T")[0],
+        career_applications:
+          i === 0
+            ? totalApplications
+            : Math.floor(totalApplications * (1 - i / days)), // Real data trend
         website_views: 0, // Coming soon
-        blog_views: 0, // Coming soon  
-        career_views: 0 // Coming soon
-      })
+        blog_views: 0, // Coming soon
+        career_views: 0, // Coming soon
+      });
     }
-    
-    return data
-  }, [timeRange, totalApplications])
+
+    return data;
+  }, [timeRange, totalApplications]);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString("id-ID", {
       month: "short",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   return (
     <Card className="pt-0">
@@ -56,7 +79,8 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
             </Badge>
           </CardTitle>
           <CardDescription>
-            Menampilkan data lamaran karir (real) - Fitur analitik lainnya segera hadir
+            Menampilkan data lamaran karir (real) - Fitur analitik lainnya
+            segera hadir
           </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
@@ -79,23 +103,20 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
           </SelectContent>
         </Select>
       </CardHeader>
-      
+
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <div className="aspect-auto h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tickFormatter={formatDate}
                 axisLine={false}
                 tickLine={false}
               />
-              <YAxis 
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip 
+              <YAxis axisLine={false} tickLine={false} />
+              <Tooltip
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     return (
@@ -116,9 +137,9 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
                           </div>
                         </div>
                       </div>
-                    )
+                    );
                   }
-                  return null
+                  return null;
                 }}
               />
               <Area
@@ -132,7 +153,7 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-        
+
         {/* Legend */}
         <div className="flex items-center justify-center gap-6 pt-4 flex-wrap">
           <div className="flex items-center gap-2">
@@ -157,14 +178,17 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
         <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-dashed">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Fitur Dalam Pengembangan</span>
+            <span className="text-sm font-medium">
+              Fitur Dalam Pengembangan
+            </span>
           </div>
           <p className="text-xs text-muted-foreground">
-            Analytics untuk website views, blog views, dan career views akan segera hadir pada Q1 2025. 
-            Saat ini hanya data lamaran karir yang ditampilkan secara real-time.
+            Analytics untuk website views, blog views, dan career views akan
+            segera hadir pada Q1 2025. Saat ini hanya data lamaran karir yang
+            ditampilkan secara real-time.
           </p>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,40 +1,48 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { XIcon } from "lucide-react"
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { XIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-function Dialog({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Root>>) {
+function Dialog({
+  ...props
+}: Readonly<React.ComponentProps<typeof DialogPrimitive.Root>>) {
   // Prevent dialogs from opening during SSR/hydration which can cause
   // Radix to add overflow:hidden to the root html/body. If the parent
   // controls `open`, we override it to false until the component is
   // mounted on the client.
-  const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => setMounted(true), [])
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
   // If `open` is a controlled prop, only allow it after mount.
-  type RootProps = React.ComponentProps<typeof DialogPrimitive.Root>
-  const controlledOpen = (props as RootProps & { open?: boolean }).open
-  const rootProps: RootProps = { ...(props as RootProps) }
+  type RootProps = React.ComponentProps<typeof DialogPrimitive.Root>;
+  const controlledOpen = (props as RootProps & { open?: boolean }).open;
+  const rootProps: RootProps = { ...(props as RootProps) };
   if (controlledOpen !== undefined) {
-    rootProps.open = mounted ? controlledOpen : false
+    rootProps.open = mounted ? controlledOpen : false;
   }
 
-  return <DialogPrimitive.Root data-slot="dialog" {...rootProps} />
+  return <DialogPrimitive.Root data-slot="dialog" {...rootProps} />;
 }
 
-function DialogTrigger({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Trigger>>) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+function DialogTrigger({
+  ...props
+}: Readonly<React.ComponentProps<typeof DialogPrimitive.Trigger>>) {
+  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
-function DialogPortal({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Portal>>) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+function DialogPortal({
+  ...props
+}: Readonly<React.ComponentProps<typeof DialogPrimitive.Portal>>) {
+  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
-function DialogClose({ ...props }: Readonly<React.ComponentProps<typeof DialogPrimitive.Close>>) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+function DialogClose({
+  ...props
+}: Readonly<React.ComponentProps<typeof DialogPrimitive.Close>>) {
+  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
 function DialogOverlay({
@@ -50,7 +58,7 @@ function DialogOverlay({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DialogContent({
@@ -59,7 +67,7 @@ function DialogContent({
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
+  showCloseButton?: boolean;
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -84,7 +92,7 @@ function DialogContent({
         )}
       </DialogPrimitive.Content>
     </DialogPortal>
-  )
+  );
 }
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -94,7 +102,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
@@ -107,7 +115,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function DialogTitle({
@@ -120,7 +128,7 @@ function DialogTitle({
       className={cn("text-lg leading-none font-semibold", className)}
       {...props}
     />
-  )
+  );
 }
 
 function DialogDescription({
@@ -133,7 +141,7 @@ function DialogDescription({
       className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -147,4 +155,4 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-}
+};

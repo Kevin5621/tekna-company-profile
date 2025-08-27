@@ -1,13 +1,15 @@
-import CareerPositionClient from "./career-position-client"
+import CareerPositionClient from "./career-position-client";
 
 interface CareerPositionPageProps {
   params: Promise<{
-    slug: string
-  }>
+    slug: string;
+  }>;
 }
 
-export default async function CareerPositionPage({ params }: CareerPositionPageProps) {
-  const { slug } = await params
-  
-  return <CareerPositionClient slug={slug} />
+export default async function CareerPositionPage({
+  params,
+}: CareerPositionPageProps) {
+  const { slug } = await params;
+
+  return <CareerPositionClient slug={slug} />;
 }

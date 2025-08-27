@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import Image from 'next/image';
-import { uploadFile } from '@/lib/utils/upload';
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
+import { uploadFile } from "@/lib/utils/upload";
 
 interface ImageUploadProps {
   readonly value?: string;
@@ -25,12 +25,18 @@ export function ImageUpload({
   value,
   onChange,
   onRemove,
-  bucket = 'media',
-  path = 'partners',
+  bucket = "media",
+  path = "partners",
   maxSize = 5 * 1024 * 1024, // 5MB
-  allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'],
-  placeholder = 'Upload an image',
-  className = ''
+  allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/svg+xml",
+  ],
+  placeholder = "Upload an image",
+  className = "",
 }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -47,17 +53,17 @@ export function ImageUpload({
         path,
         file,
         maxSize,
-        allowedTypes
+        allowedTypes,
       });
 
       if (result.success && result.url) {
         onChange(result.url);
       } else {
-        alert(result.error || 'Failed to upload image');
+        alert(result.error || "Failed to upload image");
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      alert('Failed to upload image');
+      console.error("Upload error:", error);
+      alert("Failed to upload image");
     } finally {
       setUploading(false);
     }
@@ -73,7 +79,7 @@ export function ImageUpload({
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
-    
+
     const file = e.dataTransfer.files[0];
     if (file) {
       handleFileSelect(file);
@@ -94,10 +100,10 @@ export function ImageUpload({
     if (onRemove) {
       onRemove();
     } else {
-      onChange('');
+      onChange("");
     }
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -108,7 +114,7 @@ export function ImageUpload({
   return (
     <div className={`space-y-4 ${className}`}>
       <Label>Logo Image</Label>
-      
+
       {value ? (
         <Card>
           <CardContent className="p-4">
@@ -145,7 +151,7 @@ export function ImageUpload({
                 disabled={uploading}
               >
                 <Upload className="w-4 h-4 mr-2" />
-                {uploading ? 'Uploading...' : 'Replace Image'}
+                {uploading ? "Uploading..." : "Replace Image"}
               </Button>
             </div>
           </CardContent>
@@ -153,7 +159,9 @@ export function ImageUpload({
       ) : (
         <Card
           className={`border-2 border-dashed transition-colors cursor-pointer ${
-            dragOver ? 'border-primary bg-primary/5' : 'border-gray-300 hover:border-gray-400'
+            dragOver
+              ? "border-primary bg-primary/5"
+              : "border-gray-300 hover:border-gray-400"
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -165,13 +173,14 @@ export function ImageUpload({
               <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <div className="space-y-2">
                 <p className="text-lg font-medium text-gray-700">
-                  {uploading ? 'Uploading...' : placeholder}
+                  {uploading ? "Uploading..." : placeholder}
                 </p>
                 <p className="text-sm text-gray-500">
                   Drag and drop an image here, or click to select
                 </p>
                 <p className="text-xs text-gray-400">
-                  Supported formats: JPG, PNG, WebP, SVG (max {Math.round(maxSize / 1024 / 1024)}MB)
+                  Supported formats: JPG, PNG, WebP, SVG (max{" "}
+                  {Math.round(maxSize / 1024 / 1024)}MB)
                 </p>
               </div>
               {!uploading && (
@@ -193,7 +202,7 @@ export function ImageUpload({
       <Input
         ref={fileInputRef}
         type="file"
-        accept={allowedTypes.join(',')}
+        accept={allowedTypes.join(",")}
         onChange={handleInputChange}
         className="hidden"
         disabled={uploading}

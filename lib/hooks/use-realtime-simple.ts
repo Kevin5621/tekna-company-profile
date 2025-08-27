@@ -1,21 +1,25 @@
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export function useRealtimeCategories(onDataChange?: () => void) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     const channel = supabase
-      .channel('categories-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => {
-        if (onDataChange) {
-          onDataChange();
+      .channel("categories-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "categories" },
+        () => {
+          if (onDataChange) {
+            onDataChange();
+          }
         }
-      })
+      )
       .subscribe((status) => {
-        setIsConnected(status === 'SUBSCRIBED');
+        setIsConnected(status === "SUBSCRIBED");
       });
 
     return () => {
@@ -31,16 +35,20 @@ export function useRealtimeAuthors(onDataChange?: () => void) {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     const channel = supabase
-      .channel('authors-changes')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
-        if (onDataChange) {
-          onDataChange();
+      .channel("authors-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        () => {
+          if (onDataChange) {
+            onDataChange();
+          }
         }
-      })
+      )
       .subscribe((status) => {
-        setIsConnected(status === 'SUBSCRIBED');
+        setIsConnected(status === "SUBSCRIBED");
       });
 
     return () => {
@@ -56,16 +64,20 @@ export function useRealtimeBlogPosts(onDataChange?: () => void) {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     const channel = supabase
-      .channel('posts-changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
-        if (onDataChange) {
-          onDataChange();
+      .channel("posts-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "posts" },
+        () => {
+          if (onDataChange) {
+            onDataChange();
+          }
         }
-      })
+      )
       .subscribe((status) => {
-        setIsConnected(status === 'SUBSCRIBED');
+        setIsConnected(status === "SUBSCRIBED");
       });
 
     return () => {

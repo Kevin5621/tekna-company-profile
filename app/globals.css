@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --radius: 0.5rem;
-    
+
     /* Variable font settings */
     --font-inter: "Inter", system-ui, sans-serif;
     --background: 0 0% 100%;
@@ -14,11 +14,11 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    
+
     /* Primary color updated */
     --primary: 182 97% 37%;
     --primary-foreground: 0 0% 100%; /* putih untuk kontras */
-    
+
     --secondary: 182 20% 94%; /* soft teal tint */
     --secondary-foreground: 240 10% 3.9%;
     --accent: 46 15% 95.33%;
@@ -30,7 +30,7 @@
     --border: 182 10% 90%;
     --input: 182 10% 90%;
     --ring: 182 97% 37%;
-    
+
     /* Additional semantic colors */
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
@@ -38,17 +38,17 @@
     --warning-foreground: 0 0% 98%;
     --info: 199 89% 48%;
     --info-foreground: 0 0% 98%;
-    
+
     /* Sidebar variables */
-  --sidebar: 240 5.9% 10%;
-  --sidebar-foreground: 240 4.8% 95.9%;
-  /* Use primary as the sidebar's accent / interactive color so hover and icons follow primary */
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--primary);
-  --sidebar-accent-foreground: var(--primary-foreground);
-  --sidebar-border: 182 25% 20%;
-  --sidebar-ring: var(--primary);
+    --sidebar: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    /* Use primary as the sidebar's accent / interactive color so hover and icons follow primary */
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--primary);
+    --sidebar-accent-foreground: var(--primary-foreground);
+    --sidebar-border: 182 25% 20%;
+    --sidebar-ring: var(--primary);
   }
 
   .dark {
@@ -58,11 +58,11 @@
     --card-foreground: 0 0% 98%;
     --popover: 182 15% 12%;
     --popover-foreground: 0 0% 98%;
-    
+
     /* Primary dark */
     --primary: 182 97% 40%;
     --primary-foreground: 0 0% 100%;
-    
+
     --secondary: 182 30% 18%;
     --secondary-foreground: 0 0% 98%;
     --accent: 182 25% 20%;
@@ -74,7 +74,7 @@
     --border: 182 20% 25%;
     --input: 182 20% 25%;
     --ring: 182 97% 40%;
-    
+
     /* Additional semantic colors - dark mode */
     --success: 142 76% 40%;
     --success-foreground: 0 0% 98%;
@@ -82,17 +82,17 @@
     --warning-foreground: 0 0% 98%;
     --info: 199 89% 55%;
     --info-foreground: 0 0% 98%;
-    
+
     /* Dark sidebar */
-  --sidebar: 182 20% 12%;
-  --sidebar-foreground: 0 0% 98%;
-  /* Keep primary mapping consistent in dark mode */
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--primary);
-  --sidebar-accent-foreground: var(--primary-foreground);
-  --sidebar-border: 182 25% 20%;
-  --sidebar-ring: var(--primary);
+    --sidebar: 182 20% 12%;
+    --sidebar-foreground: 0 0% 98%;
+    /* Keep primary mapping consistent in dark mode */
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--primary);
+    --sidebar-accent-foreground: var(--primary-foreground);
+    --sidebar-border: 182 25% 20%;
+    --sidebar-ring: var(--primary);
   }
 
   * {
@@ -118,7 +118,7 @@
     fill: hsl(var(--sidebar-accent));
     stroke: hsl(var(--sidebar-accent));
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -130,7 +130,7 @@
     font-family: var(--font-inter), "Inter", system-ui, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
-  
+
   .font-var {
     font-family: var(--font-inter), "Inter", system-ui, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -145,7 +145,7 @@
     margin: 0 auto;
     width: 100%;
   }
-  
+
   /* Responsive layout */
   @media (max-width: 1024px) {
     .dashboard-content {
@@ -258,7 +258,7 @@
       margin-top: 0;
       margin-bottom: 0;
     }
-    
+
     .dashboard-content-wrapper {
       padding-left: 2rem;
       padding-right: 2rem;
@@ -280,7 +280,7 @@
       margin-top: 0;
       margin-bottom: 0;
     }
-    
+
     .dashboard-content-wrapper {
       padding-left: 1rem;
       padding-right: 1rem;
@@ -288,7 +288,7 @@
       width: 100%;
       margin: 0 auto;
     }
-    
+
     .dashboard-scroll-container {
       -webkit-overflow-scrolling: touch;
     }

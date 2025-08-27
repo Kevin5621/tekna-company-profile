@@ -1,9 +1,9 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef, useCallback } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Register ScrollTrigger plugin
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
@@ -45,7 +45,7 @@ export function useScrollAnimation(config?: ScrollAnimationConfig) {
 
       // Clear previous timeout
       clearTimeout(scrollTimeout);
-      
+
       // Set new timeout for scroll end detection
       scrollTimeout = setTimeout(() => {
         handleScrollEnd();
@@ -53,11 +53,13 @@ export function useScrollAnimation(config?: ScrollAnimationConfig) {
     };
 
     // Add scroll listener
-    window.addEventListener('scroll', throttledScrollHandler, { passive: true });
+    window.addEventListener("scroll", throttledScrollHandler, {
+      passive: true,
+    });
 
     // Cleanup
     return () => {
-      window.removeEventListener('scroll', throttledScrollHandler);
+      window.removeEventListener("scroll", throttledScrollHandler);
       clearTimeout(scrollTimeout);
     };
   }, [handleScroll, handleScrollEnd]);
@@ -67,5 +69,3 @@ export function useScrollAnimation(config?: ScrollAnimationConfig) {
     isScrolling: isScrolling.current,
   };
 }
-
-

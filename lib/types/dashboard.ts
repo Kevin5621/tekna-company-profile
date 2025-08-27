@@ -1,8 +1,12 @@
 // Types for dashboard data based on Supabase schema
-import { ComponentType } from 'react';
+import { ComponentType } from "react";
 
-export type ProjectStatus = 'planning' | 'in-progress' | 'completed' | 'on-hold';
-export type PostStatus = 'draft' | 'published' | 'archived';
+export type ProjectStatus =
+  | "planning"
+  | "in-progress"
+  | "completed"
+  | "on-hold";
+export type PostStatus = "draft" | "published" | "archived";
 
 export interface DashboardStats {
   title: string;
@@ -10,7 +14,7 @@ export interface DashboardStats {
   description: string;
   icon?: ComponentType<{ className?: string }>; // Icon component (optional, will be added in dashboard page)
   change: string;
-  changeType: 'positive' | 'negative' | 'default';
+  changeType: "positive" | "negative" | "default";
 }
 
 export interface Project {

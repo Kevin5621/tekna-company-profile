@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useParams } from 'next/navigation';
-import { Suspense } from 'react';
-import PartnerForm from '../../partner-form';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useParams } from "next/navigation";
+import { Suspense } from "react";
+import PartnerForm from "../../partner-form";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EditPartnerPage() {
   const params = useParams();

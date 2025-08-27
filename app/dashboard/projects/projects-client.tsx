@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -7,10 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { IconFolder, IconPlus, IconSearch, IconFilter, IconEdit, IconTrash, IconLoader2 } from "@tabler/icons-react";
+import {
+  IconFolder,
+  IconPlus,
+  IconSearch,
+  IconFilter,
+  IconEdit,
+  IconTrash,
+  IconLoader2,
+} from "@tabler/icons-react";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
-import { useToast } from '@/hooks/use-toast'
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import { useToast } from "@/hooks/use-toast";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 
 interface Project {
   id: string;
@@ -25,33 +33,35 @@ interface ProjectsPageProps {
   initialProjects: Project[];
 }
 
-export default function ProjectsPageClient({ initialProjects }: Readonly<ProjectsPageProps>) {
+export default function ProjectsPageClient({
+  initialProjects,
+}: Readonly<ProjectsPageProps>) {
   const router = useRouter();
   const [projects, setProjects] = useState<Project[]>(initialProjects);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const handleDelete = async (projectId: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus proyek ini?')) {
+    if (!confirm("Apakah Anda yakin ingin menghapus proyek ini?")) {
       return;
     }
 
     setDeletingId(projectId);
     try {
       await ClientDashboardService.deleteProject(projectId);
-      setProjects(prev => prev.filter(p => p.id !== projectId));
+      setProjects((prev) => prev.filter((p) => p.id !== projectId));
       toast({
         title: "Project Deleted!",
         description: "Project has been deleted successfully.",
         variant: "success",
-      })
+      });
     } catch (error) {
-      console.error('Error deleting project:', error);
+      console.error("Error deleting project:", error);
       toast({
         title: "Delete Failed",
         description: "Gagal menghapus proyek",
         variant: "destructive",
-      })
+      });
     } finally {
       setDeletingId(null);
     }
@@ -62,7 +72,7 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
   };
 
   const handleAddNew = () => {
-    router.push('/dashboard/projects/new');
+    router.push("/dashboard/projects/new");
   };
 
   return (
@@ -71,10 +81,10 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
         <div className="flex flex-1 flex-col gap-4 py-4 md:gap-6 md:py-6">
           {/* Breadcrumbs */}
           <div>
-            <DashboardBreadcrumb 
+            <DashboardBreadcrumb
               items={[
                 { label: "Proyek", href: "/dashboard/projects" },
-                { label: "Daftar Proyek", isCurrentPage: true }
+                { label: "Daftar Proyek", isCurrentPage: true },
               ]}
             />
           </div>
@@ -82,7 +92,9 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
           {/* Header */}
           <div>
             <div className="flex flex-col gap-2">
-              <h1 className="text-3xl font-bold tracking-tight">Kelola Proyek</h1>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Kelola Proyek
+              </h1>
               <p className="text-muted-foreground">
                 Kelola semua proyek perusahaan dalam satu tempat
               </p>
@@ -95,10 +107,7 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
               <div className="flex gap-2 w-full sm:w-auto">
                 <div className="relative w-full sm:w-80">
                   <IconSearch className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Cari proyek..."
-                    className="pl-8"
-                  />
+                  <Input placeholder="Cari proyek..." className="pl-8" />
                 </div>
                 <Button variant="outline" size="icon">
                   <IconFilter className="h-4 w-4" />
@@ -116,7 +125,10 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
             {projects.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {projects.map((project) => (
-                  <Card key={project.id} className="hover:shadow-lg transition-shadow">
+                  <Card
+                    key={project.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
                     {/* Project Image */}
                     {project.featured_image_url && (
                       <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
@@ -128,19 +140,21 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
                           onError={(e) => {
                             // Hide image on error
                             const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
+                            target.style.display = "none";
                           }}
                         />
                       </div>
                     )}
-                    
+
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-2">
                           {!project.featured_image_url && (
                             <IconFolder className="h-5 w-5 text-muted-foreground" />
                           )}
-                          <CardTitle className="text-lg">{project.name}</CardTitle>
+                          <CardTitle className="text-lg">
+                            {project.name}
+                          </CardTitle>
                         </div>
                         <div className="flex gap-2">
                           {project.is_featured && (
@@ -159,18 +173,18 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
                           </p>
                         )}
                         <div className="flex gap-2 pt-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            variant="outline"
+                            size="sm"
                             className="flex-1"
                             onClick={() => handleEdit(project.id)}
                           >
                             <IconEdit className="h-4 w-4 mr-1" />
                             Edit
                           </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
+                          <Button
+                            variant="outline"
+                            size="sm"
                             className="flex-1"
                             onClick={() => handleDelete(project.id)}
                             disabled={deletingId === project.id}
@@ -192,7 +206,9 @@ export default function ProjectsPageClient({ initialProjects }: Readonly<Project
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <IconFolder className="h-12 w-12 mx-auto mb-4 opacity-50 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">Belum ada proyek</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Belum ada proyek
+                  </h3>
                   <p className="text-muted-foreground text-center mb-4">
                     Mulai dengan menambahkan proyek pertama Anda
                   </p>

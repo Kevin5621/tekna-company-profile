@@ -1,15 +1,15 @@
-import { AuthorForm } from '@/components/author-form';
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
-import BackButton from '@/components/ui/back-button';
+import { AuthorForm } from "@/components/author-form";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import BackButton from "@/components/ui/back-button";
 
 export default function NewAuthorPage() {
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Penulis", href: "/dashboard/authors" },
-          { label: "Tambah Penulis Baru", isCurrentPage: true }
+          { label: "Tambah Penulis Baru", isCurrentPage: true },
         ]}
       />
 

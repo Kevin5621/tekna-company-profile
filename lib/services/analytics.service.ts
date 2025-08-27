@@ -33,19 +33,21 @@ export interface ChartDataItem {
 export class AnalyticsService {
   /**
    * Get analytics data for chart (currently using mock data for cost optimization)
-   * 
+   *
    * NOTE: Database queries are commented out to reduce costs
    * Uncomment the code below when you want to enable real analytics tracking
    */
   static async getChartData(days: number = 30): Promise<ChartDataItem[]> {
     // NOTE: Database tracking is currently disabled for cost optimization
     // Return mock data instead of querying database
-    
-    console.log(`📊 [AnalyticsService] Using mock data for ${days} days (database tracking disabled)`);
-    
+
+    console.log(
+      `📊 [AnalyticsService] Using mock data for ${days} days (database tracking disabled)`
+    );
+
     // Return mock data for now
     return this.getFallbackChartData(days);
-    
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     
@@ -163,77 +165,79 @@ export class AnalyticsService {
   private static getFallbackChartData(days: number): ChartDataItem[] {
     const data = [];
     const today = new Date();
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
-      const dateKey = date.toISOString().split('T')[0];
-      
+      const dateKey = date.toISOString().split("T")[0];
+
       // Generate some realistic-looking fallback data
       const baseWebsiteViews = 50 + Math.floor(Math.random() * 100);
       const baseBlogViews = 20 + Math.floor(Math.random() * 50);
       const baseCareerViews = 10 + Math.floor(Math.random() * 30);
       const baseCareerApplications = 2 + Math.floor(Math.random() * 8);
-      
+
       data.push({
         date: dateKey,
         website_views: baseWebsiteViews,
         blog_views: baseBlogViews,
         career_applications: baseCareerApplications,
-        career_views: baseCareerViews
+        career_views: baseCareerViews,
       });
     }
-    
+
     return data;
   }
 
   /**
    * Get analytics overview (currently using mock data for cost optimization)
-   * 
+   *
    * NOTE: Database queries are commented out to reduce costs
    * Uncomment the code below when you want to enable real analytics tracking
    */
   static async getAnalyticsOverview() {
     // NOTE: Database tracking is currently disabled for cost optimization
     // Return mock data instead of querying database
-    
-    console.log('📊 [AnalyticsService] Using mock overview data (database tracking disabled)');
-    
+
+    console.log(
+      "📊 [AnalyticsService] Using mock overview data (database tracking disabled)"
+    );
+
     // Return mock data for now
     return {
-      today: { 
-        page_views: 150, 
-        sessions: 45, 
-        unique_visitors: 38, 
-        bounce_rate: 25.5, 
-        avg_session_duration: 180 
+      today: {
+        page_views: 150,
+        sessions: 45,
+        unique_visitors: 38,
+        bounce_rate: 25.5,
+        avg_session_duration: 180,
       },
-      yesterday: { 
-        page_views: 120, 
-        sessions: 32, 
-        unique_visitors: 28 
+      yesterday: {
+        page_views: 120,
+        sessions: 32,
+        unique_visitors: 28,
       },
       weekly_total: 850,
       monthly_total: 3200,
       top_pages: [
-        { page_path: '/', page_title: 'Home', views: 45 },
-        { page_path: '/blog', page_title: 'Blog', views: 28 },
-        { page_path: '/career', page_title: 'Career', views: 22 },
-        { page_path: '/about', page_title: 'About', views: 18 },
-        { page_path: '/contact', page_title: 'Contact', views: 15 }
+        { page_path: "/", page_title: "Home", views: 45 },
+        { page_path: "/blog", page_title: "Blog", views: 28 },
+        { page_path: "/career", page_title: "Career", views: 22 },
+        { page_path: "/about", page_title: "About", views: 18 },
+        { page_path: "/contact", page_title: "Contact", views: 15 },
       ],
       top_referrers: [
-        { referrer: 'google.com', count: 25 },
-        { referrer: 'facebook.com', count: 18 },
-        { referrer: 'linkedin.com', count: 12 }
+        { referrer: "google.com", count: 25 },
+        { referrer: "facebook.com", count: 18 },
+        { referrer: "linkedin.com", count: 12 },
       ],
       device_breakdown: [
-        { device_type: 'desktop', count: 65 },
-        { device_type: 'mobile', count: 28 },
-        { device_type: 'tablet', count: 7 }
-      ]
+        { device_type: "desktop", count: 65 },
+        { device_type: "mobile", count: 28 },
+        { device_type: "tablet", count: 7 },
+      ],
     };
-    
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     
@@ -345,14 +349,16 @@ export class AnalyticsService {
 
   /**
    * Record a page view (for client-side tracking)
-   * 
+   *
    * NOTE: Currently disabled for cost optimization
    */
   static async recordPageView() {
     // NOTE: Database tracking is currently disabled for cost optimization
-    console.log('📊 [AnalyticsService] Page view tracking disabled (mock mode)');
-    return { id: 'mock-page-view-id' };
-    
+    console.log(
+      "📊 [AnalyticsService] Page view tracking disabled (mock mode)"
+    );
+    return { id: "mock-page-view-id" };
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     
@@ -381,14 +387,14 @@ export class AnalyticsService {
 
   /**
    * Create or update session (for client-side tracking)
-   * 
+   *
    * NOTE: Currently disabled for cost optimization
    */
   static async createOrUpdateSession() {
     // NOTE: Database tracking is currently disabled for cost optimization
-    console.log('📊 [AnalyticsService] Session tracking disabled (mock mode)');
-    return { id: 'mock-session-id' };
-    
+    console.log("📊 [AnalyticsService] Session tracking disabled (mock mode)");
+    return { id: "mock-session-id" };
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     
@@ -421,14 +427,14 @@ export class AnalyticsService {
 
   /**
    * End session (for client-side tracking)
-   * 
+   *
    * NOTE: Currently disabled for cost optimization
    */
   static async endSession() {
     // NOTE: Database tracking is currently disabled for cost optimization
-    console.log('📊 [AnalyticsService] Session ending disabled (mock mode)');
+    console.log("📊 [AnalyticsService] Session ending disabled (mock mode)");
     return true;
-    
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     

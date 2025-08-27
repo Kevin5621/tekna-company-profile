@@ -33,14 +33,16 @@ export interface ChartDataItem {
 export class AnalyticsClientService {
   /**
    * Record a page view (for client-side tracking)
-   * 
+   *
    * NOTE: Currently disabled for cost optimization
    */
   static async recordPageView() {
     // NOTE: Database tracking is currently disabled for cost optimization
-    console.log('📊 [AnalyticsClientService] Page view tracking disabled (mock mode)');
-    return { id: 'mock-page-view-id' };
-    
+    console.log(
+      "📊 [AnalyticsClientService] Page view tracking disabled (mock mode)"
+    );
+    return { id: "mock-page-view-id" };
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     
@@ -69,14 +71,16 @@ export class AnalyticsClientService {
 
   /**
    * Create or update session (for client-side tracking)
-   * 
+   *
    * NOTE: Currently disabled for cost optimization
    */
   static async createOrUpdateSession() {
     // NOTE: Database tracking is currently disabled for cost optimization
-    console.log('📊 [AnalyticsClientService] Session tracking disabled (mock mode)');
-    return { id: 'mock-session-id' };
-    
+    console.log(
+      "📊 [AnalyticsClientService] Session tracking disabled (mock mode)"
+    );
+    return { id: "mock-session-id" };
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     
@@ -109,14 +113,16 @@ export class AnalyticsClientService {
 
   /**
    * End session (for client-side tracking)
-   * 
+   *
    * NOTE: Currently disabled for cost optimization
    */
   static async endSession() {
     // NOTE: Database tracking is currently disabled for cost optimization
-    console.log('📊 [AnalyticsClientService] Session ending disabled (mock mode)');
+    console.log(
+      "📊 [AnalyticsClientService] Session ending disabled (mock mode)"
+    );
     return true;
-    
+
     /*
     // UNCOMMENT BELOW WHEN READY TO ENABLE REAL ANALYTICS
     

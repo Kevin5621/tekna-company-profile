@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { 
-  IconChevronLeft, 
-  IconChevronRight, 
+import { Button } from "@/components/ui/button";
+import {
+  IconChevronLeft,
+  IconChevronRight,
   IconDots,
   IconChevronsLeft,
-  IconChevronsRight 
-} from '@tabler/icons-react';
+  IconChevronsRight,
+} from "@tabler/icons-react";
 
 interface PaginationProps {
   currentPage: number;
@@ -18,49 +18,49 @@ interface PaginationProps {
   maxVisiblePages?: number;
 }
 
-export function Pagination({ 
-  currentPage, 
-  totalPages, 
-  onPageChange, 
+export function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
   isLoading = false,
   showFirstLast = true,
-  maxVisiblePages = 5 
+  maxVisiblePages = 5,
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const getVisiblePages = () => {
     const pages = [];
     const half = Math.floor(maxVisiblePages / 2);
-    
+
     let start = Math.max(1, currentPage - half);
     const end = Math.min(totalPages, start + maxVisiblePages - 1);
-    
+
     // Adjust start if we're near the end
     if (end - start + 1 < maxVisiblePages) {
       start = Math.max(1, end - maxVisiblePages + 1);
     }
-    
+
     // Add ellipsis and first page if needed
     if (start > 1) {
       pages.push(1);
       if (start > 2) {
-        pages.push('ellipsis-start');
+        pages.push("ellipsis-start");
       }
     }
-    
+
     // Add visible pages
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
-    
+
     // Add ellipsis and last page if needed
     if (end < totalPages) {
       if (end < totalPages - 1) {
-        pages.push('ellipsis-end');
+        pages.push("ellipsis-end");
       }
       pages.push(totalPages);
     }
-    
+
     return pages;
   };
 
@@ -73,7 +73,11 @@ export function Pagination({
   };
 
   return (
-    <nav className="flex items-center justify-center space-x-1" role="navigation" aria-label="Pagination">
+    <nav
+      className="flex items-center justify-center space-x-1"
+      role="navigation"
+      aria-label="Pagination"
+    >
       {/* First Page Button */}
       {showFirstLast && currentPage > 1 && (
         <Button
@@ -103,7 +107,7 @@ export function Pagination({
       {/* Page Numbers */}
       <div className="flex items-center space-x-1">
         {visiblePages.map((page, index) => {
-          if (page === 'ellipsis-start' || page === 'ellipsis-end') {
+          if (page === "ellipsis-start" || page === "ellipsis-end") {
             return (
               <div key={`ellipsis-${index}`} className="px-3 py-2">
                 <IconDots className="h-4 w-4 text-muted-foreground" />
@@ -121,7 +125,11 @@ export function Pagination({
               size="sm"
               onClick={() => handlePageClick(pageNum)}
               disabled={isLoading}
-              aria-label={isCurrentPage ? `Current page ${pageNum}` : `Go to page ${pageNum}`}
+              aria-label={
+                isCurrentPage
+                  ? `Current page ${pageNum}`
+                  : `Go to page ${pageNum}`
+              }
               aria-current={isCurrentPage ? "page" : undefined}
               className="min-w-[40px]"
             >
@@ -166,25 +174,22 @@ interface PaginationInfoProps {
   readonly itemsPerPage: number;
 }
 
-export function PaginationInfo({ 
-  currentPage, 
-  totalItems, 
-  itemsPerPage 
+export function PaginationInfo({
+  currentPage,
+  totalItems,
+  itemsPerPage,
 }: PaginationInfoProps) {
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   if (totalItems === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        No articles found
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground">No articles found</p>;
   }
 
   return (
     <p className="text-sm text-muted-foreground">
-      Showing {startItem.toLocaleString()} to {endItem.toLocaleString()} of {totalItems.toLocaleString()} articles
+      Showing {startItem.toLocaleString()} to {endItem.toLocaleString()} of{" "}
+      {totalItems.toLocaleString()} articles
     </p>
   );
 }

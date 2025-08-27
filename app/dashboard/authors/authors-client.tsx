@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ClientDashboardService } from '@/lib/services/client-dashboard.service';
-import { useRealtimeAuthors } from '@/lib/hooks/use-realtime-simple';
-import { IconPlus, IconEdit, IconTrash, IconMail } from '@tabler/icons-react';
-import { useToast } from '@/hooks/use-toast'
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
+import { useRealtimeAuthors } from "@/lib/hooks/use-realtime-simple";
+import { IconPlus, IconEdit, IconTrash, IconMail } from "@tabler/icons-react";
+import { useToast } from "@/hooks/use-toast";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 
 interface Author {
   id: string;
@@ -32,7 +32,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
   const router = useRouter();
   const [authors, setAuthors] = useState<Author[]>(initialAuthors);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   // Real-time sync for authors
   useRealtimeAuthors(() => {
@@ -42,7 +42,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
         const updatedAuthors = await ClientDashboardService.getAuthors();
         setAuthors(updatedAuthors);
       } catch (error) {
-        console.error('Error refreshing authors:', error);
+        console.error("Error refreshing authors:", error);
       }
     };
     refreshAuthors();
@@ -56,19 +56,20 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
     setIsLoading(true);
     try {
       await ClientDashboardService.deleteAuthor(authorId);
-      setAuthors(prev => prev.filter(author => author.id !== authorId));
+      setAuthors((prev) => prev.filter((author) => author.id !== authorId));
       toast({
         title: "Author Deleted!",
         description: "Author has been deleted successfully.",
         variant: "success",
-      })
+      });
     } catch (error) {
-      console.error('Error deleting author:', error);
+      console.error("Error deleting author:", error);
       toast({
         title: "Delete Failed",
-        description: error instanceof Error ? error.message : 'Failed to delete author',
+        description:
+          error instanceof Error ? error.message : "Failed to delete author",
         variant: "destructive",
-      })
+      });
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +80,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
   };
 
   const handleAddNew = () => {
-    router.push('/dashboard/authors/new');
+    router.push("/dashboard/authors/new");
   };
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -89,10 +90,10 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Penulis", href: "/dashboard/authors" },
-          { label: "Daftar Penulis", isCurrentPage: true }
+          { label: "Daftar Penulis", isCurrentPage: true },
         ]}
       />
 
@@ -148,7 +149,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent className="flex-1 flex flex-col">
                 <div className="flex-1 space-y-3">
                   {/* Contact Info */}
@@ -162,7 +163,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
                   {/* Status & Order */}
                   <div className="flex items-center justify-between">
                     <Badge variant={author.is_active ? "default" : "secondary"}>
-                      {author.is_active ? 'Aktif' : 'Tidak Aktif'}
+                      {author.is_active ? "Aktif" : "Tidak Aktif"}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       Order: {author.sort_order}
@@ -184,7 +185,12 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleDelete(author.id, `${author.first_name} ${author.last_name}`)}
+                    onClick={() =>
+                      handleDelete(
+                        author.id,
+                        `${author.first_name} ${author.last_name}`
+                      )
+                    }
                     disabled={isLoading}
                     className="flex-1"
                   >

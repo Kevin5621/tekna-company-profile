@@ -1,9 +1,14 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import Link from 'next/link';
+import { useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { AlertTriangle, Home, RefreshCw, ArrowLeft } from "lucide-react";
 
 interface ErrorPageProps {
@@ -23,11 +28,11 @@ export function ErrorPage({
   description = "Maaf, terjadi kesalahan yang tidak terduga. Silakan coba lagi atau kembali ke halaman sebelumnya.",
   showBackButton = true,
   backButtonText = "Kembali",
-  backButtonHref
+  backButtonHref,
 }: ErrorPageProps) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Route error:', error);
+    console.error("Route error:", error);
   }, [error]);
 
   const handleBack = () => {
@@ -61,7 +66,7 @@ export function ErrorPage({
             </div>
 
             {/* Error Details (Development only) */}
-            {process.env.NODE_ENV === 'development' && (
+            {process.env.NODE_ENV === "development" && (
               <div className="mb-6 p-3 bg-muted rounded-lg text-left">
                 <p className="text-xs font-mono text-muted-foreground break-all">
                   {error.message}
@@ -76,19 +81,19 @@ export function ErrorPage({
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-              <Button 
-                onClick={reset} 
-                size="default" 
+              <Button
+                onClick={reset}
+                size="default"
                 className="w-full sm:w-auto"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Coba Lagi
               </Button>
-              
+
               {showBackButton && (
-                <Button 
-                  variant="outline" 
-                  size="default" 
+                <Button
+                  variant="outline"
+                  size="default"
                   onClick={handleBack}
                   className="w-full sm:w-auto"
                 >
@@ -97,9 +102,9 @@ export function ErrorPage({
                 </Button>
               )}
 
-              <Button 
-                variant="ghost" 
-                size="default" 
+              <Button
+                variant="ghost"
+                size="default"
                 asChild
                 className="w-full sm:w-auto"
               >
@@ -116,9 +121,11 @@ export function ErrorPage({
   );
 }
 
-export default function RouteError(props: Omit<ErrorPageProps, 'title' | 'description'>) {
+export default function RouteError(
+  props: Omit<ErrorPageProps, "title" | "description">
+) {
   return (
-    <ErrorPage 
+    <ErrorPage
       {...props}
       title="Terjadi Kesalahan"
       description="Maaf, terjadi kesalahan pada halaman ini. Silakan coba lagi atau kembali ke halaman sebelumnya."

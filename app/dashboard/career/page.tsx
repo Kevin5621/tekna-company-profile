@@ -1,35 +1,47 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import Link from 'next/link'
-import { 
-  Briefcase, 
-  Plus, 
-  Search, 
-  Star, 
-  Clock, 
-  Users, 
-  Eye, 
-  Edit, 
-  Trash2, 
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import Link from "next/link";
+import {
+  Briefcase,
+  Plus,
+  Search,
+  Star,
+  Clock,
+  Users,
+  Eye,
+  Edit,
+  Trash2,
   MoreHorizontal,
   MapPin,
   Settings,
   TrendingUp,
   FileText,
-} from 'lucide-react'
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -37,88 +49,96 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 
-import { 
-  CareerService, 
-  CareerPosition, 
-  CareerCategory
-} from '@/lib/services/career'
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import {
+  CareerService,
+  CareerPosition,
+  CareerCategory,
+} from "@/lib/services/career";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 
 export default function CareerManagementPage() {
-  const [positions, setPositions] = useState<CareerPosition[]>([])
-  const [categories, setCategories] = useState<CareerCategory[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
-  const [filterCategory, setFilterCategory] = useState('all')
+  const [positions, setPositions] = useState<CareerPosition[]>([]);
+  const [categories, setCategories] = useState<CareerCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
 
-  const careerService = useMemo(() => new CareerService(), [])
+  const careerService = useMemo(() => new CareerService(), []);
 
   const loadData = useCallback(async () => {
     try {
-      setLoading(true)
-      const [
-        positionsData, 
-        categoriesData
-      ] = await Promise.all([
+      setLoading(true);
+      const [positionsData, categoriesData] = await Promise.all([
         careerService.getAllPositions(),
-        careerService.getAllCategories()
-      ])
+        careerService.getAllCategories(),
+      ]);
 
-      setPositions(positionsData)
-      setCategories(categoriesData)
+      setPositions(positionsData);
+      setCategories(categoriesData);
     } catch (error) {
-      console.error('Failed to load career data:', error)
+      console.error("Failed to load career data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [careerService])
+  }, [careerService]);
 
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    loadData();
+  }, [loadData]);
 
   const stats = useMemo(() => {
     return {
       totalPositions: positions.length,
-      openPositions: positions.filter(p => p.status === 'open').length,
-      totalApplications: positions.reduce((sum, p) => sum + p.applications_count, 0),
-      featuredPositions: positions.filter(p => p.featured).length
-    }
-  }, [positions])
+      openPositions: positions.filter((p) => p.status === "open").length,
+      totalApplications: positions.reduce(
+        (sum, p) => sum + p.applications_count,
+        0
+      ),
+      featuredPositions: positions.filter((p) => p.featured).length,
+    };
+  }, [positions]);
 
   const filteredPositions = useMemo(() => {
     return positions.filter((position) => {
-      const matchesSearch = position.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           position.description.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesStatus = filterStatus === 'all' || position.status === filterStatus
-      const matchesCategory = filterCategory === 'all' || position.category_id === filterCategory
-      
-      return matchesSearch && matchesStatus && matchesCategory
-    })
-  }, [positions, searchQuery, filterStatus, filterCategory])
+      const matchesSearch =
+        position.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        position.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        filterStatus === "all" || position.status === filterStatus;
+      const matchesCategory =
+        filterCategory === "all" || position.category_id === filterCategory;
 
-  const handleToggleFeatured = async (positionId: string, currentFeatured: boolean) => {
+      return matchesSearch && matchesStatus && matchesCategory;
+    });
+  }, [positions, searchQuery, filterStatus, filterCategory]);
+
+  const handleToggleFeatured = async (
+    positionId: string,
+    currentFeatured: boolean
+  ) => {
     try {
-      await careerService.updatePosition(positionId, { featured: !currentFeatured })
-      await loadData()
+      await careerService.updatePosition(positionId, {
+        featured: !currentFeatured,
+      });
+      await loadData();
     } catch (error) {
-      console.error('Failed to toggle featured status:', error)
+      console.error("Failed to toggle featured status:", error);
     }
-  }
+  };
 
   const handleDeletePosition = async (positionId: string) => {
-    if (confirm('Are you sure you want to delete this position?')) {
+    if (confirm("Are you sure you want to delete this position?")) {
       try {
-        await careerService.deletePosition(positionId)
-        await loadData()
+        await careerService.deletePosition(positionId);
+        await loadData();
       } catch (error) {
-        console.error('Failed to delete position:', error)
+        console.error("Failed to delete position:", error);
       }
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -133,23 +153,25 @@ export default function CareerManagementPage() {
           <div className="h-96 bg-gray-200 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Karir", href: "/dashboard/career" },
-          { label: "Manajemen Karir", isCurrentPage: true }
+          { label: "Manajemen Karir", isCurrentPage: true },
         ]}
       />
 
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Career Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Career Management
+          </h1>
           <p className="text-muted-foreground">
             Manage job positions, categories, and applications
           </p>
@@ -174,20 +196,22 @@ export default function CareerManagementPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Positions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Positions
+            </CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalPositions}</div>
-            <p className="text-xs text-muted-foreground">
-              All job positions
-            </p>
+            <p className="text-xs text-muted-foreground">All job positions</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Positions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Open Positions
+            </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -200,7 +224,9 @@ export default function CareerManagementPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Applications
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -218,9 +244,7 @@ export default function CareerManagementPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.featuredPositions}</div>
-            <p className="text-xs text-muted-foreground">
-              Featured positions
-            </p>
+            <p className="text-xs text-muted-foreground">Featured positions</p>
           </CardContent>
         </Card>
       </div>
@@ -284,9 +308,7 @@ export default function CareerManagementPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Manage job types
-              </p>
+              <p className="text-sm text-muted-foreground">Manage job types</p>
             </CardContent>
           </Card>
         </Link>
@@ -315,9 +337,7 @@ export default function CareerManagementPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Coming soon
-            </p>
+            <p className="text-sm text-muted-foreground">Coming soon</p>
           </CardContent>
         </Card>
       </div>
@@ -381,22 +401,28 @@ export default function CareerManagementPage() {
           {filteredPositions.length === 0 ? (
             <div className="text-center py-12">
               <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-2 text-sm font-semibold text-gray-900">No positions found</h3>
+              <h3 className="mt-2 text-sm font-semibold text-gray-900">
+                No positions found
+              </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                {searchQuery || filterStatus !== 'all' || filterCategory !== 'all'
-                  ? 'Try adjusting your filters'
-                  : 'Get started by creating a new position'}
+                {searchQuery ||
+                filterStatus !== "all" ||
+                filterCategory !== "all"
+                  ? "Try adjusting your filters"
+                  : "Get started by creating a new position"}
               </p>
-              {!searchQuery && filterStatus === 'all' && filterCategory === 'all' && (
-                <div className="mt-6">
-                  <Link href="/dashboard/career/new">
-                    <Button>
-                      <Plus className="mr-2 h-4 w-4" />
-                      New Position
-                    </Button>
-                  </Link>
-                </div>
-              )}
+              {!searchQuery &&
+                filterStatus === "all" &&
+                filterCategory === "all" && (
+                  <div className="mt-6">
+                    <Link href="/dashboard/career/new">
+                      <Button>
+                        <Plus className="mr-2 h-4 w-4" />
+                        New Position
+                      </Button>
+                    </Link>
+                  </div>
+                )}
             </div>
           ) : (
             <Table>
@@ -419,7 +445,10 @@ export default function CareerManagementPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{position.title}</span>
                           {position.featured && (
-                            <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                            <Badge
+                              variant="secondary"
+                              className="bg-yellow-100 text-yellow-800"
+                            >
                               <Star className="w-3 h-3 mr-1" />
                               Featured
                             </Badge>
@@ -434,17 +463,21 @@ export default function CareerManagementPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant={
-                          position.status === 'open' ? 'default' : 
-                          position.status === 'closed' ? 'secondary' : 
-                          position.status === 'filled' ? 'outline' : 'destructive'
+                          position.status === "open"
+                            ? "default"
+                            : position.status === "closed"
+                            ? "secondary"
+                            : position.status === "filled"
+                            ? "outline"
+                            : "destructive"
                         }
                       >
                         {position.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{position.type?.name || '-'}</TableCell>
+                    <TableCell>{position.type?.name || "-"}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4 text-muted-foreground" />
@@ -475,16 +508,25 @@ export default function CareerManagementPage() {
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
-                            <Link href={`/dashboard/career/edit/${position.id}`}>
+                            <Link
+                              href={`/dashboard/career/edit/${position.id}`}
+                            >
                               <Edit className="mr-2 h-4 w-4" />
                               Edit
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleToggleFeatured(position.id, position.featured)}
+                            onClick={() =>
+                              handleToggleFeatured(
+                                position.id,
+                                position.featured
+                              )
+                            }
                           >
                             <Star className="mr-2 h-4 w-4" />
-                            {position.featured ? 'Remove Featured' : 'Make Featured'}
+                            {position.featured
+                              ? "Remove Featured"
+                              : "Make Featured"}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDeletePosition(position.id)}
@@ -504,5 +546,5 @@ export default function CareerManagementPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

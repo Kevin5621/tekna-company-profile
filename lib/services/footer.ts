@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from "@/lib/supabase/client";
 
 export interface FooterSection {
   id: string;
@@ -80,25 +80,25 @@ export class FooterService {
   async getFooterSections(): Promise<FooterSection[]> {
     try {
       const { data: sections, error: sectionsError } = await this.supabase
-        .from('footer_sections')
-        .select('*')
-        .order('sort_order');
+        .from("footer_sections")
+        .select("*")
+        .order("sort_order");
 
       if (sectionsError) {
-        console.error('Error fetching footer sections:', sectionsError);
+        console.error("Error fetching footer sections:", sectionsError);
         return [];
       }
 
       const sectionsWithLinks = await Promise.all(
         sections.map(async (section) => {
           const { data: links, error: linksError } = await this.supabase
-            .from('footer_links')
-            .select('*')
-            .eq('footer_section_id', section.id)
-            .order('sort_order');
+            .from("footer_links")
+            .select("*")
+            .eq("footer_section_id", section.id)
+            .order("sort_order");
 
           if (linksError) {
-            console.error('Error fetching footer links:', linksError);
+            console.error("Error fetching footer links:", linksError);
             return { ...section, links: [] };
           }
 
@@ -108,14 +108,16 @@ export class FooterService {
 
       return sectionsWithLinks;
     } catch (error) {
-      console.error('Error in getFooterSections:', error);
+      console.error("Error in getFooterSections:", error);
       return [];
     }
   }
 
-  async createFooterSection(section: Omit<FooterSection, 'id' | 'created_at' | 'updated_at' | 'links'>): Promise<FooterSection> {
+  async createFooterSection(
+    section: Omit<FooterSection, "id" | "created_at" | "updated_at" | "links">
+  ): Promise<FooterSection> {
     const { data, error } = await this.supabase
-      .from('footer_sections')
+      .from("footer_sections")
       .insert(section)
       .select()
       .single();
@@ -124,11 +126,14 @@ export class FooterService {
     return { ...data, links: [] };
   }
 
-  async updateFooterSection(id: string, section: Partial<FooterSection>): Promise<FooterSection> {
+  async updateFooterSection(
+    id: string,
+    section: Partial<FooterSection>
+  ): Promise<FooterSection> {
     const { data, error } = await this.supabase
-      .from('footer_sections')
+      .from("footer_sections")
       .update(section)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -138,9 +143,9 @@ export class FooterService {
 
   async deleteFooterSection(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('footer_sections')
+      .from("footer_sections")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
   }
@@ -148,17 +153,19 @@ export class FooterService {
   // Footer Links CRUD
   async getFooterLinks(): Promise<FooterLink[]> {
     const { data, error } = await this.supabase
-      .from('footer_links')
-      .select('*')
-      .order('sort_order');
+      .from("footer_links")
+      .select("*")
+      .order("sort_order");
 
     if (error) throw error;
     return data || [];
   }
 
-  async createFooterLink(link: Omit<FooterLink, 'id' | 'created_at' | 'updated_at'>): Promise<FooterLink> {
+  async createFooterLink(
+    link: Omit<FooterLink, "id" | "created_at" | "updated_at">
+  ): Promise<FooterLink> {
     const { data, error } = await this.supabase
-      .from('footer_links')
+      .from("footer_links")
       .insert(link)
       .select()
       .single();
@@ -167,11 +174,14 @@ export class FooterService {
     return data;
   }
 
-  async updateFooterLink(id: string, link: Partial<FooterLink>): Promise<FooterLink> {
+  async updateFooterLink(
+    id: string,
+    link: Partial<FooterLink>
+  ): Promise<FooterLink> {
     const { data, error } = await this.supabase
-      .from('footer_links')
+      .from("footer_links")
       .update(link)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -181,9 +191,9 @@ export class FooterService {
 
   async deleteFooterLink(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('footer_links')
+      .from("footer_links")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
   }
@@ -192,25 +202,27 @@ export class FooterService {
   async getSocialMedia(): Promise<SocialMedia[]> {
     try {
       const { data, error } = await this.supabase
-        .from('social_media')
-        .select('*')
-        .order('sort_order');
+        .from("social_media")
+        .select("*")
+        .order("sort_order");
 
       if (error) {
-        console.error('Error fetching social media:', error);
+        console.error("Error fetching social media:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getSocialMedia:', error);
+      console.error("Error in getSocialMedia:", error);
       return [];
     }
   }
 
-  async createSocialMedia(social: Omit<SocialMedia, 'id' | 'created_at' | 'updated_at'>): Promise<SocialMedia> {
+  async createSocialMedia(
+    social: Omit<SocialMedia, "id" | "created_at" | "updated_at">
+  ): Promise<SocialMedia> {
     const { data, error } = await this.supabase
-      .from('social_media')
+      .from("social_media")
       .insert(social)
       .select()
       .single();
@@ -219,11 +231,14 @@ export class FooterService {
     return data;
   }
 
-  async updateSocialMedia(id: string, social: Partial<SocialMedia>): Promise<SocialMedia> {
+  async updateSocialMedia(
+    id: string,
+    social: Partial<SocialMedia>
+  ): Promise<SocialMedia> {
     const { data, error } = await this.supabase
-      .from('social_media')
+      .from("social_media")
       .update(social)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -233,9 +248,9 @@ export class FooterService {
 
   async deleteSocialMedia(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('social_media')
+      .from("social_media")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
   }
@@ -244,25 +259,27 @@ export class FooterService {
   async getContactInfo(): Promise<ContactInfo[]> {
     try {
       const { data, error } = await this.supabase
-        .from('contact_info')
-        .select('*')
-        .order('sort_order');
+        .from("contact_info")
+        .select("*")
+        .order("sort_order");
 
       if (error) {
-        console.error('Error fetching contact info:', error);
+        console.error("Error fetching contact info:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getContactInfo:', error);
+      console.error("Error in getContactInfo:", error);
       return [];
     }
   }
 
-  async createContactInfo(contact: Omit<ContactInfo, 'id' | 'created_at' | 'updated_at'>): Promise<ContactInfo> {
+  async createContactInfo(
+    contact: Omit<ContactInfo, "id" | "created_at" | "updated_at">
+  ): Promise<ContactInfo> {
     const { data, error } = await this.supabase
-      .from('contact_info')
+      .from("contact_info")
       .insert(contact)
       .select()
       .single();
@@ -271,11 +288,14 @@ export class FooterService {
     return data;
   }
 
-  async updateContactInfo(id: string, contact: Partial<ContactInfo>): Promise<ContactInfo> {
+  async updateContactInfo(
+    id: string,
+    contact: Partial<ContactInfo>
+  ): Promise<ContactInfo> {
     const { data, error } = await this.supabase
-      .from('contact_info')
+      .from("contact_info")
       .update(contact)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -285,9 +305,9 @@ export class FooterService {
 
   async deleteContactInfo(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('contact_info')
+      .from("contact_info")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
   }
@@ -296,25 +316,27 @@ export class FooterService {
   async getAllNewsletterSettings(): Promise<NewsletterSettings[]> {
     try {
       const { data, error } = await this.supabase
-        .from('newsletter_settings')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("newsletter_settings")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (error) {
-        console.error('Error fetching newsletter settings:', error);
+        console.error("Error fetching newsletter settings:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getAllNewsletterSettings:', error);
+      console.error("Error in getAllNewsletterSettings:", error);
       return [];
     }
   }
 
-  async createNewsletterSettings(settings: Omit<NewsletterSettings, 'id' | 'created_at' | 'updated_at'>): Promise<NewsletterSettings> {
+  async createNewsletterSettings(
+    settings: Omit<NewsletterSettings, "id" | "created_at" | "updated_at">
+  ): Promise<NewsletterSettings> {
     const { data, error } = await this.supabase
-      .from('newsletter_settings')
+      .from("newsletter_settings")
       .insert(settings)
       .select()
       .single();
@@ -323,11 +345,14 @@ export class FooterService {
     return data;
   }
 
-  async updateNewsletterSettings(id: string, settings: Partial<NewsletterSettings>): Promise<NewsletterSettings> {
+  async updateNewsletterSettings(
+    id: string,
+    settings: Partial<NewsletterSettings>
+  ): Promise<NewsletterSettings> {
     const { data, error } = await this.supabase
-      .from('newsletter_settings')
+      .from("newsletter_settings")
       .update(settings)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -337,9 +362,9 @@ export class FooterService {
 
   async deleteNewsletterSettings(id: string): Promise<void> {
     const { error } = await this.supabase
-      .from('newsletter_settings')
+      .from("newsletter_settings")
       .delete()
-      .eq('id', id);
+      .eq("id", id);
 
     if (error) throw error;
   }
@@ -347,31 +372,33 @@ export class FooterService {
   async getCompanyInfo(): Promise<CompanyInfo | null> {
     try {
       const { data: company, error: companyError } = await this.supabase
-        .from('companies')
-        .select('*')
-        .eq('slug', 'tekna')
-        .eq('is_active', true)
+        .from("companies")
+        .select("*")
+        .eq("slug", "tekna")
+        .eq("is_active", true)
         .single();
 
       if (companyError) {
-        console.error('Error fetching company info:', companyError);
+        console.error("Error fetching company info:", companyError);
         return null;
       }
 
       // Get company translation for Indonesian
       const { data: translation, error: translationError } = await this.supabase
-        .from('company_translations')
-        .select(`
+        .from("company_translations")
+        .select(
+          `
           description,
           short_description,
           languages!inner(code)
-        `)
-        .eq('company_id', company.id)
-        .eq('languages.code', 'id')
+        `
+        )
+        .eq("company_id", company.id)
+        .eq("languages.code", "id")
         .single();
 
       if (translationError) {
-        console.error('Error fetching company translation:', translationError);
+        console.error("Error fetching company translation:", translationError);
       }
 
       return {
@@ -380,7 +407,7 @@ export class FooterService {
         short_description: translation?.short_description,
       };
     } catch (error) {
-      console.error('Error in getCompanyInfo:', error);
+      console.error("Error in getCompanyInfo:", error);
       return null;
     }
   }
@@ -389,27 +416,27 @@ export class FooterService {
   async getPublicFooterSections(): Promise<FooterSection[]> {
     try {
       const { data: sections, error: sectionsError } = await this.supabase
-        .from('footer_sections')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
+        .from("footer_sections")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order");
 
       if (sectionsError) {
-        console.error('Error fetching footer sections:', sectionsError);
+        console.error("Error fetching footer sections:", sectionsError);
         return [];
       }
 
       const sectionsWithLinks = await Promise.all(
         sections.map(async (section) => {
           const { data: links, error: linksError } = await this.supabase
-            .from('footer_links')
-            .select('*')
-            .eq('footer_section_id', section.id)
-            .eq('is_active', true)
-            .order('sort_order');
+            .from("footer_links")
+            .select("*")
+            .eq("footer_section_id", section.id)
+            .eq("is_active", true)
+            .order("sort_order");
 
           if (linksError) {
-            console.error('Error fetching footer links:', linksError);
+            console.error("Error fetching footer links:", linksError);
             return { ...section, links: [] };
           }
 
@@ -419,7 +446,7 @@ export class FooterService {
 
       return sectionsWithLinks;
     } catch (error) {
-      console.error('Error in getPublicFooterSections:', error);
+      console.error("Error in getPublicFooterSections:", error);
       return [];
     }
   }
@@ -427,19 +454,19 @@ export class FooterService {
   async getPublicSocialMedia(): Promise<SocialMedia[]> {
     try {
       const { data, error } = await this.supabase
-        .from('social_media')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
+        .from("social_media")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order");
 
       if (error) {
-        console.error('Error fetching social media:', error);
+        console.error("Error fetching social media:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getPublicSocialMedia:', error);
+      console.error("Error in getPublicSocialMedia:", error);
       return [];
     }
   }
@@ -447,19 +474,19 @@ export class FooterService {
   async getPublicContactInfo(): Promise<ContactInfo[]> {
     try {
       const { data, error } = await this.supabase
-        .from('contact_info')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
+        .from("contact_info")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order");
 
       if (error) {
-        console.error('Error fetching contact info:', error);
+        console.error("Error fetching contact info:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error in getPublicContactInfo:', error);
+      console.error("Error in getPublicContactInfo:", error);
       return [];
     }
   }
@@ -467,33 +494,38 @@ export class FooterService {
   async getPublicNewsletterSettings(): Promise<NewsletterSettings | null> {
     try {
       const { data: settings, error: settingsError } = await this.supabase
-        .from('newsletter_settings')
-        .select('*')
-        .eq('is_active', true)
+        .from("newsletter_settings")
+        .select("*")
+        .eq("is_active", true)
         .single();
 
       if (settingsError) {
-        console.error('Error fetching newsletter settings:', settingsError);
+        console.error("Error fetching newsletter settings:", settingsError);
         return null;
       }
 
       // Get newsletter translation for Indonesian
       const { data: translation, error: translationError } = await this.supabase
-        .from('newsletter_settings_translations')
-        .select(`
+        .from("newsletter_settings_translations")
+        .select(
+          `
           title,
           description,
           success_message,
           button_text,
           placeholder_text,
           languages!inner(code)
-        `)
-        .eq('newsletter_settings_id', settings.id)
-        .eq('languages.code', 'id')
+        `
+        )
+        .eq("newsletter_settings_id", settings.id)
+        .eq("languages.code", "id")
         .single();
 
       if (translationError) {
-        console.error('Error fetching newsletter translation:', translationError);
+        console.error(
+          "Error fetching newsletter translation:",
+          translationError
+        );
       }
 
       return {
@@ -507,31 +539,35 @@ export class FooterService {
         }),
       };
     } catch (error) {
-      console.error('Error in getPublicNewsletterSettings:', error);
+      console.error("Error in getPublicNewsletterSettings:", error);
       return null;
     }
   }
 
-  async subscribeToNewsletter(email: string, firstName?: string, lastName?: string): Promise<boolean> {
+  async subscribeToNewsletter(
+    email: string,
+    firstName?: string,
+    lastName?: string
+  ): Promise<boolean> {
     try {
       const { error } = await this.supabase
-        .from('newsletter_subscriptions')
+        .from("newsletter_subscriptions")
         .insert({
           email,
           first_name: firstName,
           last_name: lastName,
-          source: 'website',
+          source: "website",
           is_active: true,
         });
 
       if (error) {
-        console.error('Error subscribing to newsletter:', error);
+        console.error("Error subscribing to newsletter:", error);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error in subscribeToNewsletter:', error);
+      console.error("Error in subscribeToNewsletter:", error);
       return false;
     }
   }

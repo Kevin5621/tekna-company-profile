@@ -1,5 +1,11 @@
 import { createClient } from "@/lib/supabase/client";
-import type { Post, Project, NewsletterSubscription, Category, Tag } from "@/lib/types/dashboard";
+import type {
+  Post,
+  Project,
+  NewsletterSubscription,
+  Category,
+  Tag,
+} from "@/lib/types/dashboard";
 
 export interface PaginationParams {
   page_number: number;
@@ -24,17 +30,19 @@ export class PaginationService {
   /**
    * Get paginated posts with search and filtering
    */
-  static async getPaginatedPosts(params: PaginationParams): Promise<PaginatedResult<Post>> {
+  static async getPaginatedPosts(
+    params: PaginationParams
+  ): Promise<PaginatedResult<Post>> {
     const supabase = createClient();
-    
+
     try {
-      const { data, error } = await supabase.rpc('get_paginated_posts', {
-        p_search_query: params.search_query || '',
+      const { data, error } = await supabase.rpc("get_paginated_posts", {
+        p_search_query: params.search_query || "",
         p_category_id: params.category_id || null,
-        p_status_filter: params.status_filter || 'published',
+        p_status_filter: params.status_filter || "published",
         p_page_number: params.page_number,
         p_page_size: params.page_size,
-        p_language_code: params.language_code || 'en'
+        p_language_code: params.language_code || "en",
       });
 
       if (error) throw error;
@@ -47,7 +55,7 @@ export class PaginationService {
           page_size: params.page_size,
           total_pages: 0,
           has_next: false,
-          has_previous: false
+          has_previous: false,
         };
       }
 
@@ -55,30 +63,32 @@ export class PaginationService {
       const total_pages = Math.ceil(total_count / params.page_size);
 
       return {
-        data: data.map((item: {
-          id: string;
-          title: string;
-          author_name: string;
-          status: string;
-          view_count: number;
-          published_at: string;
-        }) => ({
-          id: item.id,
-          title: item.title,
-          author: item.author_name,
-          status: item.status,
-          views: item.view_count,
-          publishedAt: item.published_at,
-        })),
+        data: data.map(
+          (item: {
+            id: string;
+            title: string;
+            author_name: string;
+            status: string;
+            view_count: number;
+            published_at: string;
+          }) => ({
+            id: item.id,
+            title: item.title,
+            author: item.author_name,
+            status: item.status,
+            views: item.view_count,
+            publishedAt: item.published_at,
+          })
+        ),
         total_count,
         page_number: params.page_number,
         page_size: params.page_size,
         total_pages,
         has_next: params.page_number < total_pages,
-        has_previous: params.page_number > 1
+        has_previous: params.page_number > 1,
       };
     } catch (error) {
-      console.error('Error getting paginated posts:', error);
+      console.error("Error getting paginated posts:", error);
       throw error;
     }
   }
@@ -86,16 +96,18 @@ export class PaginationService {
   /**
    * Get paginated projects with search and filtering
    */
-  static async getPaginatedProjects(params: PaginationParams): Promise<PaginatedResult<Project>> {
+  static async getPaginatedProjects(
+    params: PaginationParams
+  ): Promise<PaginatedResult<Project>> {
     const supabase = createClient();
-    
+
     try {
-      const { data, error } = await supabase.rpc('get_paginated_projects', {
-        p_search_query: params.search_query || '',
-        p_status_filter: params.status_filter || 'all',
+      const { data, error } = await supabase.rpc("get_paginated_projects", {
+        p_search_query: params.search_query || "",
+        p_status_filter: params.status_filter || "all",
         p_page_number: params.page_number,
         p_page_size: params.page_size,
-        p_language_code: params.language_code || 'en'
+        p_language_code: params.language_code || "en",
       });
 
       if (error) throw error;
@@ -108,7 +120,7 @@ export class PaginationService {
           page_size: params.page_size,
           total_pages: 0,
           has_next: false,
-          has_previous: false
+          has_previous: false,
         };
       }
 
@@ -116,26 +128,28 @@ export class PaginationService {
       const total_pages = Math.ceil(total_count / params.page_size);
 
       return {
-        data: data.map((item: {
-          id: string;
-          name: string;
-          status: string;
-          description: string;
-        }) => ({
-          id: item.id,
-          name: item.name,
-          status: item.status,
-          description: item.description,
-        })),
+        data: data.map(
+          (item: {
+            id: string;
+            name: string;
+            status: string;
+            description: string;
+          }) => ({
+            id: item.id,
+            name: item.name,
+            status: item.status,
+            description: item.description,
+          })
+        ),
         total_count,
         page_number: params.page_number,
         page_size: params.page_size,
         total_pages,
         has_next: params.page_number < total_pages,
-        has_previous: params.page_number > 1
+        has_previous: params.page_number > 1,
       };
     } catch (error) {
-      console.error('Error getting paginated projects:', error);
+      console.error("Error getting paginated projects:", error);
       throw error;
     }
   }
@@ -149,19 +163,21 @@ export class PaginationService {
     search_query?: string
   ): Promise<PaginatedResult<NewsletterSubscription>> {
     const supabase = createClient();
-    
+
     try {
       let query = supabase
-        .from('newsletter_subscriptions')
-        .select('*', { count: 'exact' });
+        .from("newsletter_subscriptions")
+        .select("*", { count: "exact" });
 
       // Apply search filter
       if (search_query) {
-        query = query.or(`email.ilike.%${search_query}%,first_name.ilike.%${search_query}%,last_name.ilike.%${search_query}%`);
+        query = query.or(
+          `email.ilike.%${search_query}%,first_name.ilike.%${search_query}%,last_name.ilike.%${search_query}%`
+        );
       }
 
       const { data, error, count } = await query
-        .order('subscribed_at', { ascending: false })
+        .order("subscribed_at", { ascending: false })
         .range((page_number - 1) * page_size, page_number * page_size - 1);
 
       if (error) throw error;
@@ -176,10 +192,10 @@ export class PaginationService {
         page_size,
         total_pages,
         has_next: page_number < total_pages,
-        has_previous: page_number > 1
+        has_previous: page_number > 1,
       };
     } catch (error) {
-      console.error('Error getting paginated newsletter subscriptions:', error);
+      console.error("Error getting paginated newsletter subscriptions:", error);
       throw error;
     }
   }
@@ -193,20 +209,22 @@ export class PaginationService {
     search_query?: string
   ): Promise<PaginatedResult<Category>> {
     const supabase = createClient();
-    
+
     try {
       let query = supabase
-        .from('categories')
-        .select('*', { count: 'exact' })
-        .eq('is_active', true);
+        .from("categories")
+        .select("*", { count: "exact" })
+        .eq("is_active", true);
 
       // Apply search filter
       if (search_query) {
-        query = query.or(`name.ilike.%${search_query}%,description.ilike.%${search_query}%`);
+        query = query.or(
+          `name.ilike.%${search_query}%,description.ilike.%${search_query}%`
+        );
       }
 
       const { data, error, count } = await query
-        .order('sort_order', { ascending: true })
+        .order("sort_order", { ascending: true })
         .range((page_number - 1) * page_size, page_number * page_size - 1);
 
       if (error) throw error;
@@ -221,10 +239,10 @@ export class PaginationService {
         page_size,
         total_pages,
         has_next: page_number < total_pages,
-        has_previous: page_number > 1
+        has_previous: page_number > 1,
       };
     } catch (error) {
-      console.error('Error getting paginated categories:', error);
+      console.error("Error getting paginated categories:", error);
       throw error;
     }
   }
@@ -238,11 +256,9 @@ export class PaginationService {
     search_query?: string
   ): Promise<PaginatedResult<Tag>> {
     const supabase = createClient();
-    
+
     try {
-      let query = supabase
-        .from('tags')
-        .select('*', { count: 'exact' });
+      let query = supabase.from("tags").select("*", { count: "exact" });
 
       // Apply search filter
       if (search_query) {
@@ -250,7 +266,7 @@ export class PaginationService {
       }
 
       const { data, error, count } = await query
-        .order('name', { ascending: true })
+        .order("name", { ascending: true })
         .range((page_number - 1) * page_size, page_number * page_size - 1);
 
       if (error) throw error;
@@ -265,10 +281,10 @@ export class PaginationService {
         page_size,
         total_pages,
         has_next: page_number < total_pages,
-        has_previous: page_number > 1
+        has_previous: page_number > 1,
       };
     } catch (error) {
-      console.error('Error getting paginated tags:', error);
+      console.error("Error getting paginated tags:", error);
       throw error;
     }
   }
@@ -301,7 +317,7 @@ export class PaginationService {
       page_range: Array.from(
         { length: end_page - start_page + 1 },
         (_, i) => start_page + i
-      )
+      ),
     };
   }
 }

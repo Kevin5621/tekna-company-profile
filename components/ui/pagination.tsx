@@ -1,7 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from "@tabler/icons-react";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronsLeft,
+  IconChevronsRight,
+} from "@tabler/icons-react";
 
 interface PaginationProps {
   currentPage: number;
@@ -20,7 +25,7 @@ export function Pagination({
   pageSize,
   onPageChange,
   showPageInfo = true,
-  className = ""
+  className = "",
 }: PaginationProps) {
   if (totalPages <= 1) return null;
 
@@ -30,7 +35,7 @@ export function Pagination({
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       // Show all pages if total is small
       for (let i = 1; i <= totalPages; i++) {
@@ -38,26 +43,31 @@ export function Pagination({
       }
     } else {
       // Show pages around current page
-      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let startPage = Math.max(
+        1,
+        currentPage - Math.floor(maxVisiblePages / 2)
+      );
       const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-      
+
       // Adjust if we're near the end
       if (endPage - startPage < maxVisiblePages - 1) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
-      
+
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
     }
-    
+
     return pages;
   };
 
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 ${className}`}>
+    <div
+      className={`flex flex-col sm:flex-row items-center justify-between gap-4 ${className}`}
+    >
       {/* Page Info */}
       {showPageInfo && (
         <div className="text-sm text-muted-foreground">
@@ -131,8 +141,8 @@ export function CompactPagination({
   currentPage,
   totalPages,
   onPageChange,
-  className = ""
-}: Omit<PaginationProps, 'totalCount' | 'pageSize' | 'showPageInfo'>) {
+  className = "",
+}: Omit<PaginationProps, "totalCount" | "pageSize" | "showPageInfo">) {
   if (totalPages <= 1) return null;
 
   return (

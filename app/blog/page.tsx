@@ -1,7 +1,7 @@
-import { PublicService } from '@/lib/services/public.service';
-import { PublicLayout } from '@/components/layout/public-layout';
-import { BlogGrid } from '@/components/blog/blog-grid';
-import { Metadata } from 'next';
+import { PublicService } from "@/lib/services/public.service";
+import { PublicLayout } from "@/components/layout/public-layout";
+import { BlogGrid } from "@/components/blog/blog-grid";
+import { Metadata } from "next";
 
 interface BlogPageProps {
   searchParams: Promise<{
@@ -13,18 +13,22 @@ interface BlogPageProps {
 }
 
 export const metadata: Metadata = {
-  title: 'Blog | Tekna - Insights & Latest News',
-  description: 'Explore our articles about technology, design, and innovation that shape the future of digital experiences.',
-  keywords: 'blog, technology, innovation, web development, AI, machine learning, digital solutions',
+  title: "Blog | Tekna - Insights & Latest News",
+  description:
+    "Explore our articles about technology, design, and innovation that shape the future of digital experiences.",
+  keywords:
+    "blog, technology, innovation, web development, AI, machine learning, digital solutions",
   openGraph: {
-  title: 'Blog | Tekna',
-    description: 'Explore our articles about technology, design, and innovation that shape the future of digital experiences.',
-    type: 'website',
+    title: "Blog | Tekna",
+    description:
+      "Explore our articles about technology, design, and innovation that shape the future of digital experiences.",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
-  title: 'Blog | Tekna',
-    description: 'Explore our articles about technology, design, and innovation that shape the future of digital experiences.',
+    card: "summary_large_image",
+    title: "Blog | Tekna",
+    description:
+      "Explore our articles about technology, design, and innovation that shape the future of digital experiences.",
   },
 };
 
@@ -39,14 +43,14 @@ async function getBlogData(params: {
       PublicService.getPaginatedPublishedPosts(params),
       PublicService.getActiveCategories(),
     ]);
-    
+
     return {
       posts: postsResult.data,
       pagination: postsResult.pagination,
       categories,
     };
   } catch (error) {
-    console.error('Error fetching blog data:', error);
+    console.error("Error fetching blog data:", error);
     return {
       posts: [],
       pagination: {
@@ -64,10 +68,10 @@ async function getBlogData(params: {
 
 export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
   const resolvedSearchParams = await searchParams;
-  const page = parseInt(resolvedSearchParams.page || '1');
-  const search = resolvedSearchParams.search || '';
-  const category = resolvedSearchParams.category || '';
-  const featured = resolvedSearchParams.featured === 'true';
+  const page = parseInt(resolvedSearchParams.page || "1");
+  const search = resolvedSearchParams.search || "";
+  const category = resolvedSearchParams.category || "";
+  const featured = resolvedSearchParams.featured === "true";
 
   const { posts, pagination, categories } = await getBlogData({
     page,
@@ -86,10 +90,11 @@ export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
               Insights & Latest News
             </h1>
             <p className="mt-6 max-w-3xl mx-auto text-lg sm:text-xl text-muted-foreground leading-relaxed">
-              Explore our articles about technology, design, and innovation that shape the future of digital experiences.
+              Explore our articles about technology, design, and innovation that
+              shape the future of digital experiences.
             </p>
           </div>
-          
+
           {/* Stats Display */}
           <div className="flex flex-wrap items-center justify-center gap-8 pt-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
@@ -110,11 +115,14 @@ export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
         {/* Enhanced Blog Grid with better accessibility */}
         <main role="main" aria-label="Blog articles">
           <BlogGrid
-            initialPosts={posts.map(post => ({
+            initialPosts={posts.map((post) => ({
               ...post,
-              categories: post.categories && typeof post.categories === 'object' && !Array.isArray(post.categories)
-                ? post.categories
-                : null,
+              categories:
+                post.categories &&
+                typeof post.categories === "object" &&
+                !Array.isArray(post.categories)
+                  ? post.categories
+                  : null,
             }))}
             initialCategories={categories}
             initialPagination={pagination}
@@ -122,7 +130,7 @@ export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
               search,
               category,
               featured,
-              sortBy: 'newest',
+              sortBy: "newest",
             }}
           />
         </main>

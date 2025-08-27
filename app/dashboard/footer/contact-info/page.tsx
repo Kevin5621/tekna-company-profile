@@ -1,134 +1,158 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Plus, Edit, Trash2, Phone, Mail, MapPin, ArrowLeft } from "lucide-react"
-import { FooterService } from "@/lib/services/footer"
-import { ContactInfo } from "@/lib/services/footer"
-import { toast } from "sonner"
-import Link from "next/link"
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Phone,
+  Mail,
+  MapPin,
+  ArrowLeft,
+} from "lucide-react";
+import { FooterService } from "@/lib/services/footer";
+import { ContactInfo } from "@/lib/services/footer";
+import { toast } from "sonner";
+import Link from "next/link";
 
 export default function ContactInfoPage() {
-  const [contactInfo, setContactInfo] = useState<ContactInfo[]>([])
-  const [loading, setLoading] = useState(true)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingContact, setEditingContact] = useState<ContactInfo | null>(null)
+  const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<ContactInfo | null>(
+    null
+  );
   const [formData, setFormData] = useState({
-    type: '',
-    icon: '',
-    label: '',
-    value: '',
-    href: '',
+    type: "",
+    icon: "",
+    label: "",
+    value: "",
+    href: "",
     sort_order: 0,
-    is_active: true
-  })
+    is_active: true,
+  });
 
-  const footerService = useMemo(() => new FooterService(), [])
+  const footerService = useMemo(() => new FooterService(), []);
 
   const loadContactInfo = useCallback(async () => {
     try {
-      const data = await footerService.getContactInfo()
-      setContactInfo(data)
+      const data = await footerService.getContactInfo();
+      setContactInfo(data);
     } catch (error) {
-      console.error('Error loading contact info:', error)
-      toast.error('Failed to load contact information')
+      console.error("Error loading contact info:", error);
+      toast.error("Failed to load contact information");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [footerService])
+  }, [footerService]);
 
   useEffect(() => {
-    loadContactInfo()
-  }, [loadContactInfo])
+    loadContactInfo();
+  }, [loadContactInfo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
+
     try {
       if (editingContact) {
-        await footerService.updateContactInfo(editingContact.id, formData)
-        toast.success('Contact info updated successfully')
+        await footerService.updateContactInfo(editingContact.id, formData);
+        toast.success("Contact info updated successfully");
       } else {
-        await footerService.createContactInfo(formData)
-        toast.success('Contact info created successfully')
+        await footerService.createContactInfo(formData);
+        toast.success("Contact info created successfully");
       }
-      
-      setDialogOpen(false)
-      resetForm()
-      loadContactInfo()
+
+      setDialogOpen(false);
+      resetForm();
+      loadContactInfo();
     } catch (error) {
-      console.error('Error saving contact info:', error)
-      toast.error('Failed to save contact info')
+      console.error("Error saving contact info:", error);
+      toast.error("Failed to save contact info");
     }
-  }
+  };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this contact info?')) return
+    if (!confirm("Are you sure you want to delete this contact info?")) return;
 
     try {
-      await footerService.deleteContactInfo(id)
-      toast.success('Contact info deleted successfully')
-      loadContactInfo()
+      await footerService.deleteContactInfo(id);
+      toast.success("Contact info deleted successfully");
+      loadContactInfo();
     } catch (error) {
-      console.error('Error deleting contact info:', error)
-      toast.error('Failed to delete contact info')
+      console.error("Error deleting contact info:", error);
+      toast.error("Failed to delete contact info");
     }
-  }
+  };
 
   const resetForm = () => {
     setFormData({
-      type: '',
-      icon: '',
-      label: '',
-      value: '',
-      href: '',
+      type: "",
+      icon: "",
+      label: "",
+      value: "",
+      href: "",
       sort_order: 0,
-      is_active: true
-    })
-    setEditingContact(null)
-  }
+      is_active: true,
+    });
+    setEditingContact(null);
+  };
 
   const openEditDialog = (contact: ContactInfo) => {
-    setEditingContact(contact)
+    setEditingContact(contact);
     setFormData({
       type: contact.type,
       icon: contact.icon,
       label: contact.label,
       value: contact.value,
-      href: contact.href || '',
+      href: contact.href || "",
       sort_order: contact.sort_order,
-      is_active: contact.is_active
-    })
-    setDialogOpen(true)
-  }
+      is_active: contact.is_active,
+    });
+    setDialogOpen(true);
+  };
 
   const openCreateDialog = () => {
-    resetForm()
-    setDialogOpen(true)
-  }
+    resetForm();
+    setDialogOpen(true);
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'phone':
-        return Phone
-      case 'email':
-        return Mail
-      case 'address':
-        return MapPin
+      case "phone":
+        return Phone;
+      case "email":
+        return Mail;
+      case "address":
+        return MapPin;
       default:
-        return Phone
+        return Phone;
     }
-  }
+  };
 
   if (loading) {
-    return <div className="container mx-auto py-6">Loading...</div>
+    return <div className="container mx-auto py-6">Loading...</div>;
   }
 
   return (
@@ -142,7 +166,9 @@ export default function ContactInfoPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Contact Information</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Contact Information
+            </h1>
             <p className="text-muted-foreground">
               Manage contact details displayed in the footer
             </p>
@@ -158,13 +184,14 @@ export default function ContactInfoPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {editingContact ? 'Edit Contact Info' : 'Create New Contact Info'}
+                {editingContact
+                  ? "Edit Contact Info"
+                  : "Create New Contact Info"}
               </DialogTitle>
               <DialogDescription>
-                {editingContact 
-                  ? 'Update the contact information details below'
-                  : 'Fill in the details to create new contact information'
-                }
+                {editingContact
+                  ? "Update the contact information details below"
+                  : "Fill in the details to create new contact information"}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit}>
@@ -174,7 +201,9 @@ export default function ContactInfoPage() {
                   <Input
                     id="type"
                     value={formData.type}
-                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, type: e.target.value }))
+                    }
                     placeholder="e.g., phone, email, address"
                     required
                   />
@@ -184,7 +213,9 @@ export default function ContactInfoPage() {
                   <Input
                     id="icon"
                     value={formData.icon}
-                    onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, icon: e.target.value }))
+                    }
                     placeholder="Icon name (lucide-react)"
                     required
                   />
@@ -194,7 +225,12 @@ export default function ContactInfoPage() {
                   <Input
                     id="label"
                     value={formData.label}
-                    onChange={(e) => setFormData(prev => ({ ...prev, label: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        label: e.target.value,
+                      }))
+                    }
                     placeholder="e.g., Phone, Email, Address"
                     required
                   />
@@ -204,7 +240,12 @@ export default function ContactInfoPage() {
                   <Input
                     id="value"
                     value={formData.value}
-                    onChange={(e) => setFormData(prev => ({ ...prev, value: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        value: e.target.value,
+                      }))
+                    }
                     placeholder="The actual contact value"
                     required
                   />
@@ -214,7 +255,9 @@ export default function ContactInfoPage() {
                   <Input
                     id="href"
                     value={formData.href}
-                    onChange={(e) => setFormData(prev => ({ ...prev, href: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, href: e.target.value }))
+                    }
                     placeholder="tel:+1234567890, mailto:email@example.com"
                   />
                 </div>
@@ -224,7 +267,12 @@ export default function ContactInfoPage() {
                     id="sort_order"
                     type="number"
                     value={formData.sort_order}
-                    onChange={(e) => setFormData(prev => ({ ...prev, sort_order: parseInt(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        sort_order: parseInt(e.target.value) || 0,
+                      }))
+                    }
                     placeholder="0"
                     min="0"
                   />
@@ -233,17 +281,23 @@ export default function ContactInfoPage() {
                   <Switch
                     id="is_active"
                     checked={formData.is_active}
-                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, is_active: checked }))
+                    }
                   />
                   <Label htmlFor="is_active">Active</Label>
                 </div>
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDialogOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button type="submit">
-                  {editingContact ? 'Update' : 'Create'}
+                  {editingContact ? "Update" : "Create"}
                 </Button>
               </DialogFooter>
             </form>
@@ -253,7 +307,7 @@ export default function ContactInfoPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {contactInfo.map((contact) => {
-          const IconComponent = getTypeIcon(contact.type)
+          const IconComponent = getTypeIcon(contact.type);
           return (
             <Card key={contact.id}>
               <CardHeader>
@@ -270,8 +324,10 @@ export default function ContactInfoPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={contact.is_active ? "default" : "secondary"}>
-                      {contact.is_active ? 'Active' : 'Inactive'}
+                    <Badge
+                      variant={contact.is_active ? "default" : "secondary"}
+                    >
+                      {contact.is_active ? "Active" : "Inactive"}
                     </Badge>
                   </div>
                 </div>
@@ -286,9 +342,9 @@ export default function ContactInfoPage() {
                   </div>
                   {contact.href && (
                     <div className="text-sm">
-                      <span className="font-medium">Link:</span>{' '}
-                      <a 
-                        href={contact.href} 
+                      <span className="font-medium">Link:</span>{" "}
+                      <a
+                        href={contact.href}
                         className="text-blue-600 hover:underline break-all"
                       >
                         {contact.href}
@@ -299,8 +355,12 @@ export default function ContactInfoPage() {
                     Created: {new Date(contact.created_at).toLocaleDateString()}
                     {contact.updated_at && (
                       <>
-                        <Separator orientation="vertical" className="mx-2 h-4" />
-                        Updated: {new Date(contact.updated_at).toLocaleDateString()}
+                        <Separator
+                          orientation="vertical"
+                          className="mx-2 h-4"
+                        />
+                        Updated:{" "}
+                        {new Date(contact.updated_at).toLocaleDateString()}
                       </>
                     )}
                   </div>
@@ -325,7 +385,7 @@ export default function ContactInfoPage() {
                 </div>
               </CardContent>
             </Card>
-          )
+          );
         })}
 
         {contactInfo.length === 0 && (
@@ -333,7 +393,9 @@ export default function ContactInfoPage() {
             <Card>
               <CardContent className="py-12 text-center">
                 <Phone className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No contact information found</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  No contact information found
+                </h3>
                 <p className="text-muted-foreground mb-4">
                   Get started by adding your first contact information
                 </p>
@@ -347,5 +409,5 @@ export default function ContactInfoPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

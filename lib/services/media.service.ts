@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from "@/lib/supabase/client";
 
 export interface MediaFile {
   id: string;
@@ -30,7 +30,7 @@ export class MediaService {
    */
   static async uploadFile(
     file: File,
-    folder: string = 'blog-media',
+    folder: string = "blog-media",
     metadata?: {
       alt_text?: string;
       caption?: string;
@@ -38,34 +38,38 @@ export class MediaService {
     }
   ): Promise<UploadResult> {
     const supabase = createClient();
-    
+
     try {
       // Generate unique filename
       const timestamp = Date.now();
       const randomString = Math.random().toString(36).substring(2, 15);
-      const extension = file.name.split('.').pop();
+      const extension = file.name.split(".").pop();
       const filename = `${timestamp}-${randomString}.${extension}`;
       const filePath = `${folder}/${filename}`;
 
       // Determine bucket based on file type
-      let bucketName = 'media';
-      if (file.type.startsWith('application/') || file.type === 'text/plain' || file.type === 'text/csv') {
-        bucketName = 'documents';
+      let bucketName = "media";
+      if (
+        file.type.startsWith("application/") ||
+        file.type === "text/plain" ||
+        file.type === "text/csv"
+      ) {
+        bucketName = "documents";
       }
 
       // Upload file to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from(bucketName)
         .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
+          cacheControl: "3600",
+          upsert: false,
         });
 
       if (uploadError) {
-        console.error('Error uploading file:', uploadError);
+        console.error("Error uploading file:", uploadError);
         return {
           success: false,
-          error: `Gagal upload file: ${uploadError.message}`
+          error: `Gagal upload file: ${uploadError.message}`,
         };
       }
 
@@ -77,18 +81,20 @@ export class MediaService {
       // Get image dimensions if it's an image
       let width: number | undefined;
       let height: number | undefined;
-      
-      if (file.type.startsWith('image/')) {
+
+      if (file.type.startsWith("image/")) {
         const dimensions = await this.getImageDimensions(file);
         width = dimensions.width;
         height = dimensions.height;
       }
 
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       // Create media file record in database
-      const mediaFile: Omit<MediaFile, 'id' | 'created_at' | 'updated_at'> = {
+      const mediaFile: Omit<MediaFile, "id" | "created_at" | "updated_at"> = {
         filename,
         original_filename: file.name,
         file_path: filePath,
@@ -97,39 +103,41 @@ export class MediaService {
         mime_type: file.type,
         width,
         height,
-        alt_text: metadata?.alt_text || '',
-        caption: metadata?.caption || '',
+        alt_text: metadata?.alt_text || "",
+        caption: metadata?.caption || "",
         uploaded_by: user?.id,
-        is_active: true
+        is_active: true,
       };
 
       const { data: dbData, error: dbError } = await supabase
-        .from('media_files')
+        .from("media_files")
         .insert(mediaFile)
         .select()
         .single();
 
       if (dbError) {
-        console.error('Error saving media file to database:', dbError);
+        console.error("Error saving media file to database:", dbError);
         // Try to delete uploaded file if database insert fails
         await supabase.storage.from(bucketName).remove([filePath]);
-        
+
         return {
           success: false,
-          error: `Gagal menyimpan data file: ${dbError.message}`
+          error: `Gagal menyimpan data file: ${dbError.message}`,
         };
       }
 
       return {
         success: true,
-        file: dbData
+        file: dbData,
       };
-
     } catch (error) {
-      console.error('Error in uploadFile:', error);
+      console.error("Error in uploadFile:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Terjadi kesalahan saat upload'
+        error:
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan saat upload",
       };
     }
   }
@@ -137,13 +145,15 @@ export class MediaService {
   /**
    * Get image dimensions from File object
    */
-  private static getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+  private static getImageDimensions(
+    file: File
+  ): Promise<{ width: number; height: number }> {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
         resolve({
           width: img.naturalWidth,
-          height: img.naturalHeight
+          height: img.naturalHeight,
         });
       };
       img.onerror = () => {
@@ -162,17 +172,17 @@ export class MediaService {
     offset: number = 0
   ): Promise<MediaFile[]> {
     const supabase = createClient();
-    
+
     try {
       let query = supabase
-        .from('media_files')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false })
+        .from("media_files")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
         .range(offset, offset + limit - 1);
 
       if (folder) {
-        query = query.like('file_path', `${folder}%`);
+        query = query.like("file_path", `${folder}%`);
       }
 
       const { data, error } = await query;
@@ -180,7 +190,7 @@ export class MediaService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching media files:', error);
+      console.error("Error fetching media files:", error);
       return [];
     }
   }
@@ -190,19 +200,19 @@ export class MediaService {
    */
   static async getMediaFileById(fileId: string): Promise<MediaFile | null> {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('media_files')
-        .select('*')
-        .eq('id', fileId)
-        .eq('is_active', true)
+        .from("media_files")
+        .select("*")
+        .eq("id", fileId)
+        .eq("is_active", true)
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching media file:', error);
+      console.error("Error fetching media file:", error);
       return null;
     }
   }
@@ -218,20 +228,20 @@ export class MediaService {
     }
   ): Promise<MediaFile | null> {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('media_files')
+        .from("media_files")
         .update(updates)
-        .eq('id', fileId)
-        .eq('is_active', true)
+        .eq("id", fileId)
+        .eq("is_active", true)
         .select()
         .single();
 
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error updating media file:', error);
+      console.error("Error updating media file:", error);
       return null;
     }
   }
@@ -241,39 +251,41 @@ export class MediaService {
    */
   static async deleteMediaFile(fileId: string): Promise<boolean> {
     const supabase = createClient();
-    
+
     try {
       // Get file info first
       const file = await this.getMediaFileById(fileId);
       if (!file) return false;
 
       // Determine bucket from file path
-      const bucketName = file.file_path.includes('/documents/') ? 'documents' : 'media';
-      
+      const bucketName = file.file_path.includes("/documents/")
+        ? "documents"
+        : "media";
+
       // Delete from storage
       const { error: storageError } = await supabase.storage
         .from(bucketName)
         .remove([file.file_path]);
 
       if (storageError) {
-        console.error('Error deleting file from storage:', storageError);
+        console.error("Error deleting file from storage:", storageError);
         return false;
       }
 
       // Soft delete from database
       const { error: dbError } = await supabase
-        .from('media_files')
+        .from("media_files")
         .update({ is_active: false })
-        .eq('id', fileId);
+        .eq("id", fileId);
 
       if (dbError) {
-        console.error('Error deleting file from database:', dbError);
+        console.error("Error deleting file from database:", dbError);
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Error deleting media file:', error);
+      console.error("Error deleting media file:", error);
       return false;
     }
   }
@@ -286,20 +298,22 @@ export class MediaService {
     limit: number = 50
   ): Promise<MediaFile[]> {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('media_files')
-        .select('*')
-        .eq('is_active', true)
-        .or(`original_filename.ilike.%${query}%,alt_text.ilike.%${query}%,caption.ilike.%${query}%`)
-        .order('created_at', { ascending: false })
+        .from("media_files")
+        .select("*")
+        .eq("is_active", true)
+        .or(
+          `original_filename.ilike.%${query}%,alt_text.ilike.%${query}%,caption.ilike.%${query}%`
+        )
+        .order("created_at", { ascending: false })
         .limit(limit);
 
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error searching media files:', error);
+      console.error("Error searching media files:", error);
       return [];
     }
   }
@@ -316,19 +330,19 @@ export class MediaService {
    */
   static async getMediaFilesByType(mimeType: string): Promise<MediaFile[]> {
     const supabase = createClient();
-    
+
     try {
       const { data, error } = await supabase
-        .from('media_files')
-        .select('*')
-        .eq('is_active', true)
-        .like('mime_type', `${mimeType}%`)
-        .order('created_at', { ascending: false });
+        .from("media_files")
+        .select("*")
+        .eq("is_active", true)
+        .like("mime_type", `${mimeType}%`)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching media files by type:', error);
+      console.error("Error fetching media files by type:", error);
       return [];
     }
   }

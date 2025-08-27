@@ -1,14 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { IconSettings, IconDeviceFloppy, IconRefresh, IconBuilding, IconGlobe } from "@tabler/icons-react";
-import { DashboardBreadcrumb } from '@/components/ui/dashboard-breadcrumb';
+import {
+  IconSettings,
+  IconDeviceFloppy,
+  IconRefresh,
+  IconBuilding,
+  IconGlobe,
+} from "@tabler/icons-react";
+import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 
 interface CompanySettings {
   name: string;
@@ -40,29 +52,29 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState<CompanySettings>({
-  name: "PT Sapujagat Nirmana Tekna",
-  description: "Leading technology solutions provider",
-  website_url: "https://tekna.com",
-  contact_email: "contact@tekna.com",
+    name: "PT Sapujagat Nirmana Tekna",
+    description: "Leading technology solutions provider",
+    website_url: "https://tekna.com",
+    contact_email: "contact@tekna.com",
     phone: "+62 21 1234 5678",
     address: "Jakarta, Indonesia",
     social_media: {
       facebook: "",
       twitter: "",
       linkedin: "",
-      instagram: ""
+      instagram: "",
     },
     seo: {
-  meta_title: "Tekna - Technology Solutions Provider",
+      meta_title: "Tekna - Technology Solutions Provider",
       meta_description: "Leading technology solutions provider in Indonesia",
-      meta_keywords: "technology, solutions, software, consulting"
+      meta_keywords: "technology, solutions, software, consulting",
     },
     features: {
       blog_enabled: true,
       newsletter_enabled: true,
       contact_form_enabled: true,
-      analytics_enabled: true
-    }
+      analytics_enabled: true,
+    },
   });
 
   useEffect(() => {
@@ -79,7 +91,7 @@ export default function SettingsPage() {
     setIsSaving(true);
     try {
       // TODO: Implement saving settings to database
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
       console.log("Settings saved:", settings);
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -94,15 +106,15 @@ export default function SettingsPage() {
   };
 
   const updateSettings = (path: string, value: string | boolean) => {
-    setSettings(prev => {
+    setSettings((prev) => {
       const newSettings = { ...prev };
-      const keys = path.split('.');
+      const keys = path.split(".");
       let current: Record<string, unknown> = newSettings;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
         current = current[keys[i]] as Record<string, unknown>;
       }
-      
+
       current[keys[keys.length - 1]] = value;
       return newSettings;
     });
@@ -122,10 +134,10 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       {/* Breadcrumbs */}
-      <DashboardBreadcrumb 
+      <DashboardBreadcrumb
         items={[
           { label: "Pengaturan", href: "/dashboard/settings" },
-          { label: "Konfigurasi Sistem", isCurrentPage: true }
+          { label: "Konfigurasi Sistem", isCurrentPage: true },
         ]}
       />
 
@@ -167,17 +179,17 @@ export default function SettingsPage() {
               <Input
                 id="company_name"
                 value={settings.name}
-                onChange={(e) => updateSettings('name', e.target.value)}
+                onChange={(e) => updateSettings("name", e.target.value)}
                 placeholder="Company name"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="website_url">Website URL</Label>
               <Input
                 id="website_url"
                 value={settings.website_url}
-                onChange={(e) => updateSettings('website_url', e.target.value)}
+                onChange={(e) => updateSettings("website_url", e.target.value)}
                 placeholder="https://example.com"
               />
             </div>
@@ -188,7 +200,7 @@ export default function SettingsPage() {
             <Textarea
               id="description"
               value={settings.description}
-              onChange={(e) => updateSettings('description', e.target.value)}
+              onChange={(e) => updateSettings("description", e.target.value)}
               placeholder="Brief description of your company"
               rows={3}
             />
@@ -201,17 +213,19 @@ export default function SettingsPage() {
                 id="contact_email"
                 type="email"
                 value={settings.contact_email}
-                onChange={(e) => updateSettings('contact_email', e.target.value)}
+                onChange={(e) =>
+                  updateSettings("contact_email", e.target.value)
+                }
                 placeholder="contact@company.com"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
               <Input
                 id="phone"
                 value={settings.phone}
-                onChange={(e) => updateSettings('phone', e.target.value)}
+                onChange={(e) => updateSettings("phone", e.target.value)}
                 placeholder="+62 21 1234 5678"
               />
             </div>
@@ -222,7 +236,7 @@ export default function SettingsPage() {
             <Textarea
               id="address"
               value={settings.address}
-              onChange={(e) => updateSettings('address', e.target.value)}
+              onChange={(e) => updateSettings("address", e.target.value)}
               placeholder="Company address"
               rows={2}
             />
@@ -245,37 +259,45 @@ export default function SettingsPage() {
               <Input
                 id="facebook"
                 value={settings.social_media.facebook}
-                onChange={(e) => updateSettings('social_media.facebook', e.target.value)}
+                onChange={(e) =>
+                  updateSettings("social_media.facebook", e.target.value)
+                }
                 placeholder="https://facebook.com/company"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="twitter">Twitter</Label>
               <Input
                 id="twitter"
                 value={settings.social_media.twitter}
-                onChange={(e) => updateSettings('social_media.twitter', e.target.value)}
+                onChange={(e) =>
+                  updateSettings("social_media.twitter", e.target.value)
+                }
                 placeholder="https://twitter.com/company"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="linkedin">LinkedIn</Label>
               <Input
                 id="linkedin"
                 value={settings.social_media.linkedin}
-                onChange={(e) => updateSettings('social_media.linkedin', e.target.value)}
+                onChange={(e) =>
+                  updateSettings("social_media.linkedin", e.target.value)
+                }
                 placeholder="https://linkedin.com/company/company"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="instagram">Instagram</Label>
               <Input
                 id="instagram"
                 value={settings.social_media.instagram}
-                onChange={(e) => updateSettings('social_media.instagram', e.target.value)}
+                onChange={(e) =>
+                  updateSettings("social_media.instagram", e.target.value)
+                }
                 placeholder="https://instagram.com/company"
               />
             </div>
@@ -290,9 +312,7 @@ export default function SettingsPage() {
             <IconGlobe className="h-5 w-5" />
             SEO Settings
           </CardTitle>
-          <CardDescription>
-            Search engine optimization settings
-          </CardDescription>
+          <CardDescription>Search engine optimization settings</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -300,28 +320,32 @@ export default function SettingsPage() {
             <Input
               id="meta_title"
               value={settings.seo.meta_title}
-              onChange={(e) => updateSettings('seo.meta_title', e.target.value)}
+              onChange={(e) => updateSettings("seo.meta_title", e.target.value)}
               placeholder="Page title for search engines"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="meta_description">Meta Description</Label>
             <Textarea
               id="meta_description"
               value={settings.seo.meta_description}
-              onChange={(e) => updateSettings('seo.meta_description', e.target.value)}
+              onChange={(e) =>
+                updateSettings("seo.meta_description", e.target.value)
+              }
               placeholder="Brief description for search engines"
               rows={2}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="meta_keywords">Meta Keywords</Label>
             <Input
               id="meta_keywords"
               value={settings.seo.meta_keywords}
-              onChange={(e) => updateSettings('seo.meta_keywords', e.target.value)}
+              onChange={(e) =>
+                updateSettings("seo.meta_keywords", e.target.value)
+              }
               placeholder="Keywords separated by commas"
             />
           </div>
@@ -335,9 +359,7 @@ export default function SettingsPage() {
             <IconSettings className="h-5 w-5" />
             Feature Toggles
           </CardTitle>
-          <CardDescription>
-            Enable or disable website features
-          </CardDescription>
+          <CardDescription>Enable or disable website features</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -349,10 +371,12 @@ export default function SettingsPage() {
             </div>
             <Switch
               checked={settings.features.blog_enabled}
-              onCheckedChange={(checked) => updateSettings('features.blog_enabled', checked)}
+              onCheckedChange={(checked) =>
+                updateSettings("features.blog_enabled", checked)
+              }
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Newsletter System</Label>
@@ -362,10 +386,12 @@ export default function SettingsPage() {
             </div>
             <Switch
               checked={settings.features.newsletter_enabled}
-              onCheckedChange={(checked) => updateSettings('features.newsletter_enabled', checked)}
+              onCheckedChange={(checked) =>
+                updateSettings("features.newsletter_enabled", checked)
+              }
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Contact Form</Label>
@@ -375,10 +401,12 @@ export default function SettingsPage() {
             </div>
             <Switch
               checked={settings.features.contact_form_enabled}
-              onCheckedChange={(checked) => updateSettings('features.contact_form_enabled', checked)}
+              onCheckedChange={(checked) =>
+                updateSettings("features.contact_form_enabled", checked)
+              }
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Analytics</Label>
@@ -388,7 +416,9 @@ export default function SettingsPage() {
             </div>
             <Switch
               checked={settings.features.analytics_enabled}
-              onCheckedChange={(checked) => updateSettings('features.analytics_enabled', checked)}
+              onCheckedChange={(checked) =>
+                updateSettings("features.analytics_enabled", checked)
+              }
             />
           </div>
         </CardContent>
