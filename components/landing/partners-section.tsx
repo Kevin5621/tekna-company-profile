@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { InfiniteSlider } from '@/components/motion-primitives/infinite-slider';
+import { ProgressiveBlur } from '@/components/motion-primitives/progressive-blur';
 
 interface Partner {
   id: string;
@@ -17,13 +18,12 @@ interface Partner {
 export function PartnersSection() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
-  const placeholderIds = ["ph1", "ph2", "ph3", "ph4", "ph5", "ph6"];
 
   useEffect(() => {
     const fetchPartners = async () => {
       try {
         console.log("Fetching partners...");
-        const response = await fetch("/api/partners?limit=12");
+        const response = await fetch("/api/partners?limit=20");
         console.log("Response status:", response.status);
 
         type PartnersResponse = {
@@ -63,7 +63,7 @@ export function PartnersSection() {
             }
           }
 
-          setPartners(uniquePartners.slice(0, 6)); // Limit to 6 partners
+          setPartners(uniquePartners);
         } else {
           console.warn("/api/partners returned no data or error", {
             status: response.status,
@@ -80,112 +80,85 @@ export function PartnersSection() {
     fetchPartners();
   }, []);
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.98 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.45, ease: "easeOut" as const },
-    },
-  };
+  const skeletonIds = [
+    "sk-0",
+    "sk-1",
+    "sk-2",
+    "sk-3",
+    "sk-4",
+    "sk-5",
+    "sk-6",
+    "sk-7",
+  ];
 
   if (loading) {
     return (
-      <section className="w-full py-24 md:py-32 bg-background relative z-20 pointer-events-auto">
-        <div className="container mx-auto px-4 md:px-6">
-          {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-              Trusted by Industry Leaders
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground">
-              We collaborate with innovative companies worldwide to deliver
-              exceptional digital solutions.
-            </p>
-          </div>
-
-          {/* Loading Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-12">
-            {placeholderIds.map((id) => (
-              <div
-                key={id}
-                className="flex flex-col items-center text-center space-y-4 animate-pulse"
-              >
-                <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-200 rounded-2xl"></div>
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-20"></div>
-                  <div className="h-3 bg-gray-200 rounded w-16"></div>
+      <section className="bg-background py-16 md:py-24">
+        <div className="group relative m-auto max-w-6xl px-6">
+          <div className="py-6">
+            <div className="flex gap-24 animate-pulse">
+              {skeletonIds.map((id) => (
+                <div key={id} className="flex shrink-0">
+                  <div className="w-64 h-24 bg-muted rounded"></div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
     );
   }
 
-  return (
-    <section className="w-full py-24 md:py-32 bg-background relative z-20 pointer-events-auto">
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
-            Trusted by Industry Leaders
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground">
-            We collaborate with innovative companies worldwide to deliver
-            exceptional digital solutions.
-          </p>
-        </div>
+  if (partners.length === 0) {
+    return null;
+  }
 
-        {/* Partners Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-12">
-          {partners.map((partner) => (
-            <motion.div
-              key={partner.id}
-              variants={itemVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="group"
-            >
-              <div className="flex flex-col items-center text-center space-y-4">
-                {/* Partner Logo */}
-                <motion.div
-                  className="relative w-24 h-24 md:w-32 md:h-32 bg-card rounded-2xl p-4 shadow-lg border border-border/50 group-hover:shadow-xl transition-all duration-300 group-hover:scale-105"
-                  whileHover={{
-                    y: -5,
-                    transition: { duration: 0.2 },
-                  }}
-                >
+  return (
+    <section className="bg-background py-16 md:py-24">
+      <div className="group relative m-auto max-w-6xl px-6">
+        <div className="flex items-center">
+          <div className="inline md:max-w-44 md:border-r md:border-border md:pr-6">
+            <p className="text-end text-sm text-muted-foreground">Trusted by industry leaders</p>
+          </div>
+          <div className="relative py-6 md:w-[calc(100%-11rem)]">
+            <InfiniteSlider
+              speedOnHover={20}
+              speed={40}
+              gap={112}>
+              {partners.map((partner) => (
+                <div key={partner.id} className="flex items-center justify-center">
                   {partner.logo_url ? (
-                    <Image
-                      src={partner.logo_url}
-                      alt={partner.name}
-                      fill
-                      className="object-contain p-2"
-                      sizes="(max-width: 768px) 96px, 128px"
-                    />
+                    <div className="relative h-24 w-64">
+                      <Image
+                        className="object-contain dark:invert filter grayscale hover:grayscale-0 transition-all duration-300"
+                        src={partner.logo_url}
+                        alt={`${partner.name} Logo`}
+                        fill
+                        sizes="256px"
+                      />
+                    </div>
                   ) : (
-                    <div className="w-full h-full bg-muted rounded-lg flex items-center justify-center text-muted-foreground">
-                      {partner.name.charAt(0)}
+                    <div className="h-24 px-10 bg-muted rounded flex items-center justify-center text-muted-foreground text-base font-medium">
+                      {partner.name.split(' ').map(word => word.charAt(0)).join('').slice(0, 3)}
                     </div>
                   )}
-                </motion.div>
-
-                {/* Partner Name */}
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-foreground text-sm md:text-base">
-                    {partner.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground max-w-[200px] mx-auto leading-relaxed">
-                    {partner.description}
-                  </p>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              ))}
+            </InfiniteSlider>
+
+            <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent"></div>
+            <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent"></div>
+            <ProgressiveBlur
+              className="pointer-events-none absolute left-0 top-0 h-full w-20"
+              direction="left"
+              blurIntensity={1}
+            />
+            <ProgressiveBlur
+              className="pointer-events-none absolute right-0 top-0 h-full w-20"
+              direction="right"
+              blurIntensity={1}
+            />
+          </div>
         </div>
       </div>
     </section>

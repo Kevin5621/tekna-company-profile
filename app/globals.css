@@ -142,6 +142,20 @@
     font-variation-settings: "wght" 400;
   }
 
+  /* Infinite scroll animation */
+  @keyframes infinite-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-infinite-scroll {
+    animation: infinite-scroll linear infinite;
+  }
+
   /* Ensure variable fonts work properly */
   .font-sans {
     font-family: var(--font-inter), "Inter", system-ui, sans-serif;
@@ -220,19 +234,15 @@
   }
 
   /* Prevent floating behavior on specific pages */
-  .dashboard-form-page {
-    min-height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
-
   .dashboard-form-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
     position: relative;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
   }
 
   /* Ensure proper scroll behavior */
@@ -275,17 +285,6 @@
       margin-top: 0;
       margin-bottom: 0;
     }
-
-    .dashboard-content-wrapper {
-      padding-left: 2rem;
-      padding-right: 2rem;
-      max-width: 1200px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
   }
 
   /* Mobile specific fixes */
@@ -298,30 +297,8 @@
       margin-bottom: 0;
     }
 
-    .dashboard-content-wrapper {
-      padding-left: 1rem;
-      padding-right: 1rem;
-      max-width: 100%;
-      width: 100%;
-      margin: 0 auto;
-    }
-
     .dashboard-scroll-container {
       -webkit-overflow-scrolling: touch;
-    }
-  }
-
-  /* Large screen optimization */
-  @media (min-width: 1400px) {
-    .dashboard-content-wrapper {
-      max-width: 1400px;
-    }
-  }
-
-  /* Extra large screen optimization */
-  @media (min-width: 1600px) {
-    .dashboard-content-wrapper {
-      max-width: 1600px;
     }
   }
 }
