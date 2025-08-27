@@ -4,6 +4,7 @@ import './globals.css'
 import { SessionProvider } from '@/components/session-provider'
 import { AnalyticsTracker } from '@/components/analytics-tracker'
 import { OrganizationStructuredData } from '@/components/structured-data'
+import { ThemeProvider } from 'next-themes'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -88,7 +89,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="id" className="scroll-smooth">
+    <html lang="id" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="canonical" href="https://teknasapujagat.com" />
         <meta name="geo.region" content="ID" />
@@ -102,12 +103,18 @@ export default function RootLayout({
         <meta name="country" content="Indonesia" />
       </head>
       <body className={inter.className}>
-        <SessionProvider>
-          <AnalyticsTracker>
-            {children}
-            <OrganizationStructuredData siteUrl="https://teknasapujagat.com" />
-          </AnalyticsTracker>
-        </SessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          disableTransitionOnChange
+        >
+          <SessionProvider>
+            <AnalyticsTracker>
+              {children}
+              <OrganizationStructuredData siteUrl="https://teknasapujagat.com" />
+            </AnalyticsTracker>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
