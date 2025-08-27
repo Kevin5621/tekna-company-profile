@@ -1,3 +1,7 @@
+"use client";
+
+import React from "react";
+import dynamic from "next/dynamic";
 import {
   Card,
   CardContent,
@@ -16,92 +20,57 @@ import {
   IconCalendar,
   IconBriefcase,
 } from "@tabler/icons-react";
-import { DashboardService } from "@/lib/services/dashboard.service";
-import { CareerService } from "@/lib/services/career";
 import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
-import { DashboardChart } from "@/components/dashboard-chart";
+const DashboardChart = dynamic(() => import("@/components/dashboard-chart").then((m) => m.DashboardChart), { ssr: false });
+
+// Client-side fetch will call /api/dashboard
 
 // Function to get total career applications
-async function getTotalCareerApplications(): Promise<number> {
-  try {
-    const careerService = new CareerService();
-    const applications = await careerService.getAllApplications();
-    return applications.length;
-  } catch (error) {
-    console.error("Error fetching career applications:", error);
-    return 0;
-  }
-}
+// We'll fetch dashboard data from the new API route on the client
 
-// Function to get dashboard data using service
-async function getDashboardData(): Promise<DashboardData> {
-  try {
-    const data = await DashboardService.getDashboardData();
+export default function DashboardPage() {
+  const [loading, setLoading] = React.useState(true);
+  const [dashboardData, setDashboardData] = React.useState<DashboardData | null>(null);
+  const [totalApplications, setTotalApplications] = React.useState<number>(0);
 
-    // Add icons to stats
-    return {
-      ...data,
-      stats: [
-        { ...data.stats[0], icon: IconUsers },
-        { ...data.stats[1], icon: IconFolder },
-        { ...data.stats[2], icon: IconArticle },
-        { ...data.stats[3], icon: IconMessageCircle },
-      ],
+  React.useEffect(() => {
+    let mounted = true;
+    fetch("/api/dashboard")
+      .then((r) => r.json())
+      .then((payload) => {
+        if (!mounted) return;
+        if (payload?.success && payload.data) {
+          const data: DashboardData = payload.data.dashboardData;
+          // attach icons
+          data.stats = [
+            { ...data.stats[0], icon: IconUsers },
+            { ...data.stats[1], icon: IconFolder },
+            { ...data.stats[2], icon: IconArticle },
+            { ...data.stats[3], icon: IconMessageCircle },
+          ];
+          setDashboardData(data);
+          setTotalApplications(payload.data.totalApplications || 0);
+        } else {
+          setDashboardData(null);
+        }
+      })
+      .catch((e) => {
+        console.error("Error fetching /api/dashboard:", e);
+      })
+      .finally(() => mounted && setLoading(false));
+
+    return () => {
+      mounted = false;
     };
-  } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    // Return fallback data if there's an error
-    return {
-      stats: [
-        {
-          title: "Total Tim",
-          value: "0",
-          description: "Anggota tim aktif",
-          icon: IconUsers,
-          change: "0",
-          changeType: "default",
-        },
-        {
-          title: "Proyek Aktif",
-          value: "0",
-          description: "Proyek sedang berjalan",
-          icon: IconFolder,
-          change: "0",
-          changeType: "default",
-        },
-        {
-          title: "Artikel Blog",
-          value: "0",
-          description: "Artikel diterbitkan",
-          icon: IconArticle,
-          change: "0",
-          changeType: "default",
-        },
-        {
-          title: "Testimonial",
-          value: "0",
-          description: "Ulasan klien",
-          icon: IconMessageCircle,
-          change: "0",
-          changeType: "default",
-        },
-      ],
-      recentProjects: [],
-      recentPosts: [],
-      servicesCount: 0,
-    };
-  }
-}
-
-export default async function DashboardPage() {
-  const [dashboardData, totalApplications] = await Promise.all([
-    getDashboardData(),
-    getTotalCareerApplications(),
-  ]);
+  }, []);
 
   return (
     <div className="space-y-6">
+      {/* show a simple skeleton while loading */}
+      {loading && (
+        <div className="text-muted-foreground">Memuat dashboard…</div>
+      )}
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[{ label: "Beranda", isCurrentPage: true }]}
@@ -119,32 +88,22 @@ export default async function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {dashboardData.stats.map((stat) => (
+        {dashboardData?.stats?.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              {stat.icon && (
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              )}
+              {stat.icon && React.createElement(stat.icon as React.ElementType, { className: "h-4 w-4 text-muted-foreground" })}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                {stat.description}
-              </p>
+              <p className="text-xs text-muted-foreground">{stat.description}</p>
               <div className="flex items-center pt-2">
-                <Badge
-                  variant={
-                    stat.changeType === "positive" ? "default" : "secondary"
-                  }
-                >
+                <Badge variant={stat.changeType === "positive" ? "default" : "secondary"}>
                   {stat.change}
                 </Badge>
-                <span className="text-xs text-muted-foreground ml-2">
-                  dari bulan lalu
-                </span>
+                <span className="text-xs text-muted-foreground ml-2">dari bulan lalu</span>
               </div>
             </CardContent>
           </Card>
@@ -152,7 +111,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* Analytics Chart */}
-      <DashboardChart totalApplications={totalApplications} />
+  {/* Dashboard chart loaded only on client via dynamic import */}
+  <DashboardChart totalApplications={totalApplications} />
 
       {/* Analytics Section - Career Applications */}
       <div className="grid gap-6 md:grid-cols-3">
@@ -224,9 +184,9 @@ export default async function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {dashboardData.recentPosts.length > 0 ? (
-              <div className="space-y-4">
-                {dashboardData.recentPosts.map((post) => (
+            {(dashboardData?.recentPosts?.length || 0) > 0 ? (
+                  <div className="space-y-4">
+                    {(dashboardData?.recentPosts || []).map((post) => (
                   <div key={post.id} className="flex items-center space-x-4">
                     <div className="flex-1 space-y-1">
                       <p className="text-sm font-medium leading-none">
@@ -307,7 +267,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardData.servicesCount}
+              {dashboardData?.servicesCount ?? 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Layanan yang tersedia
@@ -322,7 +282,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardData.recentPosts
+              {(dashboardData?.recentPosts || [])
                 .reduce((total, post) => total + post.views, 0)
                 .toLocaleString()}
             </div>

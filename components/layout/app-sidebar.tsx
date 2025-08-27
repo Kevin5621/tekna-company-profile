@@ -126,10 +126,11 @@ function NavigationItems() {
         const Icon = item.icon;
         const isActive = pathname === item.href;
 
-  return (
+        return (
           <Link
             key={item.href}
             href={item.href}
+            prefetch={false}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               "hover:bg-sidebar-accent hover:text-white",
@@ -184,10 +185,11 @@ function BottomNavigationItems() {
         const Icon = item.icon;
         const isActive = pathname === item.href;
 
-  return (
+        return (
           <Link
             key={item.href}
             href={item.href}
+            prefetch={false}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               "hover:bg-sidebar-accent hover:text-white",
@@ -222,7 +224,8 @@ export function AppSidebarNew() {
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
       {/* Logo/Brand */}
       <div className="flex items-center justify-center p-2 border-b border-sidebar-border">
-        <Link href="/dashboard" className="flex items-center justify-center">
+        {/* disable next/link prefetch to avoid preloading many dashboard routes */}
+        <Link href="/dashboard" prefetch={false} className="flex items-center justify-center">
           <Image
             src="/logo.webp"
             alt="Tekna Company Logo"
