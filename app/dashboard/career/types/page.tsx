@@ -6,15 +6,32 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Plus, Save, X, Briefcase } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Plus, Edit2, Trash2, Briefcase, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 import BackButton from "@/components/ui/back-button";
@@ -28,6 +45,7 @@ export default function TypesPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -41,11 +59,13 @@ export default function TypesPage() {
       // Get position counts for each type
       const typesWithCounts = await Promise.all(
         data.map(async (type: CareerType) => {
-          const positions = await careerService.getPositionsByType(type.id);
-          return {
-            ...type,
-            positions_count: positions.length,
-          };
+          try {
+            const positions = await careerService.getPositionsByType(type.id);
+            return { ...type, positions_count: positions.length };
+          } catch (error) {
+            console.error(`Error getting positions for type ${type.id}:`, error);
+            return { ...type, positions_count: 0 };
+          }
         })
       );
       setTypes(typesWithCounts);
@@ -74,8 +94,7 @@ export default function TypesPage() {
       });
 
       toast.success("Type created successfully");
-      setFormData({ name: "", description: "" });
-      setShowAddForm(false);
+      resetForm();
       loadTypes();
     } catch (error) {
       console.error("Error creating type:", error);
@@ -84,8 +103,10 @@ export default function TypesPage() {
   };
 
   const handleEdit = async (id: string) => {
-    const type = types.find((t) => t.id === id);
-    if (!type) return;
+    if (!formData.name.trim()) {
+      toast.error("Type name is required");
+      return;
+    }
 
     try {
       await careerService.updateType(id, {
@@ -94,8 +115,7 @@ export default function TypesPage() {
       });
 
       toast.success("Type updated successfully");
-      setEditingId(null);
-      setFormData({ name: "", description: "" });
+      resetForm();
       loadTypes();
     } catch (error) {
       console.error("Error updating type:", error);
@@ -104,21 +124,10 @@ export default function TypesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const type = types.find((t) => t.id === id);
-    if (!type) return;
-
-    if (type.positions_count && type.positions_count > 0) {
-      toast.error(
-        `Cannot delete type. It has ${type.positions_count} positions.`
-      );
-      return;
-    }
-
-    if (!confirm(`Are you sure you want to delete "${type.name}"?`)) return;
-
     try {
       await careerService.deleteType(id);
       toast.success("Type deleted successfully");
+      setShowDeleteConfirm(null);
       loadTypes();
     } catch (error) {
       console.error("Error deleting type:", error);
@@ -135,8 +144,9 @@ export default function TypesPage() {
     setShowAddForm(false);
   };
 
-  const cancelEdit = () => {
+  const resetForm = () => {
     setEditingId(null);
+    setShowAddForm(false);
     setFormData({ name: "", description: "" });
   };
 
@@ -144,6 +154,16 @@ export default function TypesPage() {
     setShowAddForm(true);
     setEditingId(null);
     setFormData({ name: "", description: "" });
+  };
+
+  const confirmDelete = (type: Type) => {
+    if (type.positions_count && type.positions_count > 0) {
+      toast.error(
+        `Cannot delete type. It has ${type.positions_count} positions.`
+      );
+      return;
+    }
+    setShowDeleteConfirm(type.id);
   };
 
   if (loading) {
@@ -176,169 +196,161 @@ export default function TypesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Career Types</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Job Types</h1>
           <p className="text-muted-foreground">
-            Manage job employment types (Full-time, Part-time, Contract, etc.)
+            Manage employment types and arrangements
           </p>
         </div>
-        <Button onClick={() => setShowAddForm(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+        <Button onClick={startAdd} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
           Add Type
         </Button>
       </div>
 
-      {/* Add Form */}
-      {showAddForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Type</CardTitle>
-            <CardDescription>Create a new job position type</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      {/* Add/Edit Form */}
+      <Dialog open={showAddForm || editingId !== null} onOpenChange={(open) => !open && resetForm()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingId ? "Edit Job Type" : "Add New Job Type"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingId 
+                ? "Update the job type information below."
+                : "Create a new employment type for job positions."
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="add-name">Name *</Label>
+              <Label htmlFor="name">Type Name *</Label>
               <Input
-                id="add-name"
+                id="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder="Enter type name (e.g., Full-time, Part-time)"
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g., Full-time, Part-time, Contract"
+                className="mt-1"
               />
             </div>
             <div>
-              <Label htmlFor="add-description">Description</Label>
+              <Label htmlFor="description">Description</Label>
               <Textarea
-                id="add-description"
+                id="description"
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                placeholder="Enter type description (optional)"
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Brief description of this employment type..."
                 rows={3}
+                className="mt-1"
               />
             </div>
-            <div className="flex gap-2">
-              <Button onClick={handleAdd} className="flex items-center gap-2">
-                <Save className="h-4 w-4" />
-                Save
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowAddForm(false);
-                  setFormData({ name: "", description: "" });
-                }}
-                className="flex items-center gap-2"
-              >
-                <X className="h-4 w-4" />
-                Cancel
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
 
-      {/* Types List */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {types.map((type) => (
-          <Card key={type.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  {editingId === type.id ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        placeholder="Type name"
-                      />
-                      <Textarea
-                        value={formData.description}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            description: e.target.value,
-                          })
-                        }
-                        placeholder="Type description (optional)"
-                        rows={2}
-                      />
+          <DialogFooter>
+            <Button variant="outline" onClick={resetForm}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => editingId ? handleEdit(editingId) : handleAdd()}
+              disabled={!formData.name.trim()}
+            >
+              {editingId ? "Update Type" : "Create Type"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteConfirm !== null} onOpenChange={() => setShowDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Job Type</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{types.find(t => t.id === showDeleteConfirm)?.name}&rdquo;? 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => showDeleteConfirm && handleDelete(showDeleteConfirm)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Types Grid */}
+      {types.length > 0 ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {types.map((type) => (
+            <Card key={type.id} className="hover:shadow-md transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Briefcase className="h-5 w-5 text-primary" />
                     </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <Briefcase className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="text-lg">{type.name}</CardTitle>
+                    <div>
+                      <CardTitle className="text-lg">{type.name}</CardTitle>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary" className="text-xs">
+                          <Building2 className="h-3 w-3 mr-1" />
+                          {type.positions_count || 0} positions
+                        </Badge>
                       </div>
-                      {type.description && (
-                        <CardDescription>{type.description}</CardDescription>
-                      )}
-                    </>
-                  )}
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => startEdit(type)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Edit2 className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => confirmDelete(type)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      disabled={(type.positions_count || 0) > 0}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-1 ml-2">
-                  {editingId === type.id ? (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEdit(type.id)}
-                      >
-                        <Save className="h-3 w-3" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={cancelEdit}>
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => startEdit(type)}
-                      >
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(type.id)}
-                        disabled={Boolean(
-                          type.positions_count && type.positions_count > 0
-                        )}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Badge variant="secondary">
-                  {type.positions_count || 0} positions
-                </Badge>
-                <Badge variant={type.is_active ? "default" : "secondary"}>
-                  {type.is_active ? "Active" : "Inactive"}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {types.length === 0 && (
+              </CardHeader>
+              {type.description && (
+                <CardContent className="pt-0">
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {type.description}
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+          ))}
+        </div>
+      ) : (
         <Card>
-          <CardContent className="py-8">
-            <div className="text-center">
-              <p className="text-muted-foreground">No types found.</p>
-              <Button onClick={startAdd} className="mt-4">
-                Add your first type
-              </Button>
+          <CardContent className="p-8 text-center">
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                <Briefcase className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2">No job types yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create employment types to categorize your job positions by work arrangement.
+                </p>
+                <Button onClick={startAdd} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create First Type
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

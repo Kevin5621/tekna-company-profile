@@ -6,15 +6,32 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Plus, Save, X, TrendingUp } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Plus, Edit2, Trash2, TrendingUp, Building2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 import BackButton from "@/components/ui/back-button";
@@ -28,6 +45,7 @@ export default function LevelsPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -43,11 +61,13 @@ export default function LevelsPage() {
       // Get position counts for each level
       const levelsWithCounts = await Promise.all(
         data.map(async (level: CareerLevel) => {
-          const positions = await careerService.getPositionsByLevel(level.id);
-          return {
-            ...level,
-            positions_count: positions.length,
-          };
+          try {
+            const positions = await careerService.getPositionsByLevel(level.id);
+            return { ...level, positions_count: positions.length };
+          } catch (error) {
+            console.error(`Error getting positions for level ${level.id}:`, error);
+            return { ...level, positions_count: 0 };
+          }
         })
       );
       setLevels(levelsWithCounts);
@@ -91,8 +111,7 @@ export default function LevelsPage() {
       });
 
       toast.success("Level created successfully");
-      setFormData({ name: "", description: "", years_min: "", years_max: "" });
-      setShowAddForm(false);
+      resetForm();
       loadLevels();
     } catch (error) {
       console.error("Error creating level:", error);
@@ -101,9 +120,6 @@ export default function LevelsPage() {
   };
 
   const handleEdit = async (id: string) => {
-    const level = levels.find((l) => l.id === id);
-    if (!level) return;
-
     if (!formData.name.trim() || !formData.years_min.trim()) {
       toast.error("Level name and minimum years are required");
       return;
@@ -131,8 +147,7 @@ export default function LevelsPage() {
       });
 
       toast.success("Level updated successfully");
-      setEditingId(null);
-      setFormData({ name: "", description: "", years_min: "", years_max: "" });
+      resetForm();
       loadLevels();
     } catch (error) {
       console.error("Error updating level:", error);
@@ -141,21 +156,10 @@ export default function LevelsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    const level = levels.find((l) => l.id === id);
-    if (!level) return;
-
-    if (level.positions_count && level.positions_count > 0) {
-      toast.error(
-        `Cannot delete level. It has ${level.positions_count} positions.`
-      );
-      return;
-    }
-
-    if (!confirm(`Are you sure you want to delete "${level.name}"?`)) return;
-
     try {
       await careerService.deleteLevel(id);
       toast.success("Level deleted successfully");
+      setShowDeleteConfirm(null);
       loadLevels();
     } catch (error) {
       console.error("Error deleting level:", error);
@@ -174,8 +178,9 @@ export default function LevelsPage() {
     setShowAddForm(false);
   };
 
-  const cancelEdit = () => {
+  const resetForm = () => {
     setEditingId(null);
+    setShowAddForm(false);
     setFormData({ name: "", description: "", years_min: "", years_max: "" });
   };
 
@@ -183,6 +188,16 @@ export default function LevelsPage() {
     setShowAddForm(true);
     setEditingId(null);
     setFormData({ name: "", description: "", years_min: "", years_max: "" });
+  };
+
+  const confirmDelete = (level: Level) => {
+    if (level.positions_count && level.positions_count > 0) {
+      toast.error(
+        `Cannot delete level. It has ${level.positions_count} positions.`
+      );
+      return;
+    }
+    setShowDeleteConfirm(level.id);
   };
 
   const formatExperience = (yearsMin: number, yearsMax?: number | null) => {
@@ -224,233 +239,189 @@ export default function LevelsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Career Levels</h1>
           <p className="text-muted-foreground">
-            Manage job experience levels and seniority
+            Manage career progression levels and experience requirements
           </p>
         </div>
-        <Button onClick={() => setShowAddForm(true)}>
-          <Plus className="h-4 w-4 mr-2" />
+        <Button onClick={startAdd} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
           Add Level
         </Button>
       </div>
 
-      {/* Add Form */}
-      {showAddForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Add New Level</CardTitle>
-            <CardDescription>Create a new job position level</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      {/* Add/Edit Form */}
+      <Dialog open={showAddForm || editingId !== null} onOpenChange={(open) => !open && resetForm()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingId ? "Edit Career Level" : "Add New Career Level"}
+            </DialogTitle>
+            <DialogDescription>
+              {editingId 
+                ? "Update the career level information below."
+                : "Create a new career level with experience requirements."
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="add-name">Name *</Label>
+              <Label htmlFor="name">Level Name *</Label>
               <Input
-                id="add-name"
+                id="name"
                 value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                placeholder="Enter level name (e.g., Entry Level, Senior)"
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g., Junior, Senior, Principal"
+                className="mt-1"
               />
             </div>
-            <div>
-              <Label htmlFor="add-description">Description</Label>
-              <Textarea
-                id="add-description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                placeholder="Enter level description (optional)"
-                rows={3}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="add-years-min">
-                  Minimum Years of Experience *
-                </Label>
+                <Label htmlFor="years_min">Minimum Years *</Label>
                 <Input
-                  id="add-years-min"
+                  id="years_min"
                   type="number"
                   min="0"
                   value={formData.years_min}
-                  onChange={(e) =>
-                    setFormData({ ...formData, years_min: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, years_min: e.target.value })}
                   placeholder="0"
+                  className="mt-1"
                 />
               </div>
               <div>
-                <Label htmlFor="add-years-max">
-                  Maximum Years of Experience
-                </Label>
+                <Label htmlFor="years_max">Maximum Years</Label>
                 <Input
-                  id="add-years-max"
+                  id="years_max"
                   type="number"
                   min="0"
                   value={formData.years_max}
-                  onChange={(e) =>
-                    setFormData({ ...formData, years_max: e.target.value })
-                  }
-                  placeholder="Leave empty for no maximum"
+                  onChange={(e) => setFormData({ ...formData, years_max: e.target.value })}
+                  placeholder="Optional"
+                  className="mt-1"
                 />
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button onClick={handleAdd} className="flex items-center gap-2">
-                <Save className="h-4 w-4" />
-                Save
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowAddForm(false);
-                  setFormData({
-                    name: "",
-                    description: "",
-                    years_min: "",
-                    years_max: "",
-                  });
-                }}
-                className="flex items-center gap-2"
-              >
-                <X className="h-4 w-4" />
-                Cancel
-              </Button>
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Brief description of this career level..."
+                rows={3}
+                className="mt-1"
+              />
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
 
-      {/* Levels List */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {levels.map((level) => (
-          <Card key={level.id}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  {editingId === level.id ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        placeholder="Level name"
-                      />
-                      <Textarea
-                        value={formData.description}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            description: e.target.value,
-                          })
-                        }
-                        placeholder="Level description (optional)"
-                        rows={2}
-                      />
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          type="number"
-                          min="0"
-                          value={formData.years_min}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              years_min: e.target.value,
-                            })
-                          }
-                          placeholder="Min years"
-                        />
-                        <Input
-                          type="number"
-                          min="0"
-                          value={formData.years_max}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              years_max: e.target.value,
-                            })
-                          }
-                          placeholder="Max years"
-                        />
+          <DialogFooter>
+            <Button variant="outline" onClick={resetForm}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => editingId ? handleEdit(editingId) : handleAdd()}
+              disabled={!formData.name.trim() || !formData.years_min.trim()}
+            >
+              {editingId ? "Update Level" : "Create Level"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteConfirm !== null} onOpenChange={() => setShowDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Career Level</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{levels.find(l => l.id === showDeleteConfirm)?.name}&rdquo;? 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => showDeleteConfirm && handleDelete(showDeleteConfirm)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Levels Grid */}
+      {levels.length > 0 ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {levels.map((level) => (
+            <Card key={level.id} className="hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{level.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        <Clock className="h-3 w-3 inline mr-1" />
+                        {formatExperience(level.years_min, level.years_max)}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary" className="text-xs">
+                          <Building2 className="h-3 w-3 mr-1" />
+                          {level.positions_count || 0} positions
+                        </Badge>
                       </div>
                     </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="text-lg">{level.name}</CardTitle>
-                      </div>
-                      <CardDescription>
-                        {formatExperience(level.years_min, level.years_max)}
-                        {level.description && (
-                          <div className="mt-1">{level.description}</div>
-                        )}
-                      </CardDescription>
-                    </>
-                  )}
+                  </div>
+                  <div className="flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => startEdit(level)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Edit2 className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => confirmDelete(level)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      disabled={(level.positions_count || 0) > 0}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-1 ml-2">
-                  {editingId === level.id ? (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEdit(level.id)}
-                      >
-                        <Save className="h-3 w-3" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={cancelEdit}>
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => startEdit(level)}
-                      >
-                        <Pencil className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(level.id)}
-                        disabled={Boolean(
-                          level.positions_count && level.positions_count > 0
-                        )}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <Badge variant="secondary">
-                  {level.positions_count || 0} positions
-                </Badge>
-                <Badge variant={level.is_active ? "default" : "secondary"}>
-                  {level.is_active ? "Active" : "Inactive"}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {levels.length === 0 && (
+              </CardHeader>
+              {level.description && (
+                <CardContent className="pt-0">
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {level.description}
+                  </p>
+                </CardContent>
+              )}
+            </Card>
+          ))}
+        </div>
+      ) : (
         <Card>
-          <CardContent className="py-8">
-            <div className="text-center">
-              <p className="text-muted-foreground">No levels found.</p>
-              <Button onClick={startAdd} className="mt-4">
-                Add your first level
-              </Button>
+          <CardContent className="p-8 text-center">
+            <div className="space-y-4">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                <TrendingUp className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2">No career levels yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create career levels to define progression paths and experience requirements.
+                </p>
+                <Button onClick={startAdd} className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Create First Level
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

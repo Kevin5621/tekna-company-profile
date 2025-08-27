@@ -7,21 +7,12 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { /* Input,  */ } from "@/components/ui/input";
-import { /* Select, SelectContent, SelectItem, SelectTrigger, SelectValue */ } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
+import { Users, Briefcase, MapPin, TrendingUp, Clock, Star } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -69,10 +60,12 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
       description="Manage job positions, categories, and applications"
       actions={actions}
     >
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Positions</CardTitle>
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalPositions}</div>
@@ -82,6 +75,7 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Open Positions</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.openPositions}</div>
@@ -91,6 +85,7 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalApplications}</div>
@@ -100,6 +95,7 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Featured</CardTitle>
+            <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.featuredPositions}</div>
@@ -108,120 +104,167 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mt-6">
+      {/* Quick Access Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-6">
         <Link href="/dashboard/career/applications" prefetch={false}>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Applications</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Manage job applications</p>
+          <Card className="hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer group">
+            <CardContent className="p-4 text-center">
+              <Users className="h-6 w-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="text-sm font-medium">Applications</div>
+              <div className="text-xs text-muted-foreground">{stats.totalApplications}</div>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/career/categories" prefetch={false}>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Manage job categories</p>
+          <Card className="hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer group">
+            <CardContent className="p-4 text-center">
+              <Briefcase className="h-6 w-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="text-sm font-medium">Categories</div>
+              <div className="text-xs text-muted-foreground">Manage</div>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/career/locations" prefetch={false}>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Locations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Manage work locations</p>
+          <Card className="hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer group">
+            <CardContent className="p-4 text-center">
+              <MapPin className="h-6 w-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="text-sm font-medium">Locations</div>
+              <div className="text-xs text-muted-foreground">Manage</div>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/career/types" prefetch={false}>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Types</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Manage job types</p>
+          <Card className="hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer group">
+            <CardContent className="p-4 text-center">
+              <Briefcase className="h-6 w-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="text-sm font-medium">Types</div>
+              <div className="text-xs text-muted-foreground">Manage</div>
             </CardContent>
           </Card>
         </Link>
 
         <Link href="/dashboard/career/levels" prefetch={false}>
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Levels</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Manage career levels</p>
+          <Card className="hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer group">
+            <CardContent className="p-4 text-center">
+              <TrendingUp className="h-6 w-6 mx-auto mb-2 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="text-sm font-medium">Levels</div>
+              <div className="text-xs text-muted-foreground">Manage</div>
             </CardContent>
           </Card>
         </Link>
-
-        <Card className="hover:shadow-md transition-shadow cursor-pointer opacity-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Analytics</CardTitle>
-            <CardDescription>Coming soon</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">Coming soon</p>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Positions table */}
-      <div className="mt-6">
-        <div className="overflow-hidden rounded-lg border">
-          <Table>
-            <TableHeader className="bg-muted sticky top-0 z-10">
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Level</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Applications</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).length ? (
-                ((positionsPayload?.data as CareerPosition[]) || initialPositions || []).map((p: CareerPosition) => (
-                  <TableRow key={p.id}>
-                    <TableCell>
-                      <Link href={`/dashboard/career/${p.id}`} prefetch={false}>
-                        {p.title}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{p.location?.name || "-"}</TableCell>
-                    <TableCell>{p.type?.name || "-"}</TableCell>
-                    <TableCell>{p.level?.name || "-"}</TableCell>
-                    <TableCell>{p.status}</TableCell>
-                    <TableCell>{p.applications_count || 0}</TableCell>
-                    <TableCell className="text-right">
-                      <Link href={`/dashboard/career/${p.id}/edit`} prefetch={false}>
-                        Edit
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
-                    No positions.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+      {/* Active Positions Overview - Compact Cards */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Active Positions</h2>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">
+              {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).length} total positions
+            </span>
+            <Button asChild size="sm">
+              <Link href="/dashboard/career/new" prefetch={false}>
+                Add New Position
+              </Link>
+            </Button>
+          </div>
         </div>
+
+        {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).length > 0 ? (
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).map((position: CareerPosition) => (
+              <Card key={position.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    {/* Header with title and status */}
+                    <div className="flex items-start justify-between">
+                      <Link href={`/dashboard/career/${position.id}`} prefetch={false}>
+                        <h3 className="text-base font-semibold hover:text-primary transition-colors cursor-pointer line-clamp-2">
+                          {position.title}
+                        </h3>
+                      </Link>
+                      <div className="flex items-center gap-1">
+                        {position.featured && (
+                          <Badge variant="secondary" className="text-xs">
+                            <Star className="h-3 w-3 mr-1" />
+                            Featured
+                          </Badge>
+                        )}
+                        <Badge 
+                          variant={position.status === 'open' ? 'default' : position.status === 'closed' ? 'destructive' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {position.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    {/* Position details */}
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-3 w-3" />
+                        <span>{position.location?.name || 'Remote'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="h-3 w-3" />
+                        <span>{position.type?.name || '-'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="h-3 w-3" />
+                        <span>{position.level?.name || '-'}</span>
+                      </div>
+                    </div>
+
+                    {/* Applications count and actions */}
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">{position.applications_count || 0}</span>
+                        <span className="text-xs text-muted-foreground">applications</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/career/${position.id}/edit`} prefetch={false}>
+                            Edit
+                          </Link>
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/dashboard/career/${position.id}`} prefetch={false}>
+                            View
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <div className="space-y-4">
+                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto">
+                  <Briefcase className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">No positions yet</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Start by creating your first job position to manage your career opportunities.
+                  </p>
+                  <Button asChild>
+                    <Link href="/dashboard/career/new" prefetch={false}>
+                      Create First Position
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </DashboardPageTemplate>
   );
