@@ -27,6 +27,7 @@ import {
   Send,
   UserPlus,
   Share2,
+  CheckCircle,
 } from "lucide-react";
 import {
   CareerService,
@@ -62,6 +63,7 @@ export default function CareerPage() {
   const [selectedPosition, setSelectedPosition] = useState<CareerPosition | null>(null);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
   const [applying, setApplying] = useState(false);
+  const [shareSuccess, setShareSuccess] = useState(false);
   const [applicationData, setApplicationData] = useState({
     first_name: "",
     last_name: "",
@@ -112,8 +114,13 @@ export default function CareerPage() {
       setTypes(typesData);
       setLevels(levelsData);
       setFeaturedPositions(featuredData);
+      
     } catch (error) {
       console.error("Error loading initial data:", error);
+      toast({
+        title: "❌ Data Loading Failed",
+        description: "Some career data failed to load. Please refresh the page.",
+      });
     }
   }, [careerService]);
 
@@ -132,10 +139,14 @@ export default function CareerPage() {
       }
     } catch (error) {
       console.error("Error loading positions:", error);
+      toast({
+        title: "❌ Loading Failed",
+        description: "Failed to load positions. Please refresh the page.",
+      });
     } finally {
       setLoading(false);
     }
-  }, [careerService, searchParams]); // Removed selectedPosition dependency
+  }, [careerService, searchParams]);
 
   useEffect(() => {
     loadInitialData();
@@ -147,6 +158,7 @@ export default function CareerPage() {
 
   const handleSearch = (search: string) => {
     setSearchQuery(search);
+    
   };
 
   const handleFilterChange = (key: string, value: string) => {
@@ -156,6 +168,7 @@ export default function CareerPage() {
         filters: { ...prev.filters, [key as keyof typeof prev.filters]: undefined },
         page: 1,
       }));
+      
       return;
     }
 
@@ -164,6 +177,7 @@ export default function CareerPage() {
       filters: { ...prev.filters, [key as keyof typeof prev.filters]: value },
       page: 1,
     }));
+    
   };
 
   const handleSortChange = (sort: string) => {
@@ -172,15 +186,27 @@ export default function CareerPage() {
       sort: sort as "newest" | "oldest" | "title" | "salary_high" | "salary_low" | "deadline",
       page: 1,
     }));
+    
   };
 
   const handlePageChange = (page: number) => {
     setSearchParams((prev) => ({ ...prev, page }));
+    
+  };
+
+  const handlePositionSelect = (position: CareerPosition) => {
+    setSelectedPosition(position);
+    
   };
 
   const clearFilters = () => {
     setSearchQuery("");
     setSearchParams({ page: 1, limit: 12, sort: "newest" });
+    
+    toast({
+      title: "🔄 Filters Reset",
+      description: "All filters have been cleared. Showing all positions.",
+    });
   };
 
   const hasActiveFilters = () => {
@@ -250,9 +276,8 @@ export default function CareerPage() {
         });
 
         toast({
-          title: "Application Submitted!",
-          description: "You will receive a confirmation email shortly.",
-          variant: "success",
+          title: "🎉 Application Submitted Successfully!",
+          description: "Thank you for your interest! You will receive a confirmation email shortly.",
         });
       } else {
         console.error("Application submission failed:", result.error);
@@ -266,9 +291,8 @@ export default function CareerPage() {
       }
 
       toast({
-        title: "Submission Failed",
+        title: "❌ Submission Failed",
         description: errorMessage,
-        variant: "destructive",
       });
     } finally {
       setApplying(false);
@@ -276,23 +300,62 @@ export default function CareerPage() {
   };
 
   const sharePosition = async () => {
-    if (navigator.share && selectedPosition) {
-      try {
-        await navigator.share({
-          title: selectedPosition.title,
-          text: selectedPosition.description?.substring(0, 100) + "...",
-          url: window.location.href,
+    if (!selectedPosition) return;
+
+    const shareData = {
+      title: `${selectedPosition.title} - Career Opportunity`,
+      text: selectedPosition.description 
+        ? `${selectedPosition.description.substring(0, 150)}...`
+        : `Check out this ${selectedPosition.title} position at our company!`,
+      url: window.location.href,
+    };
+
+    try {
+      // Try native sharing first (mobile devices)
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        setShareSuccess(true);
+        toast({
+          title: "📤 Shared Successfully!",
+          description: "Position shared with your contacts.",
         });
-      } catch (err) {
-        console.log("Error sharing:", err);
+        
+        // Reset share success state after 3 seconds
+        setTimeout(() => setShareSuccess(false), 3000);
+      } else {
+        // Fallback to clipboard copy
+        await navigator.clipboard.writeText(window.location.href);
+        setShareSuccess(true);
+        toast({
+          title: "📋 URL Copied!",
+          description: "Position URL copied to clipboard. You can now share it manually.",
+        });
+        
+        // Reset share success state after 3 seconds
+        setTimeout(() => setShareSuccess(false), 3000);
       }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: "URL Copied!",
-        description: "Position URL copied to clipboard!",
-        variant: "success",
-      });
+    } catch (error) {
+      console.error("Error sharing position:", error);
+      
+      // Final fallback - copy to clipboard
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setShareSuccess(true);
+        toast({
+          title: "📋 URL Copied!",
+          description: "Position URL copied to clipboard. You can now share it manually.",
+        });
+        
+        // Reset share success state after 3 seconds
+        setTimeout(() => setShareSuccess(false), 3000);
+      } catch (clipboardError) {
+        console.error("Clipboard copy failed:", clipboardError);
+        setShareSuccess(false);
+        toast({
+          title: "❌ Sharing Failed",
+          description: "Unable to share or copy URL. Please try again.",
+        });
+      }
     }
   };
 
@@ -321,6 +384,27 @@ export default function CareerPage() {
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
+              </div>
+              
+              {/* Test Toast Button - Temporary */}
+              <div className="mt-4 text-center">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    try {
+                      toast({
+                        title: "🧪 Test Toast",
+                        description: "If you see this, toast is working!",
+                      });
+                    } catch (error) {
+                      console.error("Toast error:", error);
+                    }
+                  }}
+                  className="text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/20"
+                >
+                  Test Toast
+                </Button>
               </div>
             </div>
 
@@ -465,7 +549,7 @@ export default function CareerPage() {
                             ? "border-primary bg-primary/5 shadow-md"
                             : "border-border"
                         )}
-                        onClick={() => setSelectedPosition(position)}
+                        onClick={() => handlePositionSelect(position)}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-start gap-4">
@@ -609,8 +693,12 @@ export default function CareerPage() {
 
                       <div className="flex flex-col sm:flex-row gap-3">
                         <Button onClick={sharePosition} variant="outline" size="sm">
-                          <Share2 className="w-4 h-4 mr-2" />
-                          Share
+                          {shareSuccess ? (
+                            <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                          ) : (
+                            <Share2 className="w-4 h-4 mr-2" />
+                          )}
+                          {shareSuccess ? "Shared!" : "Share"}
                         </Button>
                         <Button
                           onClick={() => setShowApplicationForm(true)}
@@ -734,7 +822,13 @@ export default function CareerPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowApplicationForm(false)}
+                  onClick={() => {
+                    setShowApplicationForm(false);
+                    toast({
+                      title: "❌ Application Cancelled",
+                      description: "Application form closed. You can apply again anytime.",
+                    });
+                  }}
                 >
                   ×
                 </Button>
@@ -891,7 +985,13 @@ export default function CareerPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setShowApplicationForm(false)}
+                    onClick={() => {
+                      setShowApplicationForm(false);
+                      toast({
+                        title: "❌ Application Cancelled",
+                        description: "Application form closed. You can apply again anytime.",
+                      });
+                    }}
                     className="flex-1"
                   >
                     Cancel
@@ -900,6 +1000,14 @@ export default function CareerPage() {
                     type="submit"
                     disabled={applying}
                     className="flex-1"
+                    onClick={() => {
+                      if (!applicationData.first_name || !applicationData.last_name || !applicationData.email) {
+                        toast({
+                          title: "⚠️ Required Fields Missing",
+                          description: "Please fill in all required fields (First Name, Last Name, Email).",
+                        });
+                      }
+                    }}
                   >
                     <Send className="w-4 h-4 mr-2" />
                     {applying ? "Submitting..." : "Submit Application"}
