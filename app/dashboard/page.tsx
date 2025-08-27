@@ -2,6 +2,7 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
+import useSWR from "swr";
 import {
   Card,
   CardContent,
@@ -23,6 +24,7 @@ import {
 import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
 const DashboardChart = dynamic(() => import("@/components/dashboard-chart").then((m) => m.DashboardChart), { ssr: false });
+import { SkeletonCard } from "@/components/ui/skeleton-card";
 
 // Client-side fetch will call /api/dashboard
 
@@ -30,46 +32,44 @@ const DashboardChart = dynamic(() => import("@/components/dashboard-chart").then
 // We'll fetch dashboard data from the new API route on the client
 
 export default function DashboardPage() {
-  const [loading, setLoading] = React.useState(true);
-  const [dashboardData, setDashboardData] = React.useState<DashboardData | null>(null);
-  const [totalApplications, setTotalApplications] = React.useState<number>(0);
+  // SWR fetcher with default revalidateOnFocus = true (revalidate when window refocus)
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload, error, isLoading } = useSWR("/api/dashboard", fetcher, {
+    revalidateOnFocus: true,
+    refreshWhenHidden: false,
+  });
 
-  React.useEffect(() => {
-    let mounted = true;
-    fetch("/api/dashboard")
-      .then((r) => r.json())
-      .then((payload) => {
-        if (!mounted) return;
-        if (payload?.success && payload.data) {
-          const data: DashboardData = payload.data.dashboardData;
-          // attach icons
-          data.stats = [
-            { ...data.stats[0], icon: IconUsers },
-            { ...data.stats[1], icon: IconFolder },
-            { ...data.stats[2], icon: IconArticle },
-            { ...data.stats[3], icon: IconMessageCircle },
-          ];
-          setDashboardData(data);
-          setTotalApplications(payload.data.totalApplications || 0);
-        } else {
-          setDashboardData(null);
-        }
-      })
-      .catch((e) => {
-        console.error("Error fetching /api/dashboard:", e);
-      })
-      .finally(() => mounted && setLoading(false));
+  const dashboardData: DashboardData | null = React.useMemo(() => {
+    if (!apiPayload?.success) return null;
+    const data: DashboardData = apiPayload.data.dashboardData;
+    // attach icons for UI
+    data.stats = [
+      { ...data.stats[0], icon: IconUsers },
+      { ...data.stats[1], icon: IconFolder },
+      { ...data.stats[2], icon: IconArticle },
+      { ...data.stats[3], icon: IconMessageCircle },
+    ];
+    return data;
+  }, [apiPayload]);
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const totalApplications = apiPayload?.data?.totalApplications || 0;
+  const loading = isLoading;
+  const fetchError = error;
 
   return (
     <div className="space-y-6">
-      {/* show a simple skeleton while loading */}
+      {/* show skeleton cards while loading */}
       {loading && (
-        <div className="text-muted-foreground">Memuat dashboard…</div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      )}
+
+      {fetchError && (
+        <div className="text-sm text-destructive">Gagal memuat data dashboard.</div>
       )}
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
