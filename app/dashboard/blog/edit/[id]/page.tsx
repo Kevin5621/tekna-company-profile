@@ -39,15 +39,16 @@ export default async function EditPostPage({ params }: EditPostPageProps) {
       <DashboardFormTemplate
         breadcrumbs={[
           { label: "Blog", href: "/dashboard/blog" },
-          { label: "Edit Artikel", href: `/dashboard/blog/edit/${id}` },
-          { label: "Form Edit", isCurrentPage: true },
+          { label: "Edit Post", isCurrentPage: true },
         ]}
-        title="Edit Artikel"
-        description="Edit artikel blog yang sudah ada"
+        title="Edit Post"
+        description="Update blog post information"
         backHref="/dashboard/blog"
-        backLabel="Kembali ke Blog"
+        backLabel="Back to Blog"
       >
-        <PostForm postId={id} initialData={initialData} />
+        <div className="dashboard-form-container">
+          <PostForm postId={id} initialData={initialData} />
+        </div>
       </DashboardFormTemplate>
     );
   } catch (error) {
