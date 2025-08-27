@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IconPlus, IconUsers } from "@tabler/icons-react";
+import { Plus, Users, Shield, Edit3, UserCheck, UserX, Mail, Settings } from "lucide-react";
 import type { AdminUser } from "@/lib/services/admin-auth.service";
 import { AdminUserModal } from "./admin-user-modal";
 import { AdminStats } from "./admin-stats";
@@ -70,13 +70,26 @@ export default function AdminClient({ initialUsers }: AdminClientProps) {
   const getRoleDisplayName = (role: string) => {
     switch (role) {
       case "admin":
-        return "Admin";
+        return "Administrator";
       case "editor":
-        return "Editor";
+        return "Content Editor";
       case "hr":
-        return "HR";
+        return "HR Manager";
       default:
         return role;
+    }
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "admin":
+        return Shield;
+      case "editor":
+        return Edit3;
+      case "hr":
+        return Users;
+      default:
+        return Users;
     }
   };
 
@@ -94,62 +107,87 @@ export default function AdminClient({ initialUsers }: AdminClientProps) {
   const filteredUsers = getFilteredUsers();
 
   const renderUserList = (list: AdminUser[]) => (
-    <div className="space-y-4">
-      {list.map((user) => (
-        <div
-          key={user.id}
-          className="flex items-center justify-between p-4 border rounded-lg"
-        >
-          <div className="flex items-center gap-4">
-            {(() => {
-              const display = user.display_name || user.profile?.first_name || user.email;
-              return (
-                <>
-                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="text-primary font-semibold">{getInitials(display)}</span>
+    <div className="grid gap-4">
+      {list.map((user) => {
+        const RoleIcon = getRoleIcon(user.role);
+        const display = user.display_name || user.profile?.first_name || user.email;
+        
+        return (
+          <Card key={user.id} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="text-primary font-semibold text-lg">{getInitials(display)}</span>
                   </div>
-                  <div>
-                    <div className="font-medium">{display}</div>
-                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                  <div className="space-y-1">
+                    <div className="font-semibold text-lg">{display}</div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Mail className="h-3 w-3" />
+                      {user.email}
+                    </div>
                   </div>
-                </>
-              );
-            })()}
-          </div>
+                </div>
 
-          <div className="flex items-center gap-3">
-            <Badge variant={getRoleBadgeVariant(user.role)}>
-              {getRoleDisplayName(user.role)}
-            </Badge>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <RoleIcon className="h-4 w-4 text-muted-foreground" />
+                    <Badge variant={getRoleBadgeVariant(user.role)}>
+                      {getRoleDisplayName(user.role)}
+                    </Badge>
+                  </div>
 
-            <div className="text-sm text-muted-foreground">
-              {user.is_active ? (
-                <span className="text-primary">Active</span>
-              ) : (
-                <span className="text-destructive">Inactive</span>
-              )}
-            </div>
+                  <div className="flex items-center gap-2">
+                    {user.is_active ? (
+                      <div className="flex items-center gap-1 text-emerald-600">
+                        <UserCheck className="h-4 w-4" />
+                        <span className="text-sm font-medium">Active</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <UserX className="h-4 w-4" />
+                        <span className="text-sm font-medium">Inactive</span>
+                      </div>
+                    )}
+                  </div>
 
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => handleModalOpen(user)}>
-                Edit
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))}
+                  <Button variant="outline" size="sm" onClick={() => handleModalOpen(user)}>
+                    <Settings className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
 
       {list.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">No users found in this category</div>
+        <Card>
+          <CardContent className="py-12 text-center">
+            <Users className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No users found</h3>
+            <p className="text-muted-foreground mb-4">
+              {activeTab === "active" 
+                ? "No active users in this category"
+                : activeTab === "inactive"
+                ? "No inactive users in this category"
+                : "No users found in this category"
+              }
+            </p>
+            <Button onClick={() => handleModalOpen()}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add First User
+            </Button>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
 
-  // SWR provides fallbackData for instant UI; no explicit loading screen needed here
-
   const actions = (
     <Button onClick={() => handleModalOpen()}>
-      <IconPlus className="h-4 w-4 mr-2" />
+      <Plus className="h-4 w-4 mr-2" />
       Add User
     </Button>
   );
@@ -168,7 +206,7 @@ export default function AdminClient({ initialUsers }: AdminClientProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <IconUsers className="h-5 w-5" />
+            <Users className="h-5 w-5" />
             Admin Users
           </CardTitle>
           <CardDescription>Manage system administrators and content editors</CardDescription>
