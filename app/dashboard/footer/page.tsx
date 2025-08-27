@@ -90,7 +90,7 @@ export default function FooterManagementPage() {
                 <CardDescription>{section.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Link href={section.href}>
+                <Link href={section.href} prefetch={false}>
                   <Button className="w-full" variant="outline">
                     <Plus className="mr-2 h-4 w-4" />
                     Manage {section.title}

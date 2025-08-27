@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import useSWR, { mutate as globalMutate } from "swr";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,20 +31,18 @@ interface AuthorsPageClientProps {
 
 export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
   const router = useRouter();
-  const [authors, setAuthors] = useState<Author[]>(initialAuthors);
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload } = useSWR("/api/authors", fetcher, {
+    fallbackData: { success: true, data: initialAuthors },
+    revalidateOnFocus: true,
+  });
+  const authors = (apiPayload?.data as Author[]) || initialAuthors;
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   useRealtimeAuthors(() => {
-    const refreshAuthors = async () => {
-      try {
-        const updatedAuthors = await ClientDashboardService.getAuthors();
-        setAuthors(updatedAuthors);
-      } catch (error) {
-        console.error("Error refreshing authors:", error);
-      }
-    };
-    refreshAuthors();
+    // revalidate SWR when realtime event arrives
+    globalMutate("/api/authors");
   });
 
   const handleDelete = async (authorId: string, name: string) => {
@@ -53,8 +52,13 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
 
     setIsLoading(true);
     try {
+      // optimistic update
+      const optimistic = authors.filter((a) => a.id !== authorId);
+      globalMutate("/api/authors", { success: true, data: optimistic }, false);
+
       await ClientDashboardService.deleteAuthor(authorId);
-      setAuthors((prev) => prev.filter((author) => author.id !== authorId));
+      await globalMutate("/api/authors");
+
       toast({
         title: "Author Deleted!",
         description: "Author has been deleted successfully.",
@@ -68,13 +72,14 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
           error instanceof Error ? error.message : "Failed to delete author",
         variant: "destructive",
       });
+      await globalMutate("/api/authors");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleEdit = (authorId: string) => {
-    router.push(`/dashboard/authors/edit/${authorId}`);
+  router.push(`/dashboard/authors/edit/${authorId}`);
   };
 
   const handleAddNew = () => {

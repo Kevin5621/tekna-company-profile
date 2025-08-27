@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient, createAdminClient } from "@/lib/supabase/client";
 
 export interface UserRole {
   id: string;
@@ -258,14 +258,66 @@ export class AdminAuthService {
    * Get all admin users (super admin only)
    */
   static async getAllAdminUsers(): Promise<AdminUser[]> {
+    // Server-side retrieval using service role client.
     try {
-      const response = await fetch("/api/admin/users");
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch admin users");
+      const supabase = createAdminClient();
+
+      // Fetch all admin role rows
+      const { data: roles, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("*");
+
+      if (rolesError) {
+        console.error("Error fetching user_roles:", rolesError);
+        return [];
       }
-      const users = await response.json();
-      return users;
+
+      const userIds = (roles || []).map((r: UserRole) => r.user_id);
+
+      // Fetch profiles for those users
+      const { data: profiles } = await supabase
+        .from("user_profiles")
+        .select("*")
+        .in("user_id", userIds || []);
+      const profilesData: UserProfile[] = (profiles || []) as UserProfile[];
+
+      // Fetch auth users via admin API
+  type AuthUser = { id: string; email?: string; user_metadata?: { display_name?: string } | Record<string, unknown> };
+      let authUsers: AuthUser[] = [];
+      try {
+        const listResp = await supabase.auth.admin.listUsers();
+        // new supabase client may return { data: { users: [] } } or { data: users }
+        authUsers = (listResp?.data?.users || listResp?.data || []) as AuthUser[];
+      } catch (e) {
+        // fallback: empty
+        console.warn("Could not list auth users via admin client:", e);
+      }
+
+      // Map roles to AdminUser shape
+      const adminUsers: AdminUser[] = (roles || []).map((r: UserRole) => {
+        const profile = profilesData.find((p) => p.user_id === r.user_id) || undefined;
+        const authUser = authUsers.find((u) => u.id === r.user_id);
+        // extract display_name from user_metadata if available
+        let display_name: string | undefined = undefined;
+        if (authUser && typeof authUser.user_metadata === "object") {
+          const meta = authUser.user_metadata as Record<string, unknown>;
+          if (typeof meta["display_name"] === "string") {
+            display_name = meta["display_name"];
+          }
+        }
+        display_name = display_name || profile?.first_name || undefined;
+
+        return {
+          id: r.user_id,
+          email: authUser?.email || "",
+          role: r.role,
+          is_active: r.is_active,
+          profile: profile || undefined,
+          display_name,
+        } as AdminUser;
+      });
+
+      return adminUsers;
     } catch (error) {
       console.error("Error getting admin users:", error);
       throw error;

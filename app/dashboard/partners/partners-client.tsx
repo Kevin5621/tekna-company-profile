@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import useSWR, { mutate as globalMutate } from "swr";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,34 +27,20 @@ interface Partner {
   updated_at: string;
   is_active: boolean;
 }
+interface PartnersClientProps {
+  initialPartners: Partner[];
+}
 
-export default function PartnersClient() {
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function PartnersClient({ initialPartners }: PartnersClientProps) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const { toast } = useToast();
-
-  const fetchPartners = useCallback(async () => {
-    try {
-      const response = await fetch("/api/partners");
-      const data = await response.json();
-
-      if (data.success) {
-        setPartners(data.partners);
-      } else {
-        throw new Error(data.error || "Failed to fetch partners");
-      }
-    } catch (error) {
-      console.error("Error fetching partners:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch partners",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [toast]);
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload } = useSWR("/api/partners", fetcher, {
+    fallbackData: { partners: initialPartners, success: true },
+    revalidateOnFocus: true,
+  });
+  const partners = (apiPayload?.partners as Partner[]) || initialPartners || [];
+  const loading = !apiPayload && initialPartners.length === 0;
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`Are you sure you want to delete "${name}"?`)) {
@@ -61,8 +48,11 @@ export default function PartnersClient() {
     }
 
     setDeleting(id);
-
     try {
+  // optimistic: keep same response shape as the API
+  const optimistic = partners.filter((p) => p.id !== id);
+  globalMutate("/api/partners", { partners: optimistic, success: true }, false);
+
       const response = await fetch(`/api/partners/${id}`, {
         method: "DELETE",
       });
@@ -70,7 +60,7 @@ export default function PartnersClient() {
       const data = await response.json();
 
       if (data.success) {
-        setPartners(partners.filter((p) => p.id !== id));
+        await globalMutate("/api/partners");
         toast({
           title: "Success",
           description: "Partner deleted successfully",
@@ -85,14 +75,16 @@ export default function PartnersClient() {
         description: "Failed to delete partner",
         variant: "destructive",
       });
+      await globalMutate("/api/partners");
     } finally {
       setDeleting(null);
     }
   };
 
   useEffect(() => {
-    fetchPartners();
-  }, [fetchPartners]);
+    // trigger a revalidate on mount
+    globalMutate("/api/partners");
+  }, []);
 
   if (loading) {
     return (
@@ -122,7 +114,7 @@ export default function PartnersClient() {
 
   const actions = (
     <Button asChild>
-      <Link href="/dashboard/partners/new">
+  <Link href="/dashboard/partners/new" prefetch={false}>
         <Plus className="w-4 h-4 mr-2" />
         Add Partner
       </Link>
@@ -212,7 +204,7 @@ export default function PartnersClient() {
 
                 <div className="flex items-center gap-2 pt-4">
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/dashboard/partners/edit/${partner.id}`}>
+                    <Link href={`/dashboard/partners/edit/${partner.id}`} prefetch={false}>
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
                     </Link>
@@ -243,7 +235,7 @@ export default function PartnersClient() {
               Get started by adding your first partner.
             </p>
             <Button asChild>
-              <Link href="/dashboard/partners/new">
+              <Link href="/dashboard/partners/new" prefetch={false}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Partner
               </Link>

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import useSWR, { mutate as globalMutate } from "swr";
+import { SkeletonList } from "@/components/ui/skeleton-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,20 +33,17 @@ export function CategoriesPageClient({
   initialCategories,
 }: CategoriesPageClientProps) {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload, isLoading: loading } = useSWR("/api/categories", fetcher, {
+    fallbackData: { success: true, data: initialCategories },
+    revalidateOnFocus: true,
+  });
+  const categories = (apiPayload?.data as Category[]) || initialCategories;
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   useRealtimeCategories(() => {
-    const refreshCategories = async () => {
-      try {
-        const updatedCategories = await ClientDashboardService.getCategories();
-        setCategories(updatedCategories as Category[]);
-      } catch (error) {
-        console.error("Error refreshing categories:", error);
-      }
-    };
-    refreshCategories();
+    globalMutate("/api/categories");
   });
 
   const handleDelete = async (categoryId: string, name: string) => {
@@ -54,10 +53,13 @@ export function CategoriesPageClient({
 
     setIsLoading(true);
     try {
+      // optimistic
+      const optimistic = categories.filter((c) => c.id !== categoryId);
+      globalMutate("/api/categories", { success: true, data: optimistic }, false);
+
       await ClientDashboardService.deleteCategory(categoryId);
-      setCategories((prev) =>
-        prev.filter((category) => category.id !== categoryId)
-      );
+      await globalMutate("/api/categories");
+
       toast({
         title: "Category Deleted!",
         description: "Category has been deleted successfully.",
@@ -71,6 +73,7 @@ export function CategoriesPageClient({
           error instanceof Error ? error.message : "Failed to delete category",
         variant: "destructive",
       });
+      await globalMutate("/api/categories");
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +113,9 @@ export function CategoriesPageClient({
       actions={actions}
     >
       {/* Categories Grid */}
-      {categories.length === 0 ? (
+      {loading ? (
+        <SkeletonList rows={6} />
+      ) : categories.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <p className="text-muted-foreground mb-4">

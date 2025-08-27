@@ -97,7 +97,7 @@ export default function ProjectsPageClient({
   const actions = (
     <Button onClick={handleAddNew}>
       <IconPlus className="h-4 w-4 mr-2" />
-      Tambah Proyek
+  Tambah Proyek
     </Button>
   );
 
