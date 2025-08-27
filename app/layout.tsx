@@ -104,8 +104,7 @@ export default function RootLayout({
         <OrganizationStructuredData siteUrl={defaultUrl} />
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
           disableTransitionOnChange
         >
           <SessionProvider>

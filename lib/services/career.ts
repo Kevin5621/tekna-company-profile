@@ -892,15 +892,55 @@ export class CareerService {
     data: Partial<CareerPosition>
   ): Promise<CareerPosition | null> {
     try {
+      // Ensure required/default fields are present to avoid DB constraint failures
+      const slugify = (s?: string) =>
+        (s || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .replace(/(^-|-$)/g, "");
+
+  const payload: Partial<CareerPosition> = {
+        // prefer explicit data values, otherwise sane defaults
+        title: data.title || "",
+        slug: data.slug || slugify(data.title),
+        description: data.description || "",
+  summary: data.summary || undefined,
+  requirements: data.requirements || undefined,
+  benefits: data.benefits || undefined,
+        salary_min: typeof data.salary_min === "number" ? data.salary_min : undefined,
+        salary_max: typeof data.salary_max === "number" ? data.salary_max : undefined,
+        salary_currency: data.salary_currency || "USD",
+        salary_type: data.salary_type || "annual",
+  application_deadline: data.application_deadline || undefined,
+  start_date: data.start_date || undefined,
+        remote_allowed:
+          typeof data.remote_allowed === "boolean"
+            ? data.remote_allowed
+            : Boolean((data as Partial<Record<string, unknown>>).remote_friendly),
+        travel_required: typeof data.travel_required === "boolean" ? data.travel_required : false,
+        travel_percentage: typeof data.travel_percentage === "number" ? data.travel_percentage : 0,
+        featured: !!data.featured,
+        urgent: !!data.urgent,
+        status: (data.status as CareerPosition["status"]) || "draft",
+        views_count: typeof data.views_count === "number" ? data.views_count : 0,
+        applications_count: typeof data.applications_count === "number" ? data.applications_count : 0,
+        is_active: typeof data.is_active === "boolean" ? data.is_active : true,
+        published_at:
+          data.status === "open" ? new Date().toISOString() : data.published_at || undefined,
+        category_id: data.category_id || undefined,
+        location_id: data.location_id || undefined,
+        type_id: data.type_id || undefined,
+        level_id: data.level_id || undefined,
+        // audit fields
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
       const { data: position, error } = await this.supabase
         .from("career_positions")
-        .insert([
-          {
-            ...data,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ])
+        .insert([payload])
         .select(
           `
           *,
@@ -913,11 +953,16 @@ export class CareerService {
         .single();
 
       if (error) {
-        console.error("Error creating position:", error);
+        // Supabase error objects can be complex; log full JSON to help debugging
+        try {
+          console.error("Error creating position:", JSON.stringify(error, null, 2));
+        } catch {
+          console.error("Error creating position (raw):", error);
+        }
         return null;
       }
 
-      return position;
+      return position as CareerPosition;
     } catch (error) {
       console.error("Error in createPosition:", error);
       return null;

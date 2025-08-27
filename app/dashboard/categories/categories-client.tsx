@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import useSWR, { mutate as globalMutate } from "swr";
+import { SkeletonList } from "@/components/ui/skeleton-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +11,7 @@ import { ClientDashboardService } from "@/lib/services/client-dashboard.service"
 import { useRealtimeCategories } from "@/lib/hooks/use-realtime-simple";
 import { IconPlus, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface Category {
   id: string;
@@ -31,22 +33,17 @@ export function CategoriesPageClient({
   initialCategories,
 }: CategoriesPageClientProps) {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload, isLoading: loading } = useSWR("/api/categories", fetcher, {
+    fallbackData: { success: true, data: initialCategories },
+    revalidateOnFocus: true,
+  });
+  const categories = (apiPayload?.data as Category[]) || initialCategories;
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Real-time sync for categories
   useRealtimeCategories(() => {
-    // Refresh categories when real-time changes are detected
-    const refreshCategories = async () => {
-      try {
-        const updatedCategories = await ClientDashboardService.getCategories();
-        setCategories(updatedCategories as Category[]);
-      } catch (error) {
-        console.error("Error refreshing categories:", error);
-      }
-    };
-    refreshCategories();
+    globalMutate("/api/categories");
   });
 
   const handleDelete = async (categoryId: string, name: string) => {
@@ -56,10 +53,13 @@ export function CategoriesPageClient({
 
     setIsLoading(true);
     try {
+      // optimistic
+      const optimistic = categories.filter((c) => c.id !== categoryId);
+      globalMutate("/api/categories", { success: true, data: optimistic }, false);
+
       await ClientDashboardService.deleteCategory(categoryId);
-      setCategories((prev) =>
-        prev.filter((category) => category.id !== categoryId)
-      );
+      await globalMutate("/api/categories");
+
       toast({
         title: "Category Deleted!",
         description: "Category has been deleted successfully.",
@@ -73,6 +73,7 @@ export function CategoriesPageClient({
           error instanceof Error ? error.message : "Failed to delete category",
         variant: "destructive",
       });
+      await globalMutate("/api/categories");
     } finally {
       setIsLoading(false);
     }
@@ -94,32 +95,27 @@ export function CategoriesPageClient({
     });
   };
 
+  const actions = (
+    <Button onClick={handleAddNew}>
+      <IconPlus className="h-4 w-4 mr-2" />
+      Add Category
+    </Button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Kategori", href: "/dashboard/categories" },
-          { label: "Daftar Kategori", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Categories</h1>
-          <p className="text-muted-foreground">
-            Manage categories for blog articles
-          </p>
-        </div>
-        <Button onClick={handleAddNew}>
-          <IconPlus className="h-4 w-4 mr-2" />
-          Add Category
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Kategori", href: "/dashboard/categories" },
+        { label: "Daftar Kategori", isCurrentPage: true },
+      ]}
+      title="Categories"
+      description="Manage categories for blog articles"
+      actions={actions}
+    >
       {/* Categories Grid */}
-      {categories.length === 0 ? (
+      {loading ? (
+        <SkeletonList rows={6} />
+      ) : categories.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <p className="text-muted-foreground mb-4">
@@ -203,6 +199,6 @@ export function CategoriesPageClient({
           ))}
         </div>
       )}
-    </div>
+    </DashboardPageTemplate>
   );
 }

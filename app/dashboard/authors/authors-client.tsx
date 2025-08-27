@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import useSWR, { mutate as globalMutate } from "swr";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +11,7 @@ import { ClientDashboardService } from "@/lib/services/client-dashboard.service"
 import { useRealtimeAuthors } from "@/lib/hooks/use-realtime-simple";
 import { IconPlus, IconEdit, IconTrash, IconMail } from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
+import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 
 interface Author {
   id: string;
@@ -30,22 +31,18 @@ interface AuthorsPageClientProps {
 
 export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
   const router = useRouter();
-  const [authors, setAuthors] = useState<Author[]>(initialAuthors);
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload } = useSWR("/api/authors", fetcher, {
+    fallbackData: { success: true, data: initialAuthors },
+    revalidateOnFocus: true,
+  });
+  const authors = (apiPayload?.data as Author[]) || initialAuthors;
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Real-time sync for authors
   useRealtimeAuthors(() => {
-    // Refresh authors when real-time changes are detected
-    const refreshAuthors = async () => {
-      try {
-        const updatedAuthors = await ClientDashboardService.getAuthors();
-        setAuthors(updatedAuthors);
-      } catch (error) {
-        console.error("Error refreshing authors:", error);
-      }
-    };
-    refreshAuthors();
+    // revalidate SWR when realtime event arrives
+    globalMutate("/api/authors");
   });
 
   const handleDelete = async (authorId: string, name: string) => {
@@ -55,8 +52,13 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
 
     setIsLoading(true);
     try {
+      // optimistic update
+      const optimistic = authors.filter((a) => a.id !== authorId);
+      globalMutate("/api/authors", { success: true, data: optimistic }, false);
+
       await ClientDashboardService.deleteAuthor(authorId);
-      setAuthors((prev) => prev.filter((author) => author.id !== authorId));
+      await globalMutate("/api/authors");
+
       toast({
         title: "Author Deleted!",
         description: "Author has been deleted successfully.",
@@ -70,13 +72,14 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
           error instanceof Error ? error.message : "Failed to delete author",
         variant: "destructive",
       });
+      await globalMutate("/api/authors");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleEdit = (authorId: string) => {
-    router.push(`/dashboard/authors/edit/${authorId}`);
+  router.push(`/dashboard/authors/edit/${authorId}`);
   };
 
   const handleAddNew = () => {
@@ -87,30 +90,23 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
+  const actions = (
+    <Button onClick={handleAddNew}>
+      <IconPlus className="h-4 w-4 mr-2" />
+      Add Author
+    </Button>
+  );
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Penulis", href: "/dashboard/authors" },
-          { label: "Daftar Penulis", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Authors</h1>
-          <p className="text-muted-foreground">
-            Manage authors/team members for blog articles
-          </p>
-        </div>
-        <Button onClick={handleAddNew}>
-          <IconPlus className="h-4 w-4 mr-2" />
-          Add Author
-        </Button>
-      </div>
-
+    <DashboardPageTemplate
+      breadcrumbs={[
+        { label: "Penulis", href: "/dashboard/authors" },
+        { label: "Daftar Penulis", isCurrentPage: true },
+      ]}
+      title="Authors"
+      description="Manage authors/team members for blog articles"
+      actions={actions}
+    >
       {/* Authors Grid */}
       {authors.length === 0 ? (
         <Card>
@@ -203,6 +199,6 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
           ))}
         </div>
       )}
-    </div>
+    </DashboardPageTemplate>
   );
 }

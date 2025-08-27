@@ -9,7 +9,7 @@ export async function GET(request: NextRequest, context: unknown) {
 
     const { data: partner, error } = await supabase
       .from("partners")
-      .select("*")
+      .select("id, logo_url, created_at, updated_at")
       .eq("id", params.id)
       .single();
 
@@ -79,13 +79,13 @@ export async function PUT(request: NextRequest, context: unknown) {
     }
 
     const body = await request.json();
-    const { name, logo_url, description, website, is_active } = body;
+    const { logo_url } = body;
 
-    if (!name?.trim()) {
+    if (!logo_url || typeof logo_url !== "string") {
       return NextResponse.json(
         {
           success: false,
-          error: "Partner name is required",
+          error: "logo_url is required",
         },
         { status: 400 }
       );
@@ -94,15 +94,11 @@ export async function PUT(request: NextRequest, context: unknown) {
     const { data: partner, error } = await supabase
       .from("partners")
       .update({
-        name: name.trim(),
-        logo_url: logo_url?.trim() || null,
-        description: description?.trim() || null,
-        website: website?.trim() || null,
-        is_active: Boolean(is_active),
+        logo_url: logo_url.trim(),
         updated_at: new Date().toISOString(),
       })
       .eq("id", params.id)
-      .select()
+      .select("id, logo_url, created_at, updated_at")
       .single();
 
     if (error) {

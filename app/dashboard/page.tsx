@@ -1,3 +1,8 @@
+"use client";
+
+import React from "react";
+import dynamic from "next/dynamic";
+import useSWR from "swr";
 import {
   Card,
   CardContent,
@@ -16,92 +21,64 @@ import {
   IconCalendar,
   IconBriefcase,
 } from "@tabler/icons-react";
-import { DashboardService } from "@/lib/services/dashboard.service";
-import { CareerService } from "@/lib/services/career";
 import type { DashboardData } from "@/lib/types/dashboard";
 import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
-import { DashboardChart } from "@/components/dashboard-chart";
+const DashboardChart = dynamic(() => import("@/components/dashboard-chart").then((m) => m.DashboardChart), { ssr: false });
+import { SkeletonCard } from "@/components/ui/skeleton-card";
+// deeper skeletons for lists
+import { SkeletonAnalytics } from "@/components/ui/skeleton-analytics";
+
+// Client-side fetch will call /api/dashboard
 
 // Function to get total career applications
-async function getTotalCareerApplications(): Promise<number> {
-  try {
-    const careerService = new CareerService();
-    const applications = await careerService.getAllApplications();
-    return applications.length;
-  } catch (error) {
-    console.error("Error fetching career applications:", error);
-    return 0;
-  }
-}
+// We'll fetch dashboard data from the new API route on the client
 
-// Function to get dashboard data using service
-async function getDashboardData(): Promise<DashboardData> {
-  try {
-    const data = await DashboardService.getDashboardData();
+export default function DashboardPage() {
+  // SWR fetcher with default revalidateOnFocus = true (revalidate when window refocus)
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const { data: apiPayload, error, isLoading } = useSWR("/api/dashboard", fetcher, {
+    revalidateOnFocus: true,
+    refreshWhenHidden: false,
+    fallbackData: undefined,
+  });
 
-    // Add icons to stats
-    return {
-      ...data,
-      stats: [
-        { ...data.stats[0], icon: IconUsers },
-        { ...data.stats[1], icon: IconFolder },
-        { ...data.stats[2], icon: IconArticle },
-        { ...data.stats[3], icon: IconMessageCircle },
-      ],
-    };
-  } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    // Return fallback data if there's an error
-    return {
-      stats: [
-        {
-          title: "Total Tim",
-          value: "0",
-          description: "Anggota tim aktif",
-          icon: IconUsers,
-          change: "0",
-          changeType: "default",
-        },
-        {
-          title: "Proyek Aktif",
-          value: "0",
-          description: "Proyek sedang berjalan",
-          icon: IconFolder,
-          change: "0",
-          changeType: "default",
-        },
-        {
-          title: "Artikel Blog",
-          value: "0",
-          description: "Artikel diterbitkan",
-          icon: IconArticle,
-          change: "0",
-          changeType: "default",
-        },
-        {
-          title: "Testimonial",
-          value: "0",
-          description: "Ulasan klien",
-          icon: IconMessageCircle,
-          change: "0",
-          changeType: "default",
-        },
-      ],
-      recentProjects: [],
-      recentPosts: [],
-      servicesCount: 0,
-    };
-  }
-}
+  const dashboardData: DashboardData | null = React.useMemo(() => {
+    if (!apiPayload?.success) return null;
+    const data: DashboardData = apiPayload.data.dashboardData;
+    // attach icons for UI
+    data.stats = [
+      { ...data.stats[0], icon: IconUsers },
+      { ...data.stats[1], icon: IconFolder },
+      { ...data.stats[2], icon: IconArticle },
+      { ...data.stats[3], icon: IconMessageCircle },
+    ];
+    return data;
+  }, [apiPayload]);
 
-export default async function DashboardPage() {
-  const [dashboardData, totalApplications] = await Promise.all([
-    getDashboardData(),
-    getTotalCareerApplications(),
-  ]);
+  const totalApplications = apiPayload?.data?.totalApplications || 0;
+  const loading = isLoading;
+  const fetchError = error;
 
   return (
     <div className="space-y-6">
+      {/* show skeleton cards while loading */}
+      {loading && (
+        <>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+          <div className="mt-6">
+            <SkeletonAnalytics />
+          </div>
+        </>
+      )}
+
+      {fetchError && (
+        <div className="text-sm text-destructive">Gagal memuat data dashboard.</div>
+      )}
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[{ label: "Beranda", isCurrentPage: true }]}
@@ -119,32 +96,22 @@ export default async function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {dashboardData.stats.map((stat) => (
+        {dashboardData?.stats?.map((stat) => (
           <Card key={stat.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 {stat.title}
               </CardTitle>
-              {stat.icon && (
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              )}
+              {stat.icon && React.createElement(stat.icon as React.ElementType, { className: "h-4 w-4 text-muted-foreground" })}
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                {stat.description}
-              </p>
+              <p className="text-xs text-muted-foreground">{stat.description}</p>
               <div className="flex items-center pt-2">
-                <Badge
-                  variant={
-                    stat.changeType === "positive" ? "default" : "secondary"
-                  }
-                >
+                <Badge variant={stat.changeType === "positive" ? "default" : "secondary"}>
                   {stat.change}
                 </Badge>
-                <span className="text-xs text-muted-foreground ml-2">
-                  dari bulan lalu
-                </span>
+                <span className="text-xs text-muted-foreground ml-2">dari bulan lalu</span>
               </div>
             </CardContent>
           </Card>
@@ -152,29 +119,40 @@ export default async function DashboardPage() {
       </div>
 
       {/* Analytics Chart */}
-      <DashboardChart totalApplications={totalApplications} />
+  {/* Dashboard chart loaded only on client via dynamic import */}
+  <DashboardChart totalApplications={totalApplications} />
 
-      {/* Analytics Section - Career Applications */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Lamaran Karir
-            </CardTitle>
-            <IconBriefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalApplications}</div>
-            <p className="text-xs text-muted-foreground">
-              Total lamaran yang diterima
-            </p>
-            <div className="flex items-center pt-2">
-              <Badge variant="default">Aktif</Badge>
+  {/* Analytics Section - Career Applications */}
+  <div className="grid gap-6 md:grid-cols-3">
+        {loading ? (
+          <div className="col-span-1">
+            <div className="animate-pulse bg-card/50 rounded-lg p-4">
+              <div className="h-4 bg-muted rounded w-1/2 mb-3" />
+              <div className="h-10 bg-muted rounded mb-2" />
+              <div className="h-3 bg-muted rounded w-2/3" />
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="opacity-60">
+          </div>
+        ) : (
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Lamaran Karir
+              </CardTitle>
+              <IconBriefcase className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalApplications}</div>
+              <p className="text-xs text-muted-foreground">
+                Total lamaran yang diterima
+              </p>
+              <div className="flex items-center pt-2">
+                <Badge variant="default">Aktif</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+  <Card className="opacity-60">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Analytics Lainnya
@@ -224,9 +202,9 @@ export default async function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {dashboardData.recentPosts.length > 0 ? (
-              <div className="space-y-4">
-                {dashboardData.recentPosts.map((post) => (
+            {(dashboardData?.recentPosts?.length || 0) > 0 ? (
+                  <div className="space-y-4">
+                    {(dashboardData?.recentPosts || []).map((post) => (
                   <div key={post.id} className="flex items-center space-x-4">
                     <div className="flex-1 space-y-1">
                       <p className="text-sm font-medium leading-none">
@@ -307,7 +285,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardData.servicesCount}
+              {dashboardData?.servicesCount ?? 0}
             </div>
             <p className="text-xs text-muted-foreground">
               Layanan yang tersedia
@@ -322,7 +300,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {dashboardData.recentPosts
+              {(dashboardData?.recentPosts || [])
                 .reduce((total, post) => total + post.views, 0)
                 .toLocaleString()}
             </div>

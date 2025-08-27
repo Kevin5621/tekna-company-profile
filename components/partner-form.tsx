@@ -23,7 +23,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -216,26 +215,6 @@ export default function PartnerForm({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/dashboard/partners">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Partners
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">
-            {isEditing ? "Edit Partner" : "Add New Partner"}
-          </h1>
-          <p className="text-muted-foreground">
-            {isEditing
-              ? "Update partner information and translations"
-              : "Create a new partner with multilingual content"}
-          </p>
-        </div>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Information */}

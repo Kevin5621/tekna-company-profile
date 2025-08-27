@@ -13,9 +13,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from("partners")
-      .select("*")
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true });
+      .select("id, logo_url, created_at, updated_at");
 
     if (limit) {
       query = query.limit(limit);
@@ -74,23 +72,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, logo_url, description, website, sort_order = 0 } = body;
+    const { logo_url } = body;
 
     // Validate required fields
-    if (!name) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    if (!logo_url || typeof logo_url !== "string") {
+      return NextResponse.json({ error: "logo_url is required" }, { status: 400 });
     }
 
     const { data, error } = await supabase
       .from("partners")
       .insert({
-        name,
         logo_url,
-        description,
-        website,
-        sort_order,
       })
-      .select()
+      .select("id, logo_url, created_at, updated_at")
       .single();
 
     if (error) {

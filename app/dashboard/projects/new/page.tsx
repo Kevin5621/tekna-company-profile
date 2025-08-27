@@ -1,26 +1,21 @@
 import { ProjectForm } from "@/components/project-form";
-import { DashboardBreadcrumb } from "@/components/ui/dashboard-breadcrumb";
-import BackButton from "@/components/ui/back-button";
+import { DashboardFormTemplate } from "@/components/dashboard/dashboard-form-template";
 
 export default function NewProjectPage() {
   return (
-    <div className="space-y-6 min-h-full dashboard-form-page">
-      {/* Breadcrumbs */}
-      <DashboardBreadcrumb
-        items={[
-          { label: "Proyek", href: "/dashboard/projects" },
-          { label: "Tambah Proyek Baru", isCurrentPage: true },
-        ]}
-      />
-
-      {/* Back Button */}
-      <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/projects" label="Kembali ke Projects" />
-      </div>
-
+    <DashboardFormTemplate
+      breadcrumbs={[
+        { label: "Proyek", href: "/dashboard/projects" },
+        { label: "Tambah Proyek Baru", isCurrentPage: true },
+      ]}
+      title="Tambah Proyek Baru"
+      description="Buat proyek baru untuk ditampilkan di website"
+      backHref="/dashboard/projects"
+      backLabel="Kembali ke Projects"
+    >
       <div className="dashboard-form-container">
         <ProjectForm mode="create" />
       </div>
-    </div>
+    </DashboardFormTemplate>
   );
 }

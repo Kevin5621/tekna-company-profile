@@ -21,8 +21,6 @@ import { Separator } from "@/components/ui/separator";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
 import { PostStatus } from "@/lib/types/dashboard";
 import {
-  IconEye,
-  IconEyeOff,
   IconTag,
   IconUser,
   IconFileText,
@@ -33,7 +31,6 @@ import {
   IconPhoto,
 } from "@tabler/icons-react";
 import Image from "next/image";
-import { ContentRenderer } from "./content-renderer";
 import { MarkdownEditor } from "./markdown-editor";
 import { useToast } from "@/hooks/use-toast";
 
@@ -76,7 +73,6 @@ export function PostForm({ postId, initialData }: PostFormProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [activeTab, setActiveTab] = useState("content");
-  const [showPreview, setShowPreview] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   // Markdown-only approach - no content type needed
   const [isUploading, setIsUploading] = useState(false);
@@ -332,125 +328,9 @@ export function PostForm({ postId, initialData }: PostFormProps) {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            {postId ? "Edit Artikel" : "Tambah Artikel Baru"}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {postId
-              ? "Edit artikel yang sudah ada"
-              : "Buat artikel baru untuk blog"}
-          </p>
-        </div>
-
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            onClick={() => setShowPreview(!showPreview)}
-            className="gap-2"
-          >
-            {showPreview ? <IconEyeOff size={16} /> : <IconEye size={16} />}
-            {showPreview ? "Sembunyikan Preview" : "Preview"}
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="gap-2"
-          >
-            <IconX size={16} />
-            Batal
-          </Button>
-        </div>
-      </div>
       {/* Preview, Stats & Help Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Article Preview */}
-        {showPreview && (
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <IconEye size={20} />
-                Preview Artikel
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {formData.featured_image_url && (
-                <Image
-                  src={formData.featured_image_url}
-                  alt="Featured"
-                  width={400}
-                  height={128}
-                  className="w-full h-32 object-cover rounded"
-                />
-              )}
-
-              <div>
-                <h2 className="text-lg font-semibold line-clamp-2">
-                  {formData.title || "Judul Artikel"}
-                </h2>
-                {formData.excerpt && (
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-3">
-                    {formData.excerpt}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                {getSelectedAuthor() && (
-                  <span className="flex items-center gap-1">
-                    <IconUser size={14} />
-                    {getSelectedAuthor()?.first_name}{" "}
-                    {getSelectedAuthor()?.last_name}
-                  </span>
-                )}
-                {getSelectedCategory() && (
-                  <span className="flex items-center gap-1">
-                    <IconTag size={14} />
-                    {getSelectedCategory()?.name}
-                  </span>
-                )}
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Konten Preview</h4>
-                <div className="text-xs space-y-1 max-h-32 overflow-y-auto">
-                  <ContentRenderer
-                    content={
-                      formData.content || "Konten akan ditampilkan di sini..."
-                    }
-                    contentType="markdown"
-                    className="text-xs"
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">SEO Preview</h4>
-                <div className="text-xs space-y-1">
-                  <p className="font-medium">
-                    {formData.meta_title || formData.title || "Title"}
-                  </p>
-                  <p className="text-muted-foreground line-clamp-2">
-                    {formData.meta_description ||
-                      formData.excerpt ||
-                      "Description"}
-                  </p>
-                  <p className="text-blue-600">
-                    /blog/{formData.slug || "slug"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Quick Stats */}
         <Card>
           <CardHeader>

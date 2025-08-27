@@ -28,7 +28,8 @@ import {
 interface NavigationItem {
   title: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  // allow passing SVG props (e.g. strokeWidth) to Lucide icons
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement> & { className?: string }>;
   roles: ("admin" | "editor" | "hr")[];
 }
 
@@ -129,6 +130,7 @@ function NavigationItems() {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={false}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               "hover:bg-sidebar-accent hover:text-white",
@@ -139,6 +141,10 @@ function NavigationItems() {
             )}
           >
             <Icon
+              strokeWidth={1}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
               className={cn(
                 "w-4 h-4 transition-colors duration-200",
                 isActive ? "text-white" : "text-white group-hover:text-white"
@@ -183,6 +189,7 @@ function BottomNavigationItems() {
           <Link
             key={item.href}
             href={item.href}
+            prefetch={false}
             className={cn(
               "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
               "hover:bg-sidebar-accent hover:text-white",
@@ -193,6 +200,10 @@ function BottomNavigationItems() {
             )}
           >
             <Icon
+              strokeWidth={1}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
               className={cn(
                 "w-4 h-4 transition-colors duration-200",
                 isActive ? "text-white" : "text-white group-hover:text-white"
@@ -213,7 +224,8 @@ export function AppSidebarNew() {
     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
       {/* Logo/Brand */}
       <div className="flex items-center justify-center p-2 border-b border-sidebar-border">
-        <Link href="/dashboard" className="flex items-center justify-center">
+        {/* disable next/link prefetch to avoid preloading many dashboard routes */}
+        <Link href="/dashboard" prefetch={false} className="flex items-center justify-center">
           <Image
             src="/logo.webp"
             alt="Tekna Company Logo"
