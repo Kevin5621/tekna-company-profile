@@ -11,7 +11,6 @@ import {
   IconFolder,
   IconPlus,
   IconSearch,
-  IconFilter,
   IconEdit,
   IconTrash,
   IconLoader2,
@@ -46,7 +45,18 @@ export default function ProjectsPageClient({
 
   const projects = (apiPayload?.data as Project[]) || initialProjects;
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [query, setQuery] = useState<string>("");
   const { toast } = useToast();
+
+  // derive filtered list from query for client-side search
+  const q = query.trim().toLowerCase();
+  const filteredProjects = q
+    ? projects.filter((p) => {
+        const name = p.name?.toLowerCase() || "";
+        const desc = p.description?.toLowerCase() || "";
+        return name.includes(q) || desc.includes(q);
+      })
+    : projects;
 
   const handleDelete = async (projectId: string) => {
     if (!confirm("Apakah Anda yakin ingin menghapus proyek ini?")) {
@@ -116,18 +126,21 @@ export default function ProjectsPageClient({
         <div className="flex gap-2 w-full sm:w-auto">
           <div className="relative w-full sm:w-80">
             <IconSearch className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Cari proyek..." className="pl-8" />
+            <Input
+              placeholder="Cari proyek..."
+              className="pl-8"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
-          <Button variant="outline" size="icon">
-            <IconFilter className="h-4 w-4" />
-          </Button>
+          {/* Filter removed per request */}
         </div>
       </div>
 
       {/* Projects Grid */}
-  {projects.length > 0 ? (
+      {filteredProjects.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
+          {filteredProjects.map((project) => (
             <Card
               key={project.id}
               className="hover:shadow-lg transition-shadow"
@@ -205,21 +218,32 @@ export default function ProjectsPageClient({
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <IconFolder className="h-12 w-12 mx-auto mb-4 opacity-50 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">
-              Belum ada proyek
-            </h3>
-            <p className="text-muted-foreground text-center mb-4">
-              Mulai dengan menambahkan proyek pertama Anda
-            </p>
-            <Button onClick={handleAddNew}>
-              <IconPlus className="h-4 w-4 mr-2" />
-              Tambah Proyek
-            </Button>
-          </CardContent>
-        </Card>
+        // show different message when there are no projects at all vs no results for query
+        projects.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <IconFolder className="h-12 w-12 mx-auto mb-4 opacity-50 text-muted-foreground" />
+              <h3 className="text-lg font-semibold mb-2">
+                Belum ada proyek
+              </h3>
+              <p className="text-muted-foreground text-center mb-4">
+                Mulai dengan menambahkan proyek pertama Anda
+              </p>
+              <Button onClick={handleAddNew}>
+                <IconPlus className="h-4 w-4 mr-2" />
+                Tambah Proyek
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <IconFolder className="h-12 w-12 mx-auto mb-4 opacity-50 text-muted-foreground" />
+              <h3 className="text-lg font-semibold mb-2">Tidak ada proyek yang cocok</h3>
+              <p className="text-muted-foreground text-center mb-4">Coba kata kunci lain.</p>
+            </CardContent>
+          </Card>
+        )
       )}
     </DashboardPageTemplate>
   );
