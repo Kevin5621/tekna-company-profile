@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Edit, Trash2, Eye, Calendar, MapPin, Briefcase, Users, DollarSign } from "lucide-react";
+import { Edit, Trash2, Eye, Calendar, MapPin, Briefcase, Users, DollarSign, TrendingUp, FileText, Globe, Link } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -80,7 +80,6 @@ export default function ViewCareerPositionPage() {
         if (positionData) {
           setPosition(positionData as CareerPosition);
           
-          // Load related data
           if (positionData.location_id) {
             const locationData = await careerService.getLocationById(positionData.location_id);
             setLocation(locationData);
@@ -139,7 +138,7 @@ export default function ViewCareerPositionPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "open":
-        return <Badge variant="default">Open</Badge>;
+        return <Badge variant="default" className="bg-success text-success-foreground">Open</Badge>;
       case "draft":
         return <Badge variant="secondary">Draft</Badge>;
       case "closed":
@@ -204,12 +203,12 @@ export default function ViewCareerPositionPage() {
     >
       <div className="space-y-6">
         {/* Header Actions */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-card rounded-lg border shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
             {getStatusBadge(position.status)}
-            {position.featured && <Badge variant="outline">Featured</Badge>}
+            {position.featured && <Badge variant="outline" className="border-primary/20 text-primary">Featured</Badge>}
             {position.urgent && <Badge variant="destructive">Urgent</Badge>}
-            {position.remote_allowed && <Badge variant="secondary">Remote</Badge>}
+            {position.remote_allowed && <Badge variant="secondary" className="bg-secondary text-secondary-foreground">Remote</Badge>}
           </div>
           
           <div className="flex gap-2">
@@ -217,6 +216,7 @@ export default function ViewCareerPositionPage() {
               variant="outline"
               onClick={() => router.push(`/dashboard/career/${positionId}/edit`)}
               disabled={loading}
+              className="hover:bg-primary/5 hover:border-primary/20"
             >
               <Edit className="h-4 w-4 mr-2" />
               Edit Position
@@ -225,6 +225,7 @@ export default function ViewCareerPositionPage() {
               variant="destructive"
               onClick={handleDelete}
               disabled={loading}
+              className="hover:bg-destructive/90"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete Position
@@ -232,216 +233,270 @@ export default function ViewCareerPositionPage() {
           </div>
         </div>
 
-        {/* Position Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Position Overview</CardTitle>
-            <CardDescription>
-              Basic information about this career position
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Location</p>
-                  <p className="text-sm text-muted-foreground">
-                    {location?.name || "Not specified"}
-                  </p>
+        {/* Bento Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Position Overview Card */}
+            <Card className="shadow-sm border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5 text-primary" />
+                  Position Overview
+                </CardTitle>
+                <CardDescription>
+                  Basic information about this career position
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <MapPin className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Location</p>
+                      <p className="font-medium">
+                        {location?.name || "Not specified"}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Briefcase className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Type</p>
+                      <p className="font-medium">
+                        {type?.name || "Not specified"}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Users className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Level</p>
+                      <p className="font-medium">
+                        {level?.name || "Not specified"}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <DollarSign className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Salary</p>
+                      <p className="font-medium">
+                        {formatSalary(position.salary_min, position.salary_max, position.salary_currency, position.salary_type)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Type</p>
-                  <p className="text-sm text-muted-foreground">
-                    {type?.name || "Not specified"}
-                  </p>
+
+                <Separator className="my-6" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Calendar className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Application Deadline</p>
+                      <p className="font-medium">
+                        {formatDate(position.application_deadline)}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Calendar className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Start Date</p>
+                      <p className="font-medium">
+                        {formatDate(position.start_date)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Level</p>
-                  <p className="text-sm text-muted-foreground">
-                    {level?.name || "Not specified"}
-                  </p>
+              </CardContent>
+            </Card>
+
+            {/* Job Description Card */}
+            <Card className="shadow-sm border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  Job Description
+                </CardTitle>
+                <CardDescription>
+                  Detailed description of the role and responsibilities
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {position.description && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg">Description</h4>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed">{position.description}</p>
+                    </div>
+                  </div>
+                )}
+
+                {position.requirements && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg">Requirements</h4>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed">{position.requirements}</p>
+                    </div>
+                  </div>
+                )}
+
+                {position.benefits && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-lg">Benefits & Perks</h4>
+                    <div className="prose prose-sm max-w-none">
+                      <p className="whitespace-pre-wrap text-muted-foreground leading-relaxed">{position.benefits}</p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Sidebar Content */}
+          <div className="space-y-6">
+            {/* Stats Overview Card */}
+            <Card className="shadow-sm border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Performance
+                </CardTitle>
+                <CardDescription>
+                  Position engagement metrics
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                    <p className="text-2xl font-bold text-primary">{position.views_count || 0}</p>
+                    <p className="text-sm text-muted-foreground">Views</p>
+                  </div>
+                  <div className="text-center p-4 bg-gradient-to-br from-success/5 to-success/10 rounded-lg border border-success/20">
+                    <p className="text-2xl font-bold text-success">{position.applications_count || 0}</p>
+                    <p className="text-sm text-muted-foreground">Applications</p>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Salary</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatSalary(position.salary_min, position.salary_max, position.salary_currency, position.salary_type)}
-                  </p>
+                
+                <Separator />
+                
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Created:</span>
+                    <span className="font-medium">{formatDate(position.created_at)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Updated:</span>
+                    <span className="font-medium">{formatDate(position.updated_at)}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
-            <Separator />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Application Deadline</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(position.application_deadline)}
-                  </p>
+            {/* SEO Information Card */}
+            <Card className="shadow-sm border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Globe className="h-5 w-5 text-primary" />
+                  SEO Information
+                </CardTitle>
+                <CardDescription>
+                  SEO metadata for this position
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">SEO Title</Label>
+                    <p className="text-sm font-medium mt-1 p-2 bg-muted/30 rounded border">
+                      {position.seo_title || "Not set"}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">SEO Description</Label>
+                    <p className="text-sm font-medium mt-1 p-2 bg-muted/30 rounded border">
+                      {position.seo_description || "Not set"}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium text-muted-foreground">SEO Keywords</Label>
+                    <p className="text-sm font-medium mt-1 p-2 bg-muted/30 rounded border">
+                      {position.seo_keywords || "Not set"}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Start Date</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(position.start_date)}
-                  </p>
+              </CardContent>
+            </Card>
+
+            {/* Public URL Card */}
+            <Card className="shadow-sm border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2">
+                  <Link className="h-5 w-5 text-primary" />
+                  Public URL
+                </CardTitle>
+                <CardDescription>
+                  Link to the public career position page
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <Input
+                    value={`${window.location.origin}/career/${position.slug}`}
+                    readOnly
+                    className="font-mono text-sm bg-muted/30 border-border/50"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/career/${position.slug}`);
+                        toast({
+                          title: "URL Copied!",
+                          description: "Public URL copied to clipboard",
+                          variant: "success",
+                        });
+                      }}
+                      className="flex-1 hover:bg-primary/5 hover:border-primary/20"
+                    >
+                      Copy
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(`/career/${position.slug}`, '_blank')}
+                      className="flex-1 hover:bg-primary/5 hover:border-primary/20"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">{position.views_count || 0}</p>
-                <p className="text-sm text-muted-foreground">Views</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">{position.applications_count || 0}</p>
-                <p className="text-sm text-muted-foreground">Applications</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  Created: {formatDate(position.created_at)}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Updated: {formatDate(position.updated_at)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Job Description */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Job Description</CardTitle>
-            <CardDescription>
-              Detailed description of the role and responsibilities
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {position.description && (
-              <div>
-                <h4 className="font-medium mb-2">Description</h4>
-                <div className="prose prose-sm max-w-none">
-                  <p className="whitespace-pre-wrap">{position.description}</p>
-                </div>
-              </div>
-            )}
-
-            {position.requirements && (
-              <div>
-                <h4 className="font-medium mb-2">Requirements</h4>
-                <div className="prose prose-sm max-w-none">
-                  <p className="whitespace-pre-wrap">{position.requirements}</p>
-                </div>
-              </div>
-            )}
-
-            {position.benefits && (
-              <div>
-                <h4 className="font-medium mb-2">Benefits & Perks</h4>
-                <div className="prose prose-sm max-w-none">
-                  <p className="whitespace-pre-wrap">{position.benefits}</p>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* SEO Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>SEO Information</CardTitle>
-            <CardDescription>
-              SEO metadata for this position
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium">SEO Title</Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {position.seo_title || "Not set"}
-                </p>
-              </div>
-              
-              <div>
-                <Label className="text-sm font-medium">SEO Description</Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {position.seo_description || "Not set"}
-                </p>
-              </div>
-            </div>
-            
-            <div>
-              <Label className="text-sm font-medium">SEO Keywords</Label>
-              <p className="text-sm text-muted-foreground mt-1">
-                {position.seo_keywords || "Not set"}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Public URL */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Public URL</CardTitle>
-            <CardDescription>
-              Link to the public career position page
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <Input
-                value={`${window.location.origin}/career/${position.slug}`}
-                readOnly
-                className="font-mono text-sm"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/career/${position.slug}`);
-                  toast({
-                    title: "URL Copied!",
-                    description: "Public URL copied to clipboard",
-                    variant: "success",
-                  });
-                }}
-              >
-                Copy
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(`/career/${position.slug}`, '_blank')}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                View
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </DashboardFormTemplate>
   );
