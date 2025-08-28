@@ -1535,6 +1535,37 @@ export class CareerService {
     }
   }
 
+  // Get applications grouped by date for analytics
+  async getApplicationsGroupedByDate(days: number = 30): Promise<Record<string, number>> {
+    try {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      const { data, error } = await this.supabase
+        .from("career_applications")
+        .select("applied_at")
+        .gte("applied_at", startDate.toISOString())
+        .order("applied_at", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching applications grouped by date:", error);
+        return {};
+      }
+
+      // Group by date
+      const grouped: Record<string, number> = {};
+      (data || []).forEach((app) => {
+        const date = new Date(app.applied_at).toISOString().split("T")[0];
+        grouped[date] = (grouped[date] || 0) + 1;
+      });
+
+      return grouped;
+    } catch (error) {
+      console.error("Error in getApplicationsGroupedByDate:", error);
+      return {};
+    }
+  }
+
   async updateApplicationStatus(
     applicationId: string,
     status: CareerApplication["status"],
