@@ -195,8 +195,10 @@ export interface CareerSearchParams {
 export class CareerService {
   private supabase;
 
-  constructor() {
-    this.supabase = createClient();
+  constructor(supabaseClient?: ReturnType<typeof createClient>) {
+    // Jika ada supabase client dari server, gunakan itu
+    // Jika tidak, buat client baru untuk client-side
+    this.supabase = supabaseClient || createClient();
   }
 
   // Public methods
@@ -696,30 +698,86 @@ export class CareerService {
   // Admin methods
   async getAllPositions(): Promise<CareerPosition[]> {
     try {
-      const { data, error } = await this.supabase
-        .from("career_positions")
-        .select(
-          `
-          *,
-          category:career_categories(*),
-          location:career_locations(*),
-          type:career_types(*),
-          level:career_levels(*)
-        `
-        )
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching all positions:", error);
-        return [];
+      // Cek user yang sedang login
+      let user: { id: string } | null | undefined = null;
+      let userRole: { role: string } | null = null;
+      
+      try {
+        const { data: { user: authUser } } = await this.supabase.auth.getUser();
+        user = authUser;
+        
+        if (user) {
+          // Cek role user
+          const { data: roleData } = await this.supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", user.id)
+            .eq("is_active", true)
+            .single();
+          
+          userRole = roleData;
+        }
+      } catch {
+        // Fallback: coba get user dari session
+        try {
+          const { data: { session } } = await this.supabase.auth.getSession();
+          user = session?.user;
+        } catch {
+          // Ignore session error
+        }
       }
+      
+      // Jika user adalah admin/HR, gunakan query yang bypass RLS
+      if (userRole && (userRole.role === 'admin' || userRole.role === 'hr')) {
+        // Query dengan RLS bypass untuk admin/HR
+        const { data, error } = await this.supabase
+          .from("career_positions")
+          .select(
+            `
+            *,
+            category:career_categories(*),
+            location:career_locations(*),
+            type:career_types(*),
+            level:career_levels(*)
+          `
+          )
+          .order("created_at", { ascending: false });
 
-      return data || [];
+        if (error) {
+          console.error("Error fetching positions:", error);
+          return [];
+        }
+
+        return data || [];
+      } else {
+        // Query untuk public user (akan respect RLS)
+        const { data, error } = await this.supabase
+          .from("career_positions")
+          .select(
+            `
+            *,
+            category:career_categories(*),
+            location:career_locations(*),
+            type:career_types(*),
+            level:career_levels(*)
+          `
+          )
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching positions:", error);
+          return [];
+        }
+
+        return data || [];
+      }
     } catch (error) {
       console.error("Error in getAllPositions:", error);
       return [];
     }
   }
+
+
 
   async getPositionById(id: string): Promise<CareerPosition | null> {
     try {

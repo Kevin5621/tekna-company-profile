@@ -17,7 +17,7 @@ export default function CareerNotFound() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground text-center">
-            The career position you're looking for doesn't exist or may have been removed.
+            The career position you&apos;re looking for doesn&apos;t exist or may have been removed.
             Please check the URL or browse our available positions.
           </p>
           

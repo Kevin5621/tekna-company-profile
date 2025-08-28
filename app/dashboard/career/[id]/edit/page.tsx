@@ -257,7 +257,14 @@ export default function EditCareerPositionPage() {
         seo_keywords: formData.seo_keywords || undefined,
       };
 
+      console.log("=== DEBUG INFO ===");
+      console.log("Position ID:", positionId);
+      console.log("Form Status:", formData.status);
+      console.log("Passed Status:", status);
+      console.log("Final Status:", status || formData.status);
       console.log("Updating position with data:", cleanData);
+      console.log("=== END DEBUG ===");
+      
       const result = await careerService.updatePosition(positionId, cleanData);
 
       if (result.success) {

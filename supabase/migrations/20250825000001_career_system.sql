@@ -265,58 +265,67 @@ ALTER TABLE career_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE career_application_activities ENABLE ROW LEVEL SECURITY;
 
 -- Simple policies: Allow public read access, authenticated users can insert applications
--- Career Categories - Public read, admin write
+-- Career Categories - Public read, admin/HR write
 CREATE POLICY "Career categories public read" ON career_categories FOR SELECT USING (true);
-CREATE POLICY "Career categories admin write" ON career_categories FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career categories admin hr write" ON career_categories FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Locations - Public read, admin write
+-- Career Locations - Public read, admin/HR write
 CREATE POLICY "Career locations public read" ON career_locations FOR SELECT USING (true);
-CREATE POLICY "Career locations admin write" ON career_locations FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career locations admin hr write" ON career_locations FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Types - Public read, admin write
+-- Career Types - Public read, admin/HR write
 CREATE POLICY "Career types public read" ON career_types FOR SELECT USING (true);
-CREATE POLICY "Career types admin write" ON career_types FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career types admin hr write" ON career_types FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Levels - Public read, admin write
+-- Career Levels - Public read, admin/HR write
 CREATE POLICY "Career levels public read" ON career_levels FOR SELECT USING (true);
-CREATE POLICY "Career levels admin write" ON career_levels FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career levels admin hr write" ON career_levels FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Positions - Public read published, admin write
+-- Career Positions - Public read published, admin/HR can see all
 CREATE POLICY "Career positions public read" ON career_positions FOR SELECT USING (
   is_active = true AND status = 'open' AND published_at IS NOT NULL
 );
-CREATE POLICY "Career positions admin write" ON career_positions FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career positions admin read all" ON career_positions FOR SELECT USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
+);
+CREATE POLICY "Career positions admin hr write" ON career_positions FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Skills - Public read, admin write
+-- Career Skills - Public read, admin/HR write
 CREATE POLICY "Career skills public read" ON career_skills FOR SELECT USING (true);
-CREATE POLICY "Career skills admin write" ON career_skills FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career skills admin hr write" ON career_skills FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Position Skills - Public read, admin write
+-- Career Position Skills - Public read, admin/HR write
 CREATE POLICY "Career position skills public read" ON career_position_skills FOR SELECT USING (true);
-CREATE POLICY "Career position skills admin write" ON career_position_skills FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career position skills admin hr write" ON career_position_skills FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Applications - Anyone can submit, admin can manage
+-- Career Applications - Anyone can submit, admin/HR can see all
 CREATE POLICY "Career applications public insert" ON career_applications FOR INSERT WITH CHECK (true);
 CREATE POLICY "Career applications public read" ON career_applications FOR SELECT USING (true);
-CREATE POLICY "Career applications admin manage" ON career_applications FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+CREATE POLICY "Career applications admin hr read all" ON career_applications FOR SELECT USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
+);
+CREATE POLICY "Career applications admin hr manage" ON career_applications FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );
 
--- Career Application Activities - Admin only
-CREATE POLICY "Career application activities admin only" ON career_application_activities FOR ALL USING (
-  auth.uid() IN (SELECT user_id FROM user_roles WHERE role = 'admin')
+-- Career Application Activities - Admin/HR can see all
+CREATE POLICY "Career application activities admin hr read" ON career_application_activities FOR SELECT USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
+);
+CREATE POLICY "Career application activities admin hr manage" ON career_application_activities FOR ALL USING (
+  auth.uid() IN (SELECT user_id FROM user_roles WHERE role IN ('admin', 'hr'))
 );

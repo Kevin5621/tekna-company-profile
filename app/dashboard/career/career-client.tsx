@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
-import { Users, Briefcase, MapPin, TrendingUp, Clock, Star } from "lucide-react";
+import { Users, Briefcase, MapPin, TrendingUp, Clock, Star, Search, Filter, X, FileText, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import type { CareerPosition } from "@/lib/services/career";
 
@@ -20,15 +22,76 @@ interface CareerClientProps {
 }
 
 export default function CareerClient({ initialPositions }: CareerClientProps) {
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+
+
   const stats = useMemo(() => {
     const pos: CareerPosition[] = initialPositions || [];
+    
+    const openPos = pos.filter((p) => p.status === "open");
+    const closedPos = pos.filter((p) => p.status === "closed");
+    const draftPos = pos.filter((p) => p.status === "draft");
+    const filledPos = pos.filter((p) => p.status === "filled");
+    
     return {
       totalPositions: pos.length,
-      openPositions: pos.filter((p) => p.status === "open").length,
+      openPositions: openPos.length,
+      closedPositions: closedPos.length,
+      draftPositions: draftPos.length,
+      filledPositions: filledPos.length,
       totalApplications: pos.reduce((sum: number, p: CareerPosition) => sum + (p.applications_count || 0), 0),
       featuredPositions: pos.filter((p) => p.featured).length,
     };
   }, [initialPositions]);
+
+  const filteredPositions = useMemo(() => {
+    let filtered = initialPositions;
+
+    // Active tab filter
+    if (activeTab !== "all") {
+      filtered = filtered.filter((p) => p.status === activeTab);
+    }
+
+    // Status filter (additional)
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((p) => p.status === statusFilter);
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((p) =>
+        p.title.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query) ||
+        p.summary?.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [initialPositions, activeTab, statusFilter, searchQuery]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "open": return "bg-green-100 text-green-800";
+      case "closed": return "bg-red-100 text-red-800";
+      case "draft": return "bg-gray-100 text-gray-800";
+      case "filled": return "bg-blue-100 text-blue-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "open": return <Clock className="h-4 w-4" />;
+      case "closed": return <X className="h-4 w-4" />;
+      case "draft": return <FileText className="h-4 w-4" />;
+      case "filled": return <CheckCircle className="h-4 w-4" />;
+      default: return <Clock className="h-4 w-4" />;
+    }
+  };
 
   return (
     <DashboardPageTemplate
@@ -37,47 +100,138 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
       description="Manage job positions, categories, and applications"
     >
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Positions</CardTitle>
+            <CardTitle className="text-sm font-medium">Total</CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalPositions}</div>
-            <p className="text-xs text-muted-foreground">All job positions</p>
+            <p className="text-xs text-muted-foreground">All positions</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Positions</CardTitle>
+            <CardTitle className="text-sm font-medium">Open</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.openPositions}</div>
-            <p className="text-xs text-muted-foreground">Currently accepting applications</p>
+            <p className="text-xs text-muted-foreground">Accepting applications</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Closed</CardTitle>
+            <X className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalApplications}</div>
-            <p className="text-xs text-muted-foreground">All applications received</p>
+            <div className="text-2xl font-bold">{stats.closedPositions}</div>
+            <p className="text-xs text-muted-foreground">No longer accepting</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Featured</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Draft</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.featuredPositions}</div>
-            <p className="text-xs text-muted-foreground">Featured positions</p>
+            <div className="text-2xl font-bold">{stats.draftPositions}</div>
+            <p className="text-xs text-muted-foreground">Work in progress</p>
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Filled</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.filledPositions}</div>
+            <p className="text-xs text-muted-foreground">Position filled</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filter Section */}
+      <div className="mt-6 space-y-4">
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search positions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="filled">Filled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Status Tabs */}
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={activeTab === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveTab("all")}
+            className="text-xs"
+          >
+            All ({stats.totalPositions})
+          </Button>
+          <Button
+            variant={activeTab === "open" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveTab("open")}
+            className="text-xs"
+          >
+            <Clock className="h-3 w-3 mr-1" />
+            Open ({stats.openPositions})
+          </Button>
+          <Button
+            variant={activeTab === "closed" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveTab("closed")}
+            className="text-xs"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Closed ({stats.closedPositions})
+          </Button>
+          <Button
+            variant={activeTab === "draft" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveTab("draft")}
+            className="text-xs"
+          >
+            <FileText className="h-3 w-3 mr-1" />
+            Draft ({stats.draftPositions})
+          </Button>
+          <Button
+            variant={activeTab === "filled" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveTab("filled")}
+            className="text-xs"
+          >
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Filled ({stats.filledPositions})
+          </Button>
+        </div>
       </div>
 
       {/* Quick Access Cards */}
@@ -136,10 +290,10 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
       {/* Active Positions Overview - Compact Cards */}
       <div className="mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Active Positions</h2>
+          <h2 className="text-xl font-semibold">Career Positions</h2>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">
-              {initialPositions.length} total positions
+              {filteredPositions.length} of {initialPositions.length} positions
             </span>
             <Button asChild size="sm">
               <Link href="/dashboard/career/new" prefetch={false}>
@@ -148,10 +302,12 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
             </Button>
           </div>
         </div>
+        
 
-        {initialPositions.length > 0 ? (
+
+        {filteredPositions.length > 0 ? (
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {initialPositions.map((position: CareerPosition) => (
+            {filteredPositions.map((position: CareerPosition) => (
               <Card key={position.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
                   <div className="space-y-3">
@@ -170,9 +326,9 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
                           </Badge>
                         )}
                         <Badge 
-                          variant={position.status === 'open' ? 'default' : position.status === 'closed' ? 'destructive' : 'secondary'}
-                          className="text-xs"
+                          className={`text-xs ${getStatusColor(position.status)}`}
                         >
+                          {getStatusIcon(position.status)}
                           {position.status}
                         </Badge>
                       </div>

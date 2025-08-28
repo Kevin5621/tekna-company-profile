@@ -232,8 +232,8 @@ export default function NewCareerPositionPage() {
                 <Briefcase className="h-5 w-5 text-primary" />
                 <CardTitle className="text-lg">Basic Information</CardTitle>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          </CardHeader>
+          <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Job Title *</Label>
                 <Input
@@ -295,8 +295,8 @@ export default function NewCareerPositionPage() {
                     <Star className="h-4 w-4 text-yellow-500" />
                     Featured Position
                   </Label>
-                </div>
-                
+            </div>
+
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="urgent"
@@ -307,8 +307,8 @@ export default function NewCareerPositionPage() {
                     <Zap className="h-4 w-4 text-orange-500" />
                     Urgent Hiring
                   </Label>
-                </div>
-                
+            </div>
+
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="remote_friendly"
@@ -355,7 +355,7 @@ export default function NewCareerPositionPage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
                 <Select
@@ -384,7 +384,7 @@ export default function NewCareerPositionPage() {
               <div className="flex items-center space-x-2">
                 <Users className="h-5 w-5 text-primary" />
                 <CardTitle className="text-lg">Type & Level</CardTitle>
-              </div>
+            </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -406,7 +406,7 @@ export default function NewCareerPositionPage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="level">Experience Level *</Label>
                 <Select
@@ -425,36 +425,36 @@ export default function NewCareerPositionPage() {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
 
           {/* Salary & Experience */}
-          <Card>
+        <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
                 <DollarSign className="h-5 w-5 text-primary" />
                 <CardTitle className="text-lg">Salary & Experience</CardTitle>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          </CardHeader>
+          <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
+            <div className="space-y-2">
                   <Label htmlFor="salary_min">Min Salary</Label>
-                  <Input
-                    id="salary_min"
-                    type="number"
-                    value={formData.salary_min}
+                <Input
+                  id="salary_min"
+                  type="number"
+                  value={formData.salary_min}
                     onChange={(e) => handleInputChange("salary_min", e.target.value)}
                     placeholder="0"
-                  />
-                </div>
-                <div className="space-y-2">
+                />
+              </div>
+              <div className="space-y-2">
                   <Label htmlFor="salary_max">Max Salary</Label>
-                  <Input
-                    id="salary_max"
-                    type="number"
-                    value={formData.salary_max}
+                <Input
+                  id="salary_max"
+                  type="number"
+                  value={formData.salary_max}
                     onChange={(e) => handleInputChange("salary_max", e.target.value)}
                     placeholder="0"
                   />
@@ -482,7 +482,7 @@ export default function NewCareerPositionPage() {
 
             </CardContent>
           </Card>
-        </div>
+            </div>
 
         {/* Content Sections - Bento Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -503,11 +503,11 @@ export default function NewCareerPositionPage() {
                 rows={8}
                 required
               />
-            </CardContent>
-          </Card>
+          </CardContent>
+        </Card>
 
           {/* Requirements */}
-          <Card>
+        <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
                 <Target className="h-5 w-5 text-primary" />
@@ -524,7 +524,7 @@ export default function NewCareerPositionPage() {
               />
             </CardContent>
           </Card>
-        </div>
+                </div>
 
         {/* Additional Content - Bento Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -563,8 +563,8 @@ export default function NewCareerPositionPage() {
                 placeholder="List the benefits, perks, and what you offer..."
                 rows={6}
               />
-            </CardContent>
-          </Card>
+          </CardContent>
+        </Card>
         </div>
 
         {/* Action Buttons */}
@@ -588,17 +588,17 @@ export default function NewCareerPositionPage() {
           </div>
           
           <div className="flex items-center space-x-3">
-            <Button
-              type="button"
-              variant="outline"
+          <Button
+            type="button"
+            variant="outline"
               onClick={() => router.push("/dashboard/career")}
-              disabled={loading}
-            >
+            disabled={loading}
+          >
               Cancel
-            </Button>
-            <Button
+          </Button>
+          <Button
               type="submit"
-              disabled={loading}
+            disabled={loading}
               className="min-w-[120px]"
             >
               {loading ? (
@@ -612,7 +612,7 @@ export default function NewCareerPositionPage() {
                   <span>Create Position</span>
                 </div>
               )}
-            </Button>
+          </Button>
           </div>
         </div>
       </form>
