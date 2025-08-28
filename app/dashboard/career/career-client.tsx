@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import useSWR from "swr";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,8 +13,6 @@ import { Badge } from "@/components/ui/badge";
 import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-template";
 import { Users, Briefcase, MapPin, TrendingUp, Clock, Star } from "lucide-react";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-
 import type { CareerPosition } from "@/lib/services/career";
 
 interface CareerClientProps {
@@ -23,20 +20,15 @@ interface CareerClientProps {
 }
 
 export default function CareerClient({ initialPositions }: CareerClientProps) {
-  const { data: positionsPayload } = useSWR("/api/career/positions", fetcher, {
-    fallbackData: { success: true, data: initialPositions },
-    revalidateOnFocus: true,
-  });
-
   const stats = useMemo(() => {
-    const pos: CareerPosition[] = positionsPayload?.data || initialPositions || [];
+    const pos: CareerPosition[] = initialPositions || [];
     return {
       totalPositions: pos.length,
       openPositions: pos.filter((p) => p.status === "open").length,
       totalApplications: pos.reduce((sum: number, p: CareerPosition) => sum + (p.applications_count || 0), 0),
       featuredPositions: pos.filter((p) => p.featured).length,
     };
-  }, [positionsPayload?.data, initialPositions]);
+  }, [initialPositions]);
 
   return (
     <DashboardPageTemplate
@@ -147,7 +139,7 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
           <h2 className="text-xl font-semibold">Active Positions</h2>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">
-              {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).length} total positions
+              {initialPositions.length} total positions
             </span>
             <Button asChild size="sm">
               <Link href="/dashboard/career/new" prefetch={false}>
@@ -157,9 +149,9 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
           </div>
         </div>
 
-        {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).length > 0 ? (
+        {initialPositions.length > 0 ? (
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {((positionsPayload?.data as CareerPosition[]) || initialPositions || []).map((position: CareerPosition) => (
+            {initialPositions.map((position: CareerPosition) => (
               <Card key={position.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
                   <div className="space-y-3">

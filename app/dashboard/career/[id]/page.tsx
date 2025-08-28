@@ -78,7 +78,7 @@ export default function ViewCareerPositionPage() {
       try {
         const positionData = await careerService.getPositionById(positionId);
         if (positionData) {
-          setPosition(positionData);
+          setPosition(positionData as CareerPosition);
           
           // Load related data
           if (positionData.location_id) {

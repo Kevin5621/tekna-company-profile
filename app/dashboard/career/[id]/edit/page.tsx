@@ -2,13 +2,30 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Save, Eye } from "lucide-react";
+import { 
+  Save, 
+  Briefcase, 
+  DollarSign, 
+  Settings, 
+  FileText,
+  Target,
+  Award,
+  Globe,
+  Zap,
+  Building2,
+  Users,
+  GraduationCap,
+  Star,
+  Edit,
+  Trash2,
+  Eye,
+  Calendar
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 import {
   CareerService,
@@ -30,39 +48,11 @@ import {
   CareerLocation,
   CareerType,
   CareerLevel,
+  CareerPosition,
 } from "@/lib/services/career";
 import { useToast } from "@/hooks/use-toast";
 import { DashboardFormTemplate } from "@/components/dashboard/dashboard-form-template";
 import { SlugInput } from "@/components/ui/slug-input";
-
-interface CareerPosition {
-  id: string;
-  title: string;
-  slug: string;
-  summary: string;
-  description: string;
-  requirements: string;
-  benefits: string;
-  category_id: string;
-  location_id: string;
-  type_id: string;
-  level_id: string;
-  salary_min: number;
-  salary_max: number;
-  salary_currency: string;
-  salary_type: string;
-  application_deadline: string;
-  start_date: string;
-  remote_allowed: boolean;
-  travel_required: boolean;
-  travel_percentage: number;
-  featured: boolean;
-  urgent: boolean;
-  status: string;
-  seo_title: string;
-  seo_description: string;
-  seo_keywords: string;
-}
 
 export default function EditCareerPositionPage() {
   const router = useRouter();
@@ -74,7 +64,7 @@ export default function EditCareerPositionPage() {
   const [locations, setLocations] = useState<CareerLocation[]>([]);
   const [types, setTypes] = useState<CareerType[]>([]);
   const [levels, setLevels] = useState<CareerLevel[]>([]);
-  const [formData, setFormData] = useState<CareerPosition>({
+  const [formData, setFormData] = useState<Partial<CareerPosition>>({
     id: "",
     title: "",
     slug: "",
@@ -101,6 +91,11 @@ export default function EditCareerPositionPage() {
     seo_title: "",
     seo_description: "",
     seo_keywords: "",
+    views_count: 0,
+    applications_count: 0,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   });
 
   const careerService = useMemo(() => new CareerService(), []);
@@ -164,42 +159,116 @@ export default function EditCareerPositionPage() {
     }));
   };
 
+  const handleInputChange = (field: string, value: string | number | boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.title?.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Title is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.description?.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Description is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.category_id) {
+      toast({
+        title: "Validation Error",
+        description: "Category is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.location_id) {
+      toast({
+        title: "Validation Error",
+        description: "Location is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.type_id) {
+      toast({
+        title: "Validation Error",
+        description: "Type is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    if (!formData.level_id) {
+      toast({
+        title: "Validation Error",
+        description: "Level is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent, status?: string) => {
     e.preventDefault();
-    setLoading(true);
+    if (!validateForm()) return;
 
+    setLoading(true);
     try {
-      const submitData = {
-        ...formData,
+      // Clean formData to only include fields that exist in career_positions table
+      const cleanData = {
+        title: formData.title,
+        slug: formData.slug,
+        summary: formData.summary || undefined,
+        description: formData.description,
+        requirements: formData.requirements || undefined,
+        benefits: formData.benefits || undefined,
+        category_id: formData.category_id,
+        location_id: formData.location_id,
+        type_id: formData.type_id,
+        level_id: formData.level_id,
+        salary_min: formData.salary_min,
+        salary_max: formData.salary_max,
+        salary_currency: formData.salary_currency,
+        salary_type: formData.salary_type,
+        application_deadline: formData.application_deadline || undefined,
+        start_date: formData.start_date || undefined,
+        remote_allowed: formData.remote_allowed,
+        travel_required: formData.travel_required,
+        travel_percentage: formData.travel_percentage,
+        featured: formData.featured,
+        urgent: formData.urgent,
         status: (status || formData.status) as
           | "draft"
           | "open"
           | "closed"
           | "filled",
-        salary_min: formData.salary_min
-          ? parseInt(formData.salary_min.toString())
-          : undefined,
-        salary_max: formData.salary_max
-          ? parseInt(formData.salary_max.toString())
-          : undefined,
-        experience_years: formData.travel_percentage
-          ? parseInt(formData.travel_percentage.toString())
-          : undefined,
+        seo_title: formData.seo_title || undefined,
+        seo_description: formData.seo_description || undefined,
+        seo_keywords: formData.seo_keywords || undefined,
       };
 
-      const result = await careerService.updatePosition(positionId, submitData);
+      console.log("Updating position with data:", cleanData);
+      const result = await careerService.updatePosition(positionId, cleanData);
 
-      if (result) {
+      if (result.success) {
         toast({
           title: "Position Updated!",
-          description: `Position ${
-            status === "open" ? "updated and published" : "updated successfully"
-          }`,
+          description: `Position updated successfully with status: ${status || formData.status}`,
           variant: "success",
         });
         router.push("/dashboard/career");
       } else {
-        throw new Error("Failed to update position");
+        throw new Error(result.error || "Failed to update position");
       }
     } catch (error) {
       console.error("Failed to update position:", error);
@@ -250,131 +319,170 @@ export default function EditCareerPositionPage() {
       title="Edit Career Position"
       description="Update the career position information"
       backHref="/dashboard/career"
-      backLabel="Back to Career"
+      backLabel="Back to Career Positions"
     >
+      {/* Action Buttons Header */}
+      <div className="flex items-center justify-between mb-6 p-4 bg-muted/50 rounded-lg">
+        <div className="flex items-center space-x-2">
+          <Badge variant="outline" className="text-sm">
+            {formData.status === "draft" ? "Draft Mode" : "Published"}
+          </Badge>
+          {formData.featured && (
+            <Badge variant="secondary" className="text-sm">
+              <Star className="h-3 w-3 mr-1" />
+              Featured
+            </Badge>
+          )}
+          {formData.urgent && (
+            <Badge variant="destructive" className="text-sm">
+              <Zap className="h-3 w-3 mr-1" />
+              Urgent
+            </Badge>
+          )}
+        </div>
+        
+        <div className="flex items-center space-x-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.push(`/dashboard/career/${positionId}`)}
+            disabled={loading}
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            View Position
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={loading}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete Position
+          </Button>
+        </div>
+      </div>
+
       <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
-        {/* Basic Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-            <CardDescription>
-              Update the basic information for this position
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Basic Information - Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Title & Slug */}
+          <Card className="lg:col-span-2">
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <Briefcase className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Basic Information</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Position Title *</Label>
+                <Label htmlFor="title">Job Title *</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="e.g., Senior Software Engineer"
+                  placeholder="e.g., Senior Frontend Developer"
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <SlugInput
-                  value={formData.slug}
-                  onChange={(value) =>
-                    setFormData((prev) => ({ ...prev, slug: value }))
-                  }
-                  entityType="career"
-                  excludeId={positionId}
-                  label="URL Slug"
-                  placeholder="auto-generated-from-title"
-                  autoGenerate
-                  sourceField="title"
-                  sourceValue={formData.title}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="summary">Job Summary</Label>
-              <Textarea
-                id="summary"
-                value={formData.summary}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    summary: e.target.value,
-                  }))
-                }
-                placeholder="Brief summary of the position..."
-                rows={3}
+              <SlugInput
+                value={formData.slug || ""}
+                onChange={(value) => setFormData((prev) => ({ ...prev, slug: value }))}
+                entityType="career"
+                excludeId={positionId}
+                label="URL Slug"
+                placeholder="auto-generated-from-title"
+                autoGenerate
+                sourceField="title"
+                sourceValue={formData.title || ""}
               />
-            </div>
+            </CardContent>
+          </Card>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Job Description *</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                placeholder="Describe the role, company, and what you're looking for..."
-                rows={6}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="requirements">Requirements</Label>
-                <Textarea
-                  id="requirements"
-                  value={formData.requirements}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      requirements: e.target.value,
-                    }))
-                  }
-                  placeholder="Job requirements and qualifications..."
-                  rows={4}
-                />
+          {/* Status & Settings */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <Settings className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Status & Settings</CardTitle>
               </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="benefits">Benefits & Perks</Label>
-                <Textarea
-                  id="benefits"
-                  value={formData.benefits}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      benefits: e.target.value,
-                    }))
-                  }
-                  placeholder="Benefits, perks, and what you offer..."
-                  rows={4}
-                />
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value) => handleInputChange("status", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="open">Open</SelectItem>
+                    <SelectItem value="closed">Closed</SelectItem>
+                    <SelectItem value="filled">Filled</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+              
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="featured"
+                    checked={formData.featured}
+                    onCheckedChange={(checked) => handleInputChange("featured", checked)}
+                  />
+                  <Label htmlFor="featured" className="flex items-center space-x-2">
+                    <Star className="h-4 w-4 text-yellow-500" />
+                    Featured Position
+                  </Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="urgent"
+                    checked={formData.urgent}
+                    onCheckedChange={(checked) => handleInputChange("urgent", checked)}
+                  />
+                  <Label htmlFor="urgent" className="flex items-center space-x-2">
+                    <Zap className="h-4 w-4 text-orange-500" />
+                    Urgent Hiring
+                  </Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="remote_allowed"
+                    checked={formData.remote_allowed}
+                    onCheckedChange={(checked) => handleInputChange("remote_allowed", checked)}
+                  />
+                  <Label htmlFor="remote_allowed" className="flex items-center space-x-2">
+                    <Globe className="h-4 w-4 text-blue-500" />
+                    Remote Work Allowed
+                  </Label>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Position Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Position Details</CardTitle>
-            <CardDescription>
-              Set the position category, location, type, and level
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Position Details - Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {/* Category & Location */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <Building2 className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Category & Location</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="category">Category *</Label>
                 <Select
                   value={formData.category_id}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, category_id: value }))
-                  }
+                  onValueChange={(value) => handleInputChange("category_id", value)}
                   required
                 >
                   <SelectTrigger>
@@ -389,14 +497,12 @@ export default function EditCareerPositionPage() {
                   </SelectContent>
                 </Select>
               </div>
-
+              
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
                 <Select
                   value={formData.location_id}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, location_id: value }))
-                  }
+                  onValueChange={(value) => handleInputChange("location_id", value)}
                   required
                 >
                   <SelectTrigger>
@@ -411,16 +517,24 @@ export default function EditCareerPositionPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Type & Level */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <Users className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Type & Level</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="type">Employment Type</Label>
+                <Label htmlFor="type">Employment Type *</Label>
                 <Select
                   value={formData.type_id}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, type_id: value }))
-                  }
+                  onValueChange={(value) => handleInputChange("type_id", value)}
+                  required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
@@ -434,14 +548,13 @@ export default function EditCareerPositionPage() {
                   </SelectContent>
                 </Select>
               </div>
-
+              
               <div className="space-y-2">
-                <Label htmlFor="level">Experience Level</Label>
+                <Label htmlFor="level">Experience Level *</Label>
                 <Select
                   value={formData.level_id}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, level_id: value }))
-                  }
+                  onValueChange={(value) => handleInputChange("level_id", value)}
+                  required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select level" />
@@ -455,60 +568,46 @@ export default function EditCareerPositionPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Salary & Benefits */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Salary & Benefits</CardTitle>
-            <CardDescription>
-              Set salary range and additional benefits
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="salary_min">Minimum Salary</Label>
-                <Input
-                  id="salary_min"
-                  type="number"
-                  value={formData.salary_min}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      salary_min: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                  placeholder="0"
-                />
+          {/* Salary & Experience */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <DollarSign className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Salary & Experience</CardTitle>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="salary_max">Maximum Salary</Label>
-                <Input
-                  id="salary_max"
-                  type="number"
-                  value={formData.salary_max}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      salary_max: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                  placeholder="0"
-                />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="salary_min">Min Salary</Label>
+                  <Input
+                    id="salary_min"
+                    type="number"
+                    value={formData.salary_min}
+                    onChange={(e) => handleInputChange("salary_min", parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="salary_max">Max Salary</Label>
+                  <Input
+                    id="salary_max"
+                    type="number"
+                    value={formData.salary_max}
+                    onChange={(e) => handleInputChange("salary_max", parseInt(e.target.value) || 0)}
+                    placeholder="0"
+                  />
+                </div>
               </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="salary_currency">Currency</Label>
                 <Select
                   value={formData.salary_currency}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      salary_currency: value,
-                    }))
-                  }
+                  onValueChange={(value) => handleInputChange("salary_currency", value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -520,21 +619,124 @@ export default function EditCareerPositionPage() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="travel_percentage">Travel Percentage</Label>
+                <Input
+                  id="travel_percentage"
+                  type="number"
+                  value={formData.travel_percentage}
+                  onChange={(e) => handleInputChange("travel_percentage", parseInt(e.target.value) || 0)}
+                  placeholder="0"
+                  min="0"
+                  max="100"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Content Sections - Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Description */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Job Description *</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+                placeholder="Describe the role, responsibilities, and what you're looking for..."
+                rows={8}
+                required
+              />
+            </CardContent>
+          </Card>
+
+          {/* Requirements */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <Target className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Requirements</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                id="requirements"
+                value={formData.requirements}
+                onChange={(e) => handleInputChange("requirements", e.target.value)}
+                placeholder="List the key requirements and qualifications..."
+                rows={8}
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Additional Content - Bento Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Summary */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <GraduationCap className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Job Summary</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                id="summary"
+                value={formData.summary}
+                onChange={(e) => handleInputChange("summary", e.target.value)}
+                placeholder="Brief summary of the position..."
+                rows={6}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Benefits */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <Award className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Benefits & Perks</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                id="benefits"
+                value={formData.benefits}
+                onChange={(e) => handleInputChange("benefits", e.target.value)}
+                placeholder="List the benefits, perks, and what you offer..."
+                rows={6}
+              />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Dates & Additional Settings */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Dates */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center space-x-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Important Dates</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="application_deadline">Application Deadline</Label>
                 <Input
                   id="application_deadline"
                   type="date"
                   value={formData.application_deadline}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      application_deadline: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => handleInputChange("application_deadline", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -543,205 +745,88 @@ export default function EditCareerPositionPage() {
                   id="start_date"
                   type="date"
                   value={formData.start_date}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      start_date: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => handleInputChange("start_date", e.target.value)}
                 />
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Additional Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Additional Settings</CardTitle>
-            <CardDescription>
-              Configure additional position settings
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Additional Settings */}
+          <Card>
+            <CardHeader className="pb-3">
               <div className="flex items-center space-x-2">
-                <Switch
-                  id="remote_allowed"
-                  checked={formData.remote_allowed}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      remote_allowed: checked,
-                    }))
-                  }
-                />
-                <Label htmlFor="remote_allowed">Remote Work Allowed</Label>
+                <Settings className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">Additional Settings</CardTitle>
               </div>
-
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="travel_required"
                   checked={formData.travel_required}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      travel_required: checked,
-                    }))
-                  }
+                  onCheckedChange={(checked) => handleInputChange("travel_required", checked)}
                 />
                 <Label htmlFor="travel_required">Travel Required</Label>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="featured"
-                  checked={formData.featured}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      featured: checked,
-                    }))
-                  }
-                />
-                <Label htmlFor="featured">Featured Position</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="urgent"
-                  checked={formData.urgent}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      urgent: checked,
-                    }))
-                  }
-                />
-                <Label htmlFor="urgent">Urgent Position</Label>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, status: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="open">Open</SelectItem>
-                  <SelectItem value="closed">Closed</SelectItem>
-                  <SelectItem value="filled">Filled</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* SEO Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>SEO Settings</CardTitle>
-            <CardDescription>
-              Configure SEO metadata for this position
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="seo_title">SEO Title</Label>
-              <Input
-                id="seo_title"
-                value={formData.seo_title}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    seo_title: e.target.value,
-                  }))
-                }
-                placeholder="SEO optimized title"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="seo_description">SEO Description</Label>
-              <Textarea
-                id="seo_description"
-                value={formData.seo_description}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    seo_description: e.target.value,
-                  }))
-                }
-                placeholder="SEO optimized description"
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="seo_keywords">SEO Keywords</Label>
-              <Input
-                id="seo_keywords"
-                value={formData.seo_keywords}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    seo_keywords: e.target.value,
-                  }))
-                }
-                placeholder="Keywords separated by commas"
-              />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-between items-center pt-6">
-          <div className="flex gap-2">
+        <div className="flex items-center justify-between pt-6 border-t">
+          <div className="flex items-center space-x-2">
+            <Badge variant="outline" className="text-sm">
+              {formData.status === "draft" ? "Draft Mode" : "Ready to Publish"}
+            </Badge>
+            {formData.featured && (
+              <Badge variant="secondary" className="text-sm">
+                <Star className="h-3 w-3 mr-1" />
+                Featured
+              </Badge>
+            )}
+            {formData.urgent && (
+              <Badge variant="destructive" className="text-sm">
+                <Zap className="h-3 w-3 mr-1" />
+                Urgent
+              </Badge>
+            )}
+          </div>
+          
+          <div className="flex items-center space-x-3">
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push(`/dashboard/career/${positionId}`)}
+              onClick={() => router.push("/dashboard/career")}
               disabled={loading}
             >
-              <Eye className="h-4 w-4 mr-2" />
-              View Position
+              Cancel
             </Button>
             <Button
               type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={loading}
-            >
-              Delete Position
-            </Button>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              type="submit"
+              variant="outline"
               onClick={(e) => handleSubmit(e, "draft")}
               disabled={loading}
-              variant="outline"
             >
               <Save className="h-4 w-4 mr-2" />
               Save as Draft
             </Button>
             <Button
-              type="submit"
-              onClick={(e) => handleSubmit(e, "open")}
+              type="button"
+              onClick={(e) => handleSubmit(e, formData.status)}
               disabled={loading}
+              className="min-w-[140px]"
             >
-              <Save className="h-4 w-4 mr-2" />
-              Update & Publish
+              {loading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Updating...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Edit className="h-4 w-4" />
+                  <span>Update Position</span>
+                </div>
+              )}
             </Button>
           </div>
         </div>

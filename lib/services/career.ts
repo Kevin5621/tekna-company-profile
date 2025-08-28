@@ -963,22 +963,44 @@ export class CareerService {
   async updatePosition(
     id: string,
     updates: Partial<CareerPosition>
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; data?: CareerPosition; error?: string }> {
     try {
-      const { error } = await this.supabase
+      // Add updated_at timestamp
+      const updateData = {
+        ...updates,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error } = await this.supabase
         .from("career_positions")
-        .update(updates)
-        .eq("id", id);
+        .update(updateData)
+        .eq("id", id)
+        .select("*")
+        .single();
 
       if (error) {
-        console.error("Error updating position:", error);
-        return false;
+        console.error("Error updating position:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        return { 
+          success: false, 
+          error: error.message || "Failed to update position" 
+        };
       }
 
-      return true;
+      return { 
+        success: true, 
+        data: data 
+      };
     } catch (error) {
       console.error("Error in updatePosition:", error);
-      return false;
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : "Unknown error occurred" 
+      };
     }
   }
 
