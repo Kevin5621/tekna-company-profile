@@ -3,6 +3,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import useSWR from "swr";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -200,34 +201,34 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
-              <a
+              <Link
                 href="/dashboard/admin"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
                 <IconUsers className="h-6 w-6" />
                 <span className="text-sm font-medium">Manage Team</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/dashboard/blog"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
                 <IconArticle className="h-6 w-6" />
                 <span className="text-sm font-medium">Manage Blog</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/dashboard/career"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
                 <IconUsers className="h-6 w-6" />
                 <span className="text-sm font-medium">Manage Career</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/dashboard/settings"
                 className="flex flex-col items-center space-y-2 p-4 rounded-lg border hover:bg-accent transition-colors"
               >
                 <IconCalendar className="h-6 w-6" />
                 <span className="text-sm font-medium">Settings</span>
-              </a>
+              </Link>
             </div>
           </CardContent>
         </Card>
