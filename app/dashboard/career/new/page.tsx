@@ -35,6 +35,7 @@ import {
 } from "@/lib/services/career";
 import { useToast } from "@/hooks/use-toast";
 import { DashboardFormTemplate } from "@/components/dashboard/dashboard-form-template";
+import { SlugInput } from "@/components/ui/slug-input";
 
 export default function NewCareerPositionPage() {
   const router = useRouter();
@@ -94,22 +95,16 @@ export default function NewCareerPositionPage() {
     loadData();
   }, [careerService, toast]);
 
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim();
-  };
+
 
   const handleTitleChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
       title: value,
-      slug: generateSlug(value),
     }));
   };
+
+
 
   const handleSubmit = async (e: React.FormEvent, status?: string) => {
     e.preventDefault();
@@ -193,14 +188,17 @@ export default function NewCareerPositionPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="slug">URL Slug</Label>
-                <Input
-                  id="slug"
+                <SlugInput
                   value={formData.slug}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, slug: e.target.value }))
+                  onChange={(value) =>
+                    setFormData((prev) => ({ ...prev, slug: value }))
                   }
+                  entityType="career"
+                  label="URL Slug"
                   placeholder="auto-generated-from-title"
+                  autoGenerate
+                  sourceField="title"
+                  sourceValue={formData.title}
                 />
               </div>
             </div>

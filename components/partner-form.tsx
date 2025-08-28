@@ -24,6 +24,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import { SlugInput } from "@/components/ui/slug-input";
 import Image from "next/image";
 
 interface PartnerFormData {
@@ -131,16 +132,7 @@ export default function PartnerForm({
     }
   }, [initialData]);
 
-  // Auto-generate slug from name
-  useEffect(() => {
-    if (formData.name && !isEditing) {
-      const slug = formData.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      setFormData((prev) => ({ ...prev, slug }));
-    }
-  }, [formData.name, isEditing]);
+
 
   const handleInputChange = (
     field: keyof PartnerFormData,
@@ -161,6 +153,8 @@ export default function PartnerForm({
       ),
     }));
   };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,15 +235,17 @@ export default function PartnerForm({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="slug">Slug *</Label>
-                    <Input
-                      id="slug"
+                    <SlugInput
                       value={formData.slug}
-                      onChange={(e) =>
-                        handleInputChange("slug", e.target.value)
-                      }
+                      onChange={(value) => handleInputChange("slug", value)}
+                      entityType="partner"
+                      excludeId={partnerId}
+                      label="Slug"
                       placeholder="partner-slug"
                       required
+                      autoGenerate
+                      sourceField="name"
+                      sourceValue={formData.name}
                     />
                   </div>
                 </div>

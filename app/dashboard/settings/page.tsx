@@ -231,67 +231,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Social Media */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Social Media Links</CardTitle>
-          <CardDescription>
-            Social media profiles for your company
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="facebook">Facebook</Label>
-              <Input
-                id="facebook"
-                value={settings.social_media.facebook}
-                onChange={(e) =>
-                  updateSettings("social_media.facebook", e.target.value)
-                }
-                placeholder="https://facebook.com/company"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="twitter">Twitter</Label>
-              <Input
-                id="twitter"
-                value={settings.social_media.twitter}
-                onChange={(e) =>
-                  updateSettings("social_media.twitter", e.target.value)
-                }
-                placeholder="https://twitter.com/company"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="linkedin">LinkedIn</Label>
-              <Input
-                id="linkedin"
-                value={settings.social_media.linkedin}
-                onChange={(e) =>
-                  updateSettings("social_media.linkedin", e.target.value)
-                }
-                placeholder="https://linkedin.com/company/company"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="instagram">Instagram</Label>
-              <Input
-                id="instagram"
-                value={settings.social_media.instagram}
-                onChange={(e) =>
-                  updateSettings("social_media.instagram", e.target.value)
-                }
-                placeholder="https://instagram.com/company"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* SEO Settings */}
       <Card>
         <CardHeader>

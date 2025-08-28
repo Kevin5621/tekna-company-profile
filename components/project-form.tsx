@@ -25,6 +25,7 @@ import { mutate as globalMutate } from "swr";
 import { MediaUpload } from "@/components/media-upload";
 import type { MediaFile } from "@/lib/services/media.service";
 import { useToast } from "@/hooks/use-toast";
+import { SlugInput } from "@/components/ui/slug-input";
 
 interface ProjectFormData {
   name: string;
@@ -60,23 +61,14 @@ export function ProjectForm({
 
   const { toast } = useToast();
 
-  // Generate slug from name
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9 -]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim();
-  };
-
   const handleNameChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
       name: value,
-      slug: generateSlug(value),
     }));
   };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,21 +225,23 @@ export function ProjectForm({
 
               {/* Slug */}
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
-                <Input
-                  id="slug"
+                <SlugInput
                   value={formData.slug}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setFormData((prev) => ({
                       ...prev,
-                      slug: e.target.value,
+                      slug: value,
                     }))
                   }
+                  entityType="project"
+                  excludeId={projectId}
+                  label="Slug"
                   placeholder="website-e-commerce-modern"
+                  description="URL slug will be automatically generated from the project name"
+                  autoGenerate
+                  sourceField="name"
+                  sourceValue={formData.name}
                 />
-                <p className="text-xs text-muted-foreground">
-                  URL slug will be automatically generated from the project name
-                </p>
               </div>
 
               {/* Project Description */}

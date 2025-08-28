@@ -33,6 +33,7 @@ import {
 import Image from "next/image";
 import { MarkdownEditor } from "./markdown-editor";
 import { useToast } from "@/hooks/use-toast";
+import { SlugInput } from "@/components/ui/slug-input";
 
 interface PostFormProps {
   postId?: string;
@@ -116,19 +117,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
     loadData();
   }, []);
 
-  // Auto-generate slug when title changes
-  useEffect(() => {
-    if (formData.title && !postId) {
-      const autoSlug = formData.title
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/[\s_-]+/g, "-")
-        .replace(/^-+|-+$/g, "");
 
-      setFormData((prev) => ({ ...prev, slug: autoSlug }));
-    }
-  }, [formData.title, postId]);
 
   // Auto-generate meta title and description
   useEffect(() => {
@@ -154,9 +143,6 @@ export function PostForm({ postId, initialData }: PostFormProps) {
 
     if (!formData.slug.trim()) {
       newErrors.slug = "Slug is required";
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug =
-        "Slug can only contain lowercase letters, numbers, and hyphens";
     }
 
     if (!formData.content.trim()) {
@@ -492,31 +478,24 @@ export function PostForm({ postId, initialData }: PostFormProps) {
 
                   {/* Slug */}
                   <div className="space-y-2">
-                    <Label htmlFor="slug" className="text-sm font-medium">
-                      Slug *
-                    </Label>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">
                         /blog/
                       </span>
-                      <Input
-                        id="slug"
-                        type="text"
+                      <SlugInput
                         value={formData.slug}
-                        onChange={(e) =>
-                          handleInputChange("slug", e.target.value)
-                        }
+                        onChange={(value) => handleInputChange("slug", value)}
+                        entityType="blog"
+                        excludeId={postId}
+                        label="Slug"
                         placeholder="url-friendly-slug"
-                        className={errors.slug ? "border-red-500" : ""}
+                        description="URL artikel akan menjadi: /blog/{formData.slug}"
                         required
+                        autoGenerate
+                        sourceField="title"
+                        sourceValue={formData.title}
                       />
                     </div>
-                    {errors.slug && (
-                      <p className="text-sm text-red-500">{errors.slug}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      URL artikel akan menjadi: /blog/{formData.slug}
-                    </p>
                   </div>
 
                   {/* Excerpt */}

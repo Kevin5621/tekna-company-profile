@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
 import { IconDeviceFloppy, IconX, IconPalette } from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
+import { SlugInput } from "@/components/ui/slug-input";
 
 interface CategoryFormProps {
   categoryId?: string;
@@ -61,19 +62,7 @@ export function CategoryForm({
   const [errors, setErrors] = useState<ValidationErrors>({});
   const { toast } = useToast();
 
-  // Auto-generate slug when name changes
-  useEffect(() => {
-    if (formData.name && !categoryId) {
-      const autoSlug = formData.name
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/[\s_-]+/g, "-")
-        .replace(/^-+|-+$/g, "");
 
-      setFormData((prev) => ({ ...prev, slug: autoSlug }));
-    }
-  }, [formData.name, categoryId]);
 
   // Validation function
   const validateForm = (): boolean => {
@@ -91,13 +80,6 @@ export function CategoryForm({
     // Slug validation
     if (!formData.slug.trim()) {
       newErrors.slug = "Slug is required";
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug =
-        "Slug can only contain lowercase letters, numbers, and hyphens";
-    } else if (formData.slug.length < 2) {
-      newErrors.slug = "Slug must be at least 2 characters";
-    } else if (formData.slug.length > 100) {
-      newErrors.slug = "Slug must be at most 100 characters";
     }
 
     // Color validation
@@ -211,21 +193,19 @@ export function CategoryForm({
 
           {/* Slug */}
           <div className="space-y-2">
-            <Label htmlFor="slug">Slug *</Label>
-            <Input
-              id="slug"
-              type="text"
+            <SlugInput
               value={formData.slug}
-              onChange={(e) => handleInputChange("slug", e.target.value)}
+              onChange={(value) => handleInputChange("slug", value)}
+              entityType="category"
+              excludeId={categoryId}
+              label="Slug"
               placeholder="url-friendly-slug"
-              className={errors.slug ? "border-destructive" : ""}
+              description="URL kategori: /blog/category/{formData.slug}"
+              required
+              autoGenerate
+              sourceField="name"
+              sourceValue={formData.name}
             />
-            {errors.slug && (
-              <p className="text-sm text-destructive">{errors.slug}</p>
-            )}
-            <p className="text-sm text-muted-foreground">
-              URL kategori: /blog/category/{formData.slug}
-            </p>
           </div>
 
           {/* Description */}
