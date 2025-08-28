@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,7 @@ import {
   UserPlus,
   Share2,
   CheckCircle,
+  RefreshCw,
 } from "lucide-react";
 import {
   CareerService,
@@ -43,6 +45,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ContentRenderer } from "@/components/content-renderer";
 
 export default function CareerPage() {
+  const router = useRouter();
   const { toast } = useToast();
   const [positions, setPositions] = useState<CareerPosition[]>([]);
   const [featuredPositions, setFeaturedPositions] = useState<CareerPosition[]>([]);
@@ -51,6 +54,7 @@ export default function CareerPage() {
   const [types, setTypes] = useState<CareerType[]>([]);
   const [levels, setLevels] = useState<CareerLevel[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [searchParams, setSearchParams] = useState<CareerSearchParams>({
     page: 1,
     limit: 12,
@@ -195,8 +199,14 @@ export default function CareerPage() {
   };
 
   const handlePositionSelect = (position: CareerPosition) => {
-    setSelectedPosition(position);
+    // On mobile, redirect to individual career page
+    if (window.innerWidth < 1024) {
+      router.push(`/career/${position.slug}`);
+      return;
+    }
     
+    // On desktop, show in sidebar
+    setSelectedPosition(position);
   };
 
   const clearFilters = () => {
@@ -386,25 +396,32 @@ export default function CareerPage() {
                 />
               </div>
               
-              {/* Test Toast Button - Temporary */}
-              <div className="mt-4 text-center">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => {
-                    try {
-                      toast({
-                        title: "🧪 Test Toast",
-                        description: "If you see this, toast is working!",
-                      });
-                    } catch (error) {
-                      console.error("Toast error:", error);
-                    }
-                  }}
-                  className="text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/20"
-                >
-                  Test Toast
-                </Button>
+              {/* Search Suggestions - Mobile Only */}
+              <div className="lg:hidden mt-3">
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {categories.slice(0, 4).map((category) => (
+                    <Button
+                      key={category.id}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleFilterChange("category", category.slug)}
+                      className="text-xs h-7 px-2 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+                    >
+                      {category.name}
+                    </Button>
+                  ))}
+                  {locations.slice(0, 3).map((location) => (
+                    <Button
+                      key={location.id}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleFilterChange("location", location.slug)}
+                      className="text-xs h-7 px-2 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+                    >
+                      {location.name}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -448,9 +465,49 @@ export default function CareerPage() {
             </p>
           </div>
 
+          {/* Mobile Sticky Header */}
+          <div className="lg:hidden sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b mb-6 -mx-4 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-primary" />
+                <span className="font-semibold text-foreground">
+                  {totalCount} Jobs Available
+                </span>
+              </div>
+              <Select value={searchParams.sort || "newest"} onValueChange={handleSortChange}>
+                <SelectTrigger className="w-32 h-8 rounded-lg text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Latest</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                  <SelectItem value="title">A-Z</SelectItem>
+                  <SelectItem value="salary_high">High Salary</SelectItem>
+                  <SelectItem value="salary_low">Low Salary</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           {/* Filters Section - Moved to top */}
           <div className="mb-8">
-            <div className="bg-card rounded-lg border shadow-sm p-6">
+            {/* Mobile Filter Toggle */}
+            <div className="lg:hidden mb-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className="w-full justify-between"
+              >
+                <span>Filters & Search</span>
+                <span className={showFilters ? "rotate-180" : ""}>▼</span>
+              </Button>
+            </div>
+
+            <div className={cn(
+              "bg-card rounded-lg border shadow-sm p-6",
+              "lg:block",
+              showFilters ? "block" : "hidden"
+            )}>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-foreground">Filters</h3>
                 {hasActiveFilters() && (
@@ -501,7 +558,7 @@ export default function CareerPage() {
 
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Column - Job Listings */}
-            <div className="lg:w-2/5">
+            <div className="w-full lg:w-2/5">
               {/* Job Listings */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -521,12 +578,60 @@ export default function CareerPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {/* Search Results Info */}
+                {hasActiveFilters() && (
+                  <div className="mb-4 p-3 bg-muted/30 rounded-lg border">
+                    <p className="text-sm text-muted-foreground text-center">
+                      🔍 Showing {positions.length} of {totalCount} positions
+                      {searchQuery && ` matching "${searchQuery}"`}
+                      {searchParams.filters?.category && ` in ${categories.find(c => c.slug === searchParams.filters?.category)?.name}`}
+                      {searchParams.filters?.location && ` at ${locations.find(l => l.slug === searchParams.filters?.location)?.name}`}
+                    </p>
+                  </div>
+                )}
+
+                {/* Mobile Instructions */}
+                <div className="lg:hidden bg-muted/30 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-muted-foreground text-center">
+                    💡 Tap on a job card to view full details and apply
+                  </p>
+                </div>
+
+                {/* Mobile Quick Actions */}
+                <div className="lg:hidden mb-4">
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowFilters(!showFilters)}
+                      className="whitespace-nowrap flex-shrink-0"
+                    >
+                      <Search className="w-4 h-4 mr-2" />
+                      {showFilters ? "Hide" : "Show"} Filters
+                    </Button>
+                    {hasActiveFilters() && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={clearFilters}
+                        className="whitespace-nowrap flex-shrink-0 text-destructive border-destructive/30 hover:bg-destructive/10"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Clear All
+                      </Button>
+                    )}
+                  </div>
+                </div>
 
                 {/* Job Cards */}
                 {loading ? (
                   <div className="text-center py-12">
                     <div className="inline-flex items-center justify-center w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
-                    <p className="text-sm text-muted-foreground">Loading positions...</p>
+                    <p className="text-sm text-muted-foreground mb-2">Loading positions...</p>
+                    <p className="text-xs text-muted-foreground">
+                      💡 This may take a few moments
+                    </p>
                   </div>
                 ) : positions.length === 0 ? (
                   <div className="text-center py-12">
@@ -534,12 +639,46 @@ export default function CareerPage() {
                       <Briefcase className="h-8 w-8 text-muted-foreground" />
                     </div>
                     <h3 className="text-lg font-medium text-foreground mb-2">No positions found</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground mb-4">
                       {hasActiveFilters() ? "Try adjusting your filters." : "Check back later for new opportunities!"}
                     </p>
+                    {hasActiveFilters() && (
+                      <div className="space-y-3">
+                        <Button
+                          onClick={clearFilters}
+                          className="w-full sm:w-auto"
+                          variant="outline"
+                        >
+                          Clear All Filters
+                        </Button>
+                        <p className="text-xs text-muted-foreground">
+                          💡 Try removing some filters to see more positions
+                        </p>
+                      </div>
+                    )}
+                    {!hasActiveFilters() && (
+                      <div className="space-y-3">
+                        <p className="text-xs text-muted-foreground">
+                          💡 No open positions available at the moment
+                        </p>
+                        <Button
+                          onClick={() => window.location.reload()}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Refresh Page
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3 max-h-[900px] overflow-y-auto">
+                    {/* Mobile Pull to Refresh Indicator */}
+                    <div className="lg:hidden text-center py-2 text-xs text-muted-foreground">
+                      ↓ Pull down to refresh
+                    </div>
+                    
                     {positions.map((position) => (
                       <Card
                         key={position.id}
@@ -597,9 +736,37 @@ export default function CareerPage() {
                                     {position.level?.name}
                                   </Badge>
                                 </div>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatTimeAgo(position.created_at)}
-                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatTimeAgo(position.created_at)}
+                                  </span>
+                                  {/* Mobile View Details Button */}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      router.push(`/career/${position.slug}`);
+                                    }}
+                                    className="lg:hidden h-7 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/10"
+                                  >
+                                    View Details
+                                  </Button>
+                                </div>
+                              </div>
+                              
+                              {/* Mobile Apply Button */}
+                              <div className="lg:hidden mt-3 pt-3 border-t border-border">
+                                <Button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    router.push(`/career/${position.slug}`);
+                                  }}
+                                  className="w-full h-9 bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium"
+                                >
+                                  <UserPlus className="w-4 h-4 mr-2" />
+                                  Apply Now
+                                </Button>
                               </div>
                             </div>
                           </div>
@@ -637,11 +804,25 @@ export default function CareerPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Mobile Load More Button */}
+                {totalPages > 1 && (
+                  <div className="lg:hidden mt-6 text-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => handlePageChange((searchParams.page || 1) + 1)}
+                      disabled={searchParams.page === totalPages}
+                      className="w-full"
+                    >
+                      {searchParams.page === totalPages ? "No More Jobs" : "Load More Jobs"}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Right Column - Job Details */}
-            <div className="lg:w-3/5">
+            {/* Right Column - Job Details - Hidden on Mobile */}
+            <div className="hidden lg:block lg:w-3/5">
               {selectedPosition ? (
                 <div className="bg-card rounded-lg border shadow-sm p-6">
                   {/* Job Header */}
@@ -824,10 +1005,6 @@ export default function CareerPage() {
                   size="sm"
                   onClick={() => {
                     setShowApplicationForm(false);
-                    toast({
-                      title: "❌ Application Cancelled",
-                      description: "Application form closed. You can apply again anytime.",
-                    });
                   }}
                 >
                   ×
@@ -954,7 +1131,7 @@ export default function CareerPage() {
                     </label>
                     <Input
                       type="url"
-                      value={applicationData.portfolio_url}
+                      value={applicationData.linkedin_url}
                       onChange={(e) =>
                         setApplicationData((prev) => ({
                           ...prev,
@@ -987,10 +1164,6 @@ export default function CareerPage() {
                     variant="outline"
                     onClick={() => {
                       setShowApplicationForm(false);
-                      toast({
-                        title: "❌ Application Cancelled",
-                        description: "Application form closed. You can apply again anytime.",
-                      });
                     }}
                     className="flex-1"
                   >
@@ -1018,6 +1191,20 @@ export default function CareerPage() {
           </Card>
         </div>
       )}
+
+      {/* Mobile Floating Action Button */}
+      <div className="lg:hidden fixed bottom-6 right-6 z-40">
+        <Button
+          onClick={() => {
+            if (positions.length > 0) {
+              router.push(`/career/${positions[0].slug}`);
+            }
+          }}
+          className="h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
+        >
+          <Briefcase className="w-6 h-6" />
+        </Button>
+      </div>
     </div>
   );
 }
