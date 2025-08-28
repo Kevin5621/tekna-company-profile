@@ -100,8 +100,8 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
   return (
     <DashboardPageTemplate
       breadcrumbs={[
-        { label: "Penulis", href: "/dashboard/authors" },
-        { label: "Daftar Penulis", isCurrentPage: true },
+        { label: "Authors", href: "/dashboard/authors" },
+        { label: "Authors List", isCurrentPage: true },
       ]}
       title="Authors"
       description="Manage authors/team members for blog articles"
@@ -159,7 +159,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
                   {/* Status & Order */}
                   <div className="flex items-center justify-between">
                     <Badge variant={author.is_active ? "default" : "secondary"}>
-                      {author.is_active ? "Aktif" : "Tidak Aktif"}
+                      {author.is_active ? "Active" : "Inactive"}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       Order: {author.sort_order}
@@ -191,7 +191,7 @@ export function AuthorsPageClient({ initialAuthors }: AuthorsPageClientProps) {
                     className="flex-1"
                   >
                     <IconTrash className="h-4 w-4 mr-1" />
-                    Hapus
+                    Delete
                   </Button>
                 </div>
               </CardContent>

@@ -139,7 +139,7 @@ export default function FooterSectionsPage() {
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/footer" label="Kembali ke Footer" />
+        <BackButton href="/dashboard/footer" label="Back to Footer" />
       </div>
 
       {/* Header */}

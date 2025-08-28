@@ -81,37 +81,37 @@ export function CategoryForm({
 
     // Name validation
     if (!formData.name.trim()) {
-      newErrors.name = "Nama kategori wajib diisi";
+      newErrors.name = "Category name is required";
     } else if (formData.name.trim().length < 2) {
-      newErrors.name = "Nama kategori minimal 2 karakter";
+      newErrors.name = "Category name must be at least 2 characters";
     } else if (formData.name.trim().length > 100) {
-      newErrors.name = "Nama kategori maksimal 100 karakter";
+      newErrors.name = "Category name must be at most 100 characters";
     }
 
     // Slug validation
     if (!formData.slug.trim()) {
-      newErrors.slug = "Slug wajib diisi";
+      newErrors.slug = "Slug is required";
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
       newErrors.slug =
-        "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung";
+        "Slug can only contain lowercase letters, numbers, and hyphens";
     } else if (formData.slug.length < 2) {
-      newErrors.slug = "Slug minimal 2 karakter";
+      newErrors.slug = "Slug must be at least 2 characters";
     } else if (formData.slug.length > 100) {
-      newErrors.slug = "Slug maksimal 100 karakter";
+      newErrors.slug = "Slug must be at most 100 characters";
     }
 
     // Color validation
     if (!formData.color) {
-      newErrors.color = "Warna wajib dipilih";
+      newErrors.color = "Color is required";
     } else if (!/^#[0-9A-F]{6}$/i.test(formData.color)) {
-      newErrors.color = "Format warna tidak valid (gunakan hex color)";
+      newErrors.color = "Invalid color format (use hex color)";
     }
 
     // Sort order validation
     if (formData.sort_order < 0) {
-      newErrors.sort_order = "Urutan tidak boleh negatif";
+      newErrors.sort_order = "Order cannot be negative";
     } else if (formData.sort_order > 999) {
-      newErrors.sort_order = "Urutan maksimal 999";
+      newErrors.sort_order = "Order maximum is 999";
     }
 
     setErrors(newErrors);
@@ -155,7 +155,7 @@ export function CategoryForm({
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Terjadi kesalahan",
+          error instanceof Error ? error.message : "An error occurred",
         variant: "destructive",
       });
     } finally {
@@ -188,20 +188,20 @@ export function CategoryForm({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconPalette className="h-5 w-5" />
-          {categoryId ? "Edit Kategori" : "Tambah Kategori Baru"}
+          {categoryId ? "Edit Category" : "Add New Category"}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Nama Kategori *</Label>
+            <Label htmlFor="name">Category Name *</Label>
             <Input
               id="name"
               type="text"
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
-              placeholder="Masukkan nama kategori"
+              placeholder="Enter category name"
               className={errors.name ? "border-destructive" : ""}
             />
             {errors.name && (
@@ -230,19 +230,19 @@ export function CategoryForm({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              placeholder="Deskripsi kategori (opsional)"
+              placeholder="Category description (optional)"
               rows={3}
             />
           </div>
 
           {/* Color */}
           <div className="space-y-2">
-            <Label htmlFor="color">Warna *</Label>
+            <Label htmlFor="color">Color *</Label>
             <div className="flex items-center gap-3">
               <Input
                 id="color"
@@ -266,7 +266,7 @@ export function CategoryForm({
 
           {/* Sort Order */}
           <div className="space-y-2">
-            <Label htmlFor="sort_order">Urutan</Label>
+            <Label htmlFor="sort_order">Order</Label>
             <Input
               id="sort_order"
               type="number"
@@ -283,7 +283,7 @@ export function CategoryForm({
               <p className="text-sm text-destructive">{errors.sort_order}</p>
             )}
             <p className="text-sm text-muted-foreground">
-              Urutan untuk mengatur posisi kategori (0 = paling atas)
+              Order to set category position (0 = topmost)
             </p>
           </div>
 
@@ -296,7 +296,7 @@ export function CategoryForm({
                 handleInputChange("is_active", !!checked)
               }
             />
-            <Label htmlFor="is_active">Kategori Aktif</Label>
+            <Label htmlFor="is_active">Active Category</Label>
           </div>
 
           {/* Submit Buttons */}
@@ -309,17 +309,17 @@ export function CategoryForm({
               className="flex-1"
             >
               <IconX className="h-4 w-4 mr-2" />
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="flex-1">
               <IconDeviceFloppy className="h-4 w-4 mr-2" />
               {isLoading
                 ? categoryId
-                  ? "Menyimpan..."
-                  : "Membuat..."
+                  ? "Saving..."
+                  : "Creating..."
                 : categoryId
-                ? "Simpan Perubahan"
-                : "Buat Kategori"}
+                ? "Save Changes"
+                : "Create Category"}
             </Button>
           </div>
         </form>
