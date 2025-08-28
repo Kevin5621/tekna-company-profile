@@ -721,6 +721,35 @@ export class CareerService {
     }
   }
 
+  async getPositionById(id: string): Promise<CareerPosition | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from("career_positions")
+        .select(
+          `
+          *,
+          category:career_categories(*),
+          location:career_locations(*),
+          type:career_types(*),
+          level:career_levels(*)
+        `
+        )
+        .eq("id", id)
+        .eq("is_active", true)
+        .single();
+
+      if (error) {
+        console.error("Error fetching position by ID:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in getPositionById:", error);
+      return null;
+    }
+  }
+
   // Send email notification manually if database trigger fails
   private async sendEmailNotification(
     application: Partial<CareerApplication> & { old_status?: string },
@@ -790,6 +819,27 @@ export class CareerService {
     }
   }
 
+  async getCategoryById(id: string): Promise<CareerCategory | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from("career_categories")
+        .select("*")
+        .eq("id", id)
+        .eq("is_active", true)
+        .single();
+
+      if (error) {
+        console.error("Error fetching category by ID:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in getCategoryById:", error);
+      return null;
+    }
+  }
+
   async getAllLocations(): Promise<CareerLocation[]> {
     try {
       const { data, error } = await this.supabase
@@ -806,6 +856,27 @@ export class CareerService {
     } catch (error) {
       console.error("Error in getAllLocations:", error);
       return [];
+    }
+  }
+
+  async getLocationById(id: string): Promise<CareerLocation | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from("career_locations")
+        .select("*")
+        .eq("id", id)
+        .eq("is_active", true)
+        .single();
+
+      if (error) {
+        console.error("Error fetching location by ID:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in getLocationById:", error);
+      return null;
     }
   }
 
@@ -828,6 +899,27 @@ export class CareerService {
     }
   }
 
+  async getTypeById(id: string): Promise<CareerType | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from("career_types")
+        .select("*")
+        .eq("id", id)
+        .eq("is_active", true)
+        .single();
+
+      if (error) {
+        console.error("Error fetching type by ID:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in getTypeById:", error);
+      return null;
+    }
+  }
+
   async getAllLevels(): Promise<CareerLevel[]> {
     try {
       const { data, error } = await this.supabase
@@ -844,6 +936,27 @@ export class CareerService {
     } catch (error) {
       console.error("Error in getAllLevels:", error);
       return [];
+    }
+  }
+
+  async getLevelById(id: string): Promise<CareerLevel | null> {
+    try {
+      const { data, error } = await this.supabase
+        .from("career_levels")
+        .select("*")
+        .eq("id", id)
+        .eq("is_active", true)
+        .single();
+
+      if (error) {
+        console.error("Error fetching level by ID:", error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error in getLevelById:", error);
+      return null;
     }
   }
 

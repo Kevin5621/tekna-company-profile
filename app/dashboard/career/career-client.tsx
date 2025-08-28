@@ -211,13 +211,13 @@ export default function CareerClient({ initialPositions }: CareerClientProps) {
                       </div>
                       <div className="flex gap-1">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/career/${position.id}/edit`} prefetch={false}>
-                            Edit
+                          <Link href={`/dashboard/career/${position.id}`} prefetch={false}>
+                            View
                           </Link>
                         </Button>
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/career/${position.id}`} prefetch={false}>
-                            View
+                          <Link href={`/dashboard/career/${position.id}/edit`} prefetch={false}>
+                            Edit
                           </Link>
                         </Button>
                       </div>

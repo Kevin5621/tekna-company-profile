@@ -332,18 +332,6 @@ export default function CareerDetailPage() {
                   <UserPlus className="w-5 h-5 mr-2" />
                   Apply Now
                 </Button>
-                <Button
-                  onClick={sharePosition}
-                  variant="outline"
-                  className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20 h-12 px-8 text-lg"
-                >
-                  {shareSuccess ? (
-                    <CheckCircle className="w-5 h-5 mr-2 text-green-400" />
-                  ) : (
-                    <Share2 className="w-5 h-5 mr-2" />
-                  )}
-                  {shareSuccess ? "Shared!" : "Share"}
-                </Button>
               </div>
             </div>
           </div>
@@ -571,10 +559,6 @@ export default function CareerDetailPage() {
                   size="sm"
                   onClick={() => {
                     setShowApplicationForm(false);
-                    toast({
-                      title: "❌ Application Cancelled",
-                      description: "Application form closed. You can apply again anytime.",
-                    });
                   }}
                 >
                   ×
@@ -734,10 +718,6 @@ export default function CareerDetailPage() {
                     variant="outline"
                     onClick={() => {
                       setShowApplicationForm(false);
-                      toast({
-                        title: "❌ Application Cancelled",
-                        description: "Application form closed. You can apply again anytime.",
-                      });
                     }}
                     className="flex-1"
                   >
