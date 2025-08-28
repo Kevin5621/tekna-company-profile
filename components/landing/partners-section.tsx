@@ -68,10 +68,10 @@ export function PartnersSection() {
       <section className="bg-background py-16 md:py-24 relative z-30">
         <div className="group relative m-auto max-w-6xl px-6">
           <div className="py-6">
-            <div className="flex gap-24 animate-pulse">
+            <div className="flex gap-16 md:gap-32 animate-pulse">
               {skeletonIds.map((id) => (
                 <div key={id} className="flex shrink-0">
-                  <div className="w-64 h-24 bg-muted rounded"></div>
+                  <div className="w-32 md:w-64 h-16 md:h-24 bg-muted rounded"></div>
                 </div>
               ))}
             </div>
@@ -100,46 +100,50 @@ export function PartnersSection() {
           <div className="relative py-6 w-full md:w-[calc(100%-11rem)]">
             {/* Mobile: Sederhana tanpa gradient dan blur */}
             <div className="md:hidden">
-              <InfiniteSlider
-                speedOnHover={30}
-                speed={50}
-                gap={48}>
-                {partners.map((partner) => (
-                  <div key={partner.id} className="flex items-center justify-center">
-                    <div className="relative h-16 w-32 md:h-24 md:w-64">
-                      <Image
-                        className="object-contain dark:invert filter grayscale hover:grayscale-0 transition-all duration-300"
-                        src={partner.logo_url}
-                        alt={`Partner Logo`}
-                        fill
-                        sizes="(max-width: 768px) 128px, 256px"
-                      />
+              <div className="overflow-hidden px-4">
+                <InfiniteSlider
+                  speedOnHover={30}
+                  speed={50}
+                  gap={64}>
+                  {partners.map((partner) => (
+                    <div key={partner.id} className="flex items-center justify-center">
+                      <div className="relative h-16 w-32 md:h-24 md:w-64">
+                        <Image
+                          className="object-contain dark:invert filter grayscale hover:grayscale-0 transition-all duration-300"
+                          src={partner.logo_url}
+                          alt={`Partner Logo`}
+                          fill
+                          sizes="(max-width: 768px) 128px, 256px"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </InfiniteSlider>
+                  ))}
+                </InfiniteSlider>
+              </div>
             </div>
 
             {/* Desktop: Dengan gradient dan blur effects */}
             <div className="hidden md:block">
-              <InfiniteSlider
-                speedOnHover={20}
-                speed={40}
-                gap={112}>
-                {partners.map((partner) => (
-                  <div key={partner.id} className="flex items-center justify-center">
-                    <div className="relative h-24 w-64">
-                      <Image
-                        className="object-contain dark:invert filter grayscale hover:grayscale-0 transition-all duration-300"
-                        src={partner.logo_url}
-                        alt={`Partner Logo`}
-                        fill
-                        sizes="256px"
-                      />
+              <div className="overflow-hidden px-8">
+                <InfiniteSlider
+                  speedOnHover={20}
+                  speed={40}
+                  gap={128}>
+                  {partners.map((partner) => (
+                    <div key={partner.id} className="flex items-center justify-center">
+                      <div className="relative h-24 w-64">
+                        <Image
+                          className="object-contain dark:invert filter grayscale hover:grayscale-0 transition-all duration-300"
+                          src={partner.logo_url}
+                          alt={`Partner Logo`}
+                          fill
+                          sizes="256px"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </InfiniteSlider>
+                  ))}
+                </InfiniteSlider>
+              </div>
 
               <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-background to-transparent"></div>
               <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent"></div>

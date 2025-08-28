@@ -10,7 +10,7 @@ const hardcodedTestimonials = [
     client_company: "PT Maju Bersama",
     client_avatar_url: undefined,
     testimonial_text:
-      "Tekna telah membantu kami mengembangkan platform digital yang sangat efektif. Tim mereka profesional dan hasilnya melebihi ekspektasi kami.",
+      "Tekna has helped us develop a highly effective digital platform. Their team is professional and the results exceeded our expectations.",
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ const hardcodedTestimonials = [
     client_company: "Global Solutions Indonesia",
     client_avatar_url: undefined,
     testimonial_text:
-      "Kolaborasi dengan Tekna sangat menyenangkan. Mereka memahami kebutuhan bisnis kami dan memberikan solusi yang tepat sasaran.",
+      "Collaboration with Tekna is very enjoyable. They understand our business needs and provide targeted solutions.",
   },
   {
     id: 3,
@@ -28,7 +28,7 @@ const hardcodedTestimonials = [
     client_company: "TechStart Indonesia",
     client_avatar_url: undefined,
     testimonial_text:
-      "Kualitas kerja Tekna sangat tinggi. Mereka tidak hanya mengembangkan aplikasi, tapi juga memastikan skalabilitas dan keamanan yang optimal.",
+      "Tekna's work quality is very high. They not only develop applications but also ensure optimal scalability and security.",
   },
   {
     id: 4,
@@ -37,7 +37,7 @@ const hardcodedTestimonials = [
     client_company: "Innovate Digital",
     client_avatar_url: undefined,
     testimonial_text:
-      "Tim Tekna sangat responsif dan komunikatif. Mereka selalu memberikan update yang jelas dan mengakomodasi feedback kami dengan baik.",
+      "The Tekna team is very responsive and communicative. They always provide clear updates and accommodate our feedback well.",
   },
   {
     id: 5,
@@ -46,7 +46,7 @@ const hardcodedTestimonials = [
     client_company: "StartupHub Jakarta",
     client_avatar_url: undefined,
     testimonial_text:
-      "Tekna membantu startup kami dari ide hingga produk yang siap diluncurkan. Keahlian mereka dalam teknologi modern sangat mengesankan.",
+      "Tekna helped our startup from idea to launch-ready product. Their expertise in modern technology is very impressive.",
   },
   {
     id: 6,
@@ -55,7 +55,7 @@ const hardcodedTestimonials = [
     client_company: "E-Commerce Pro",
     client_avatar_url: undefined,
     testimonial_text:
-      "Platform e-commerce yang dikembangkan Tekna telah meningkatkan penjualan kami secara signifikan. User experience yang mereka buat sangat user-friendly.",
+      "The e-commerce platform developed by Tekna has significantly increased our sales. The user experience they created is very user-friendly.",
   },
 ];
 
@@ -75,10 +75,10 @@ export async function TestimonialsSection() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-foreground">
-            Apa Kata Klien Kami
+            What Our Clients Say
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Kami bangga dapat bekerja sama dengan perusahaan-perusahaan hebat.
+            We are proud to work with great companies.
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
