@@ -156,6 +156,45 @@
     animation: infinite-scroll linear infinite;
   }
 
+  /* Smooth infinite scroll animation dengan intermediate keyframes */
+  @keyframes infinite-scroll-smooth {
+    0% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-25%);
+    }
+    50% {
+      transform: translateX(-50%);
+    }
+    75% {
+      transform: translateX(-75%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-infinite-scroll-smooth {
+    animation: infinite-scroll-smooth linear infinite;
+    will-change: transform;
+  }
+
+  /* Simple infinite scroll animation */
+  @keyframes infinite-scroll-simple {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-33.333%);
+    }
+  }
+
+  .animate-infinite-scroll-simple {
+    animation: infinite-scroll-simple linear infinite;
+    will-change: transform;
+  }
+
   /* Ensure variable fonts work properly */
   .font-sans {
     font-family: var(--font-inter), "Inter", system-ui, sans-serif;

@@ -33,7 +33,7 @@ export function InfiniteSlider({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className="flex shrink-0 animate-infinite-scroll"
+        className="flex shrink-0 animate-infinite-scroll-simple"
         style={{
           gap: `${gap}px`,
           animationDuration: `${currentSpeed}s`,
@@ -41,15 +41,7 @@ export function InfiniteSlider({
         }}
       >
         {children}
-      </div>
-      <div
-        className="flex shrink-0 animate-infinite-scroll"
-        style={{
-          gap: `${gap}px`,
-          animationDuration: `${currentSpeed}s`,
-          animationDirection: direction === "right" ? "reverse" : "normal",
-        }}
-      >
+        {children}
         {children}
       </div>
     </div>
