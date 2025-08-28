@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,11 +24,7 @@ export default function PartnersClient() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPartners();
-  }, []);
-
-  const fetchPartners = async () => {
+  const fetchPartners = useCallback(async () => {
     try {
       const response = await fetch("/api/partners");
       const data = await response.json();
@@ -47,7 +44,11 @@ export default function PartnersClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
+
+  useEffect(() => {
+    fetchPartners();
+  }, [fetchPartners]);
 
   const handleDelete = async (partnerId: string) => {
     if (!confirm("Are you sure you want to delete this partner?")) {
@@ -147,9 +148,11 @@ export default function PartnersClient() {
                   {/* Logo Section */}
                   <div className="aspect-square bg-muted/50 flex items-center justify-center p-4 relative overflow-hidden">
                     {partner.logo_url ? (
-                      <img
+                      <Image
                         src={partner.logo_url}
                         alt="Partner logo"
+                        width={200}
+                        height={200}
                         className="w-full h-full object-contain max-w-[80%] max-h-[80%]"
                       />
                     ) : (

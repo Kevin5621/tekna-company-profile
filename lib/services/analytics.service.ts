@@ -16,7 +16,7 @@ export interface PageViewEvent {
 
 export interface ConversionEvent {
   event_name: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, string | number | boolean>;
 }
 
 class AnalyticsService {
@@ -39,8 +39,8 @@ class AnalyticsService {
 
     // Initialize gtag
     window.dataLayer = window.dataLayer || [];
-    window.gtag = function() {
-      window.dataLayer.push(arguments);
+    window.gtag = function(command: string, targetId: string | Date, config?: Record<string, unknown>) {
+      window.dataLayer.push([command, targetId, config].filter(Boolean));
     };
 
     window.gtag('js', new Date());
@@ -210,7 +210,13 @@ class AnalyticsService {
   }
 
   // Get analytics data (for dashboard)
-  getAnalyticsData(): Promise<any> {
+  getAnalyticsData(): Promise<{
+    totalUsers: number;
+    pageViews: number;
+    conversions: number;
+    topPages: Array<{ page: string; views: number }>;
+    topKeywords: Array<{ keyword: string; searches: number }>;
+  }> {
     // This would typically call Google Analytics API
     // For now, return mock data
     return Promise.resolve({
@@ -229,8 +235,8 @@ export const analyticsService = new AnalyticsService();
 // Export types for global use
 declare global {
   interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
+    gtag: (command: string, targetId: string | Date, config?: Record<string, unknown>) => void;
+    dataLayer: Array<unknown>;
   }
 }
 

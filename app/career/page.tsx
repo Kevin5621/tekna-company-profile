@@ -122,7 +122,7 @@ export default function CareerPage() {
         description: "Some career data failed to load. Please refresh the page.",
       });
     }
-  }, [careerService]);
+  }, [careerService, toast]);
 
   const loadPositions = useCallback(async () => {
     setLoading(true);
@@ -146,7 +146,7 @@ export default function CareerPage() {
     } finally {
       setLoading(false);
     }
-  }, [careerService, searchParams]);
+  }, [careerService, searchParams, selectedPosition, toast]);
 
   useEffect(() => {
     loadInitialData();
