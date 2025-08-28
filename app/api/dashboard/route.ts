@@ -35,9 +35,10 @@ export async function GET() {
       });
     }
 
-    const [dashboardData, applications] = await Promise.all([
+    const [dashboardData, applications, applicationsByDate] = await Promise.all([
       DashboardService.getDashboardData(),
       new CareerService().getAllApplications(),
+      new CareerService().getApplicationsGroupedByDate(90), // Get last 90 days
     ]);
 
     const payload = {
@@ -45,6 +46,7 @@ export async function GET() {
       data: {
         dashboardData,
         totalApplications: Array.isArray(applications) ? applications.length : 0,
+        applicationsByDate,
       },
     };
 

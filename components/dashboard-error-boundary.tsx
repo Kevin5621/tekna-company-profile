@@ -44,23 +44,22 @@ export class DashboardErrorBoundary extends Component<Props, State> {
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="text-6xl">⚠️</div>
             <h1 className="text-2xl font-bold text-destructive">
-              Terjadi Kesalahan
+              An Error Occurred
             </h1>
             <p className="text-muted-foreground max-w-md">
-              Maaf, terjadi kesalahan saat memuat dashboard. Silakan coba
-              refresh halaman atau hubungi administrator.
+              Sorry, an error occurred while loading the dashboard. Please try refreshing the page or contact the administrator.
             </p>
             <button
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
             >
-              Refresh Halaman
+              Refresh Page
             </button>
             <button
               onClick={() => (window.location.href = "/auth/login")}
               className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90"
             >
-              Kembali ke Login
+              Back to Login
             </button>
           </div>
         </div>

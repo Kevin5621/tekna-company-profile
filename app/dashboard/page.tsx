@@ -52,6 +52,7 @@ export default function DashboardPage() {
   }, [apiPayload]);
 
   const totalApplications = apiPayload?.data?.totalApplications || 0;
+  const applicationsByDate = apiPayload?.data?.applicationsByDate || {};
   const loading = isLoading;
   const fetchError = error;
 
@@ -114,7 +115,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Analytics Chart */}
-      <DashboardChart totalApplications={totalApplications} />
+      <DashboardChart applicationsByDate={applicationsByDate} />
 
       {/* Career Applications Card */}
       <div className="grid gap-6 md:grid-cols-1">

@@ -50,7 +50,7 @@ export default function EditAuthorPage() {
         }
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Gagal memuat data author"
+          err instanceof Error ? err.message : "Failed to load author data"
         );
       } finally {
         setIsLoading(false);
@@ -68,7 +68,7 @@ export default function EditAuthorPage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Memuat data author...</p>
+            <p>Loading author data...</p>
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@ export default function EditAuthorPage() {
               href="/dashboard/authors"
               className="text-primary hover:underline"
             >
-              ← Kembali ke Authors
+              ← Back to Authors
             </Link>
           </div>
         </div>
@@ -98,18 +98,18 @@ export default function EditAuthorPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Penulis", href: "/dashboard/authors" },
+          { label: "Authors", href: "/dashboard/authors" },
           {
-            label: "Edit Penulis",
+            label: "Edit Author",
             href: `/dashboard/authors/edit/${authorId}`,
           },
-          { label: "Form Edit", isCurrentPage: true },
+          { label: "Edit Form", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/authors" label="Kembali ke Authors" />
+        <BackButton href="/dashboard/authors" label="Back to Authors" />
       </div>
 
       {initialData && (

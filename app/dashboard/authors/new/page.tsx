@@ -8,14 +8,14 @@ export default function NewAuthorPage() {
       {/* Breadcrumbs */}
       <DashboardBreadcrumb
         items={[
-          { label: "Penulis", href: "/dashboard/authors" },
-          { label: "Tambah Penulis Baru", isCurrentPage: true },
+          { label: "Authors", href: "/dashboard/authors" },
+          { label: "Add New Author", isCurrentPage: true },
         ]}
       />
 
       {/* Back Button */}
       <div className="flex items-center gap-4">
-        <BackButton href="/dashboard/authors" label="Kembali ke Authors" />
+        <BackButton href="/dashboard/authors" label="Back to Authors" />
       </div>
 
       <AuthorForm />

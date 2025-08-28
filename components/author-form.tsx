@@ -117,27 +117,27 @@ export function AuthorForm({
 
     // First name validation
     if (!formData.first_name.trim()) {
-      newErrors.first_name = "Nama depan wajib diisi";
+      newErrors.first_name = "First name is required";
     } else if (formData.first_name.trim().length < 2) {
-      newErrors.first_name = "Nama depan minimal 2 karakter";
+      newErrors.first_name = "First name must be at least 2 characters";
     } else if (formData.first_name.trim().length > 50) {
-      newErrors.first_name = "Nama depan maksimal 50 karakter";
+      newErrors.first_name = "First name must be at most 50 characters";
     }
 
     // Last name validation
     if (!formData.last_name.trim()) {
-      newErrors.last_name = "Nama belakang wajib diisi";
+      newErrors.last_name = "Last name is required";
     } else if (formData.last_name.trim().length < 2) {
-      newErrors.last_name = "Nama belakang minimal 2 karakter";
+      newErrors.last_name = "Last name must be at least 2 characters";
     } else if (formData.last_name.trim().length > 50) {
-      newErrors.last_name = "Nama belakang maksimal 50 karakter";
+      newErrors.last_name = "Last name must be at most 50 characters";
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      newErrors.email = "Email wajib diisi";
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      newErrors.email = "Format email tidak valid";
+      newErrors.email = "Invalid email format";
     }
 
     // Phone validation
@@ -145,21 +145,21 @@ export function AuthorForm({
       formData.phone.trim() &&
       !/^[\+]?[0-9\s\-\(\)]{8,}$/.test(formData.phone.trim())
     ) {
-      newErrors.phone = "Format nomor telepon tidak valid";
+      newErrors.phone = "Invalid phone number format";
     }
 
     // Position validation
     if (!formData.position.trim()) {
-      newErrors.position = "Posisi wajib diisi";
+      newErrors.position = "Position is required";
     } else if (formData.position.trim().length < 2) {
-      newErrors.position = "Posisi minimal 2 karakter";
+      newErrors.position = "Position must be at least 2 characters";
     } else if (formData.position.trim().length > 100) {
-      newErrors.position = "Posisi maksimal 100 karakter";
+      newErrors.position = "Position must be at most 100 characters";
     }
 
     // Department validation
     if (!formData.department.trim()) {
-      newErrors.department = "Departemen wajib dipilih";
+      newErrors.department = "Department is required";
     }
 
     // URL validations
@@ -167,23 +167,23 @@ export function AuthorForm({
       formData.linkedin_url.trim() &&
       !isValidUrl(formData.linkedin_url.trim())
     ) {
-      newErrors.linkedin_url = "URL LinkedIn tidak valid";
+      newErrors.linkedin_url = "Invalid LinkedIn URL";
     }
     if (
       formData.twitter_url.trim() &&
       !isValidUrl(formData.twitter_url.trim())
     ) {
-      newErrors.twitter_url = "URL Twitter tidak valid";
+      newErrors.twitter_url = "Invalid Twitter URL";
     }
     if (formData.github_url.trim() && !isValidUrl(formData.github_url.trim())) {
-      newErrors.github_url = "URL GitHub tidak valid";
+      newErrors.github_url = "Invalid GitHub URL";
     }
 
     // Sort order validation
     if (formData.sort_order < 0) {
-      newErrors.sort_order = "Urutan tidak boleh negatif";
+      newErrors.sort_order = "Order cannot be negative";
     } else if (formData.sort_order > 999) {
-      newErrors.sort_order = "Urutan maksimal 999";
+      newErrors.sort_order = "Order maximum is 999";
     }
 
     setErrors(newErrors);
@@ -236,7 +236,7 @@ export function AuthorForm({
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Terjadi kesalahan",
+          error instanceof Error ? error.message : "An error occurred",
         variant: "destructive",
       });
     } finally {
@@ -269,23 +269,23 @@ export function AuthorForm({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <IconUser className="h-5 w-5" />
-          {authorId ? "Edit Author" : "Tambah Author Baru"}
+          {authorId ? "Edit Author" : "Add New Author"}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Informasi Pribadi</h3>
+            <h3 className="text-lg font-semibold">Personal Information</h3>
 
             <div className="grid grid-cols-2 gap-4">
               {/* First Name */}
               <div className="space-y-2">
-                <Label htmlFor="first_name">Nama Depan *</Label>
+                <Label htmlFor="first_name">First Name *</Label>
                 <Input
                   id="first_name"
                   type="text"
-                  placeholder="Masukkan nama depan"
+                  placeholder="Enter first name"
                   value={formData.first_name}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -304,11 +304,11 @@ export function AuthorForm({
 
               {/* Last Name */}
               <div className="space-y-2">
-                <Label htmlFor="last_name">Nama Belakang *</Label>
+                <Label htmlFor="last_name">Last Name *</Label>
                 <Input
                   id="last_name"
                   type="text"
-                  placeholder="Masukkan nama belakang"
+                  placeholder="Enter last name"
                   value={formData.last_name}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -330,7 +330,7 @@ export function AuthorForm({
               <Input
                 id="email"
                 type="email"
-                placeholder="Masukkan email"
+                placeholder="Enter email"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, email: e.target.value }))
@@ -344,11 +344,11 @@ export function AuthorForm({
 
             {/* Phone */}
             <div className="space-y-2">
-              <Label htmlFor="phone">Nomor Telepon</Label>
+              <Label htmlFor="phone">Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="Masukkan nomor telepon"
+                placeholder="Enter phone number"
                 value={formData.phone}
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, phone: e.target.value }))
@@ -363,16 +363,16 @@ export function AuthorForm({
 
           {/* Professional Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Informasi Profesional</h3>
+            <h3 className="text-lg font-semibold">Professional Information</h3>
 
             <div className="grid grid-cols-2 gap-4">
               {/* Position */}
               <div className="space-y-2">
-                <Label htmlFor="position">Posisi *</Label>
+                <Label htmlFor="position">Position *</Label>
                 <Input
                   id="position"
                   type="text"
-                  placeholder="Masukkan posisi/jabatan"
+                  placeholder="Enter position/title"
                   value={formData.position}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -389,7 +389,7 @@ export function AuthorForm({
 
               {/* Department */}
               <div className="space-y-2">
-                <Label htmlFor="department">Departemen *</Label>
+                <Label htmlFor="department">Department *</Label>
                 <Select
                   value={formData.department}
                   onValueChange={(value) =>
@@ -399,7 +399,7 @@ export function AuthorForm({
                   <SelectTrigger
                     className={errors.department ? "border-destructive" : ""}
                   >
-                    <SelectValue placeholder="Pilih departemen" />
+                    <SelectValue placeholder="Select department" />
                   </SelectTrigger>
                   <SelectContent>
                     {DEPARTMENTS.map((dept) => (
@@ -419,11 +419,11 @@ export function AuthorForm({
 
             {/* Sort Order */}
             <div className="space-y-2">
-              <Label htmlFor="sort_order">Urutan</Label>
+              <Label htmlFor="sort_order">Order</Label>
               <Input
                 id="sort_order"
                 type="number"
-                placeholder="Masukkan urutan"
+                placeholder="Enter order"
                 value={formData.sort_order}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -437,23 +437,23 @@ export function AuthorForm({
                 <p className="text-sm text-destructive">{errors.sort_order}</p>
               )}
               <p className="text-sm text-muted-foreground">
-                Urutan untuk mengatur posisi author (0 = paling atas)
+                Order to set author position (0 = topmost)
               </p>
             </div>
           </div>
 
           {/* Social Media & Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Media Sosial & Link</h3>
+            <h3 className="text-lg font-semibold">Social Media & Links</h3>
 
             {/* Avatar URL */}
             <div className="space-y-2">
-              <Label htmlFor="avatar_url">URL Avatar</Label>
+              <Label htmlFor="avatar_url">Avatar URL</Label>
               <div className="flex items-center gap-3">
                 <Input
                   id="avatar_url"
                   type="url"
-                  placeholder="Masukkan URL avatar"
+                  placeholder="Enter avatar URL"
                   value={formData.avatar_url}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -481,11 +481,11 @@ export function AuthorForm({
 
             {/* LinkedIn */}
             <div className="space-y-2">
-              <Label htmlFor="linkedin_url">URL LinkedIn</Label>
+              <Label htmlFor="linkedin_url">LinkedIn URL</Label>
               <Input
                 id="linkedin_url"
                 type="url"
-                placeholder="Masukkan URL LinkedIn"
+                placeholder="Enter LinkedIn URL"
                 value={formData.linkedin_url}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -504,11 +504,11 @@ export function AuthorForm({
 
             {/* Twitter */}
             <div className="space-y-2">
-              <Label htmlFor="twitter_url">URL Twitter</Label>
+              <Label htmlFor="twitter_url">Twitter URL</Label>
               <Input
                 id="twitter_url"
                 type="url"
-                placeholder="Masukkan URL Twitter"
+                placeholder="Enter Twitter URL"
                 value={formData.twitter_url}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -525,11 +525,11 @@ export function AuthorForm({
 
             {/* GitHub */}
             <div className="space-y-2">
-              <Label htmlFor="github_url">URL GitHub</Label>
+              <Label htmlFor="github_url">GitHub URL</Label>
               <Input
                 id="github_url"
                 type="url"
-                placeholder="Masukkan URL GitHub"
+                placeholder="Enter GitHub URL"
                 value={formData.github_url}
                 onChange={(e) =>
                   setFormData((prev) => ({
@@ -554,7 +554,7 @@ export function AuthorForm({
                 handleInputChange("is_active", !!checked)
               }
             />
-            <Label htmlFor="is_active">Author Aktif</Label>
+            <Label htmlFor="is_active">Active Author</Label>
           </div>
 
           {/* Submit Buttons */}
@@ -567,17 +567,17 @@ export function AuthorForm({
               className="flex-1"
             >
               <IconX className="h-4 w-4 mr-2" />
-              Batal
+              Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="flex-1">
               <IconDeviceFloppy className="h-4 w-4 mr-2" />
               {isLoading
                 ? authorId
-                  ? "Menyimpan..."
-                  : "Membuat..."
+                  ? "Saving..."
+                  : "Creating..."
                 : authorId
-                ? "Simpan Perubahan"
-                : "Buat Author"}
+                ? "Save Changes"
+                : "Create Author"}
             </Button>
           </div>
         </form>

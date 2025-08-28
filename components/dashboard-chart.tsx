@@ -27,26 +27,35 @@ import {
 import { TrendingUp } from "lucide-react";
 
 interface DashboardChartProps {
-  totalApplications?: number;
+  readonly applicationsByDate?: Record<string, number>;
 }
 
-export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
+export function DashboardChart({ applicationsByDate = {} }: DashboardChartProps) {
   const [timeRange, setTimeRange] = React.useState("30d");
 
-  // Generate chart data with accurate career applications showing sharp spike on last date
+  // Generate chart data using actual application dates
   const chartData = React.useMemo(() => {
     const data = [];
     const today = new Date();
-    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+
+    let days: number;
+    if (timeRange === "7d") {
+      days = 7;
+    } else if (timeRange === "30d") {
+      days = 30;
+    } else {
+      days = 90;
+    }
 
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
+      const dateString = date.toISOString().split("T")[0];
 
-      // Show 0 applications for all previous days, and total applications only on the last day
+      // Use actual application count for this date, or 0 if no applications
       data.push({
-        date: date.toISOString().split("T")[0],
-        career_applications: i === 0 ? totalApplications : 0, // Sharp spike on last date
+        date: dateString,
+        career_applications: applicationsByDate[dateString] || 0,
         website_views: 0, // Coming soon
         blog_views: 0, // Coming soon
         career_views: 0, // Coming soon
@@ -54,7 +63,7 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
     }
 
     return data;
-  }, [timeRange, totalApplications]);
+  }, [timeRange, applicationsByDate]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -63,6 +72,37 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
       day: "numeric",
     });
   };
+
+  // Extract tooltip content to separate component
+  const TooltipContent = React.useCallback((props: {
+    active?: boolean;
+    payload?: Array<{ value?: number }>;
+    label?: string;
+  }) => {
+    const { active, payload, label } = props;
+    if (active && payload && payload.length > 0 && label) {
+      return (
+        <div className="rounded-lg border bg-background p-2 shadow-sm">
+          <div className="grid grid-cols-1 gap-2">
+            <div className="flex flex-col">
+              <span className="text-[0.70rem] uppercase text-muted-foreground">
+                {formatDate(label)}
+              </span>
+              <span className="font-bold text-muted-foreground">
+                Career Applications: {payload[0]?.value || 0}
+              </span>
+              <div className="mt-2 text-xs text-muted-foreground">
+                <div>Website Views: Coming Soon</div>
+                <div>Blog Views: Coming Soon</div>
+                <div>Career Views: Coming Soon</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }, []);
 
   return (
     <Card className="pt-0">
@@ -109,32 +149,7 @@ export function DashboardChart({ totalApplications = 0 }: DashboardChartProps) {
                 tickLine={false}
               />
               <YAxis axisLine={false} tickLine={false} />
-              <Tooltip
-                content={({ active, payload, label }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <div className="rounded-lg border bg-background p-2 shadow-sm">
-                        <div className="grid grid-cols-1 gap-2">
-                          <div className="flex flex-col">
-                            <span className="text-[0.70rem] uppercase text-muted-foreground">
-                              {formatDate(label)}
-                            </span>
-                            <span className="font-bold text-muted-foreground">
-                              Career Applications: {payload[0]?.value}
-                            </span>
-                            <div className="mt-2 text-xs text-muted-foreground">
-                              <div>Website Views: Coming Soon</div>
-                              <div>Blog Views: Coming Soon</div>
-                              <div>Career Views: Coming Soon</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  return null;
-                }}
-              />
+              <Tooltip content={<TooltipContent />} />
               <Area
                 type="monotone"
                 dataKey="career_applications"

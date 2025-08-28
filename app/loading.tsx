@@ -7,7 +7,7 @@ export default function Loading() {
         <div className="p-4 bg-card/50 backdrop-blur-sm rounded-full">
           <Loader2 className="w-10 h-10 text-primary animate-spin" />
         </div>
-        <span className="text-sm text-muted-foreground">Memuat…</span>
+        <span className="text-sm text-muted-foreground">Loading...</span>
       </div>
     </div>
   );

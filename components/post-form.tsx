@@ -33,6 +33,7 @@ import {
 import Image from "next/image";
 import { MarkdownEditor } from "./markdown-editor";
 import { useToast } from "@/hooks/use-toast";
+import { SlugInput } from "@/components/ui/slug-input";
 
 interface PostFormProps {
   postId?: string;
@@ -116,19 +117,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
     loadData();
   }, []);
 
-  // Auto-generate slug when title changes
-  useEffect(() => {
-    if (formData.title && !postId) {
-      const autoSlug = formData.title
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/[\s_-]+/g, "-")
-        .replace(/^-+|-+$/g, "");
 
-      setFormData((prev) => ({ ...prev, slug: autoSlug }));
-    }
-  }, [formData.title, postId]);
 
   // Auto-generate meta title and description
   useEffect(() => {
@@ -149,23 +138,20 @@ export function PostForm({ postId, initialData }: PostFormProps) {
     const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = "Judul artikel wajib diisi";
+      newErrors.title = "Article title is required";
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = "Slug wajib diisi";
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug =
-        "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung";
+      newErrors.slug = "Slug is required";
     }
 
     if (!formData.content.trim()) {
-      newErrors.content = "Konten artikel wajib diisi";
+      newErrors.content = "Article content is required";
     }
 
     if (formData.status === "published" && !formData.published_at) {
       newErrors.published_at =
-        "Tanggal publikasi wajib diisi untuk artikel yang dipublish";
+        "Publication date is required for published articles";
     }
 
     setErrors(newErrors);
@@ -213,7 +199,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Terjadi kesalahan",
+          error instanceof Error ? error.message : "An error occurred",
         variant: "destructive",
       });
     } finally {
@@ -238,7 +224,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
 
     return (
       <span className={`text-xs ${color}`}>
-        {count}/{max} karakter
+        {count}/{max} characters
       </span>
     );
   };
@@ -284,7 +270,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
     if (!file.type.startsWith("image/")) {
       toast({
         title: "Invalid File Type",
-        description: "Hanya file gambar yang diperbolehkan",
+        description: "Only image files are allowed",
         variant: "destructive",
       });
       return;
@@ -293,7 +279,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "File Too Large",
-        description: "Ukuran file maksimal 5MB",
+        description: "Maximum file size is 5MB",
         variant: "destructive",
       });
       return;
@@ -314,7 +300,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
       console.error("Error uploading file:", error);
       toast({
         title: "Upload Failed",
-        description: "Gagal upload file",
+        description: "Failed to upload file",
         variant: "destructive",
       });
     } finally {
@@ -334,26 +320,26 @@ export function PostForm({ postId, initialData }: PostFormProps) {
         {/* Quick Stats */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Statistik Artikel</CardTitle>
+            <CardTitle className="text-lg">Article Statistics</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Judul</span>
+              <span className="text-sm text-muted-foreground">Title</span>
               <Badge
                 variant={formData.title.length > 0 ? "default" : "secondary"}
               >
-                {formData.title.length} karakter
+                {formData.title.length} characters
               </Badge>
             </div>
 
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Konten</span>
+              <span className="text-sm text-muted-foreground">Content</span>
               <Badge
                 variant={
                   formData.content.length > 100 ? "default" : "secondary"
                 }
               >
-                {formData.content.length} karakter
+                {formData.content.length} characters
               </Badge>
             </div>
 
@@ -389,23 +375,23 @@ export function PostForm({ postId, initialData }: PostFormProps) {
         {/* Help & Tips */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Tips & Bantuan</CardTitle>
+            <CardTitle className="text-lg">Tips & Help</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <div className="space-y-2">
               <p className="font-medium text-foreground">Markdown Editor</p>
               <p>
-                Gunakan toolbar atau keyboard shortcuts untuk formatting. Ctrl+B
-                untuk bold, Ctrl+I untuk italic.
+                Use the toolbar or keyboard shortcuts for formatting. Ctrl+B
+                for bold, Ctrl+I for italic.
               </p>
             </div>
 
             <Separator />
 
             <div className="space-y-2">
-              <p className="font-medium text-foreground">Gambar</p>
+              <p className="font-medium text-foreground">Images</p>
               <p>
-                Drag & drop gambar atau gunakan URL. Format yang didukung: PNG,
+                Drag & drop images or use URL. Supported formats: PNG,
                 JPG, GIF.
               </p>
             </div>
@@ -415,7 +401,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
             <div className="space-y-2">
               <p className="font-medium text-foreground">SEO</p>
               <p>
-                Isi meta title dan description untuk optimasi search engine.
+                Fill in meta title and description for search engine optimization.
               </p>
             </div>
           </CardContent>
@@ -429,7 +415,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <IconFileText size={20} />
-              Form Artikel
+              Article Form
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -445,7 +431,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                     className="flex items-center gap-2"
                   >
                     <IconFileText size={16} />
-                    Konten
+                    Content
                   </TabsTrigger>
                   <TabsTrigger
                     value="metadata"
@@ -463,7 +449,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                     className="flex items-center gap-2"
                   >
                     <IconSettings size={16} />
-                    Pengaturan
+                    Settings
                   </TabsTrigger>
                 </TabsList>
 
@@ -472,7 +458,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                   {/* Title */}
                   <div className="space-y-2">
                     <Label htmlFor="title" className="text-sm font-medium">
-                      Judul Artikel *
+                      Article Title *
                     </Label>
                     <Input
                       id="title"
@@ -481,7 +467,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       onChange={(e) =>
                         handleInputChange("title", e.target.value)
                       }
-                      placeholder="Masukkan judul artikel yang menarik"
+                      placeholder="Enter an engaging article title"
                       className={errors.title ? "border-red-500" : ""}
                       required
                     />
@@ -492,37 +478,30 @@ export function PostForm({ postId, initialData }: PostFormProps) {
 
                   {/* Slug */}
                   <div className="space-y-2">
-                    <Label htmlFor="slug" className="text-sm font-medium">
-                      Slug *
-                    </Label>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-muted-foreground">
                         /blog/
                       </span>
-                      <Input
-                        id="slug"
-                        type="text"
+                      <SlugInput
                         value={formData.slug}
-                        onChange={(e) =>
-                          handleInputChange("slug", e.target.value)
-                        }
+                        onChange={(value) => handleInputChange("slug", value)}
+                        entityType="blog"
+                        excludeId={postId}
+                        label="Slug"
                         placeholder="url-friendly-slug"
-                        className={errors.slug ? "border-red-500" : ""}
+                        description="URL artikel akan menjadi: /blog/{formData.slug}"
                         required
+                        autoGenerate
+                        sourceField="title"
+                        sourceValue={formData.title}
                       />
                     </div>
-                    {errors.slug && (
-                      <p className="text-sm text-red-500">{errors.slug}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      URL artikel akan menjadi: /blog/{formData.slug}
-                    </p>
                   </div>
 
                   {/* Excerpt */}
                   <div className="space-y-2">
                     <Label htmlFor="excerpt" className="text-sm font-medium">
-                      Ringkasan
+                      Summary
                     </Label>
                     <Textarea
                       id="excerpt"
@@ -530,7 +509,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       onChange={(e) =>
                         handleInputChange("excerpt", e.target.value)
                       }
-                      placeholder="Ringkasan singkat artikel untuk preview dan SEO"
+                      placeholder="Brief article summary for preview and SEO"
                       rows={3}
                     />
                     {getCharacterCount(formData.excerpt, 160)}
@@ -539,12 +518,12 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                   {/* Content */}
                   <div className="space-y-2">
                     <Label htmlFor="content" className="text-sm font-medium">
-                      Konten Artikel *
+                      Article Content *
                     </Label>
                     <MarkdownEditor
                       value={formData.content}
                       onChange={(value) => handleInputChange("content", value)}
-                      placeholder="# Judul Artikel\n\nParagraf pertama...\n\n## Sub Judul\n\n- Item 1\n- Item 2\n\n**Teks tebal** dan *teks miring*"
+                      placeholder="# Article Title\n\nFirst paragraph...\n\n## Sub Title\n\n- Item 1\n- Item 2\n\n**Bold text** and *italic text*"
                     />
                     {errors.content && (
                       <p className="text-sm text-red-500">{errors.content}</p>
@@ -556,7 +535,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                 <TabsContent value="metadata" className="space-y-6 mt-6">
                   {/* Featured Image Upload */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">Gambar Utama</Label>
+                    <Label className="text-sm font-medium">Featured Image</Label>
 
                     {/* Image Upload Area */}
                     <div
@@ -589,7 +568,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                               className="gap-2"
                             >
                               <IconUpload size={16} />
-                              Ganti Gambar
+                              Change Image
                             </Button>
                             <Button
                               type="button"
@@ -599,7 +578,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                               className="gap-2 text-red-600 hover:text-red-700"
                             >
                               <IconX size={16} />
-                              Hapus
+                              Remove
                             </Button>
                           </div>
                         </div>
@@ -613,10 +592,10 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                           </div>
                           <div>
                             <p className="text-sm font-medium">
-                              Drag & drop gambar atau klik untuk upload
+                              Drag & drop image or click to upload
                             </p>
                             <p className="text-xs text-muted-foreground mt-1">
-                              PNG, JPG, GIF hingga 5MB
+                              PNG, JPG, GIF up to 5MB
                             </p>
                           </div>
                           <Button
@@ -627,7 +606,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                             className="gap-2"
                           >
                             <IconUpload size={16} />
-                            {isUploading ? "Uploading..." : "Pilih File"}
+                            {isUploading ? "Uploading..." : "Choose File"}
                           </Button>
                         </div>
                       )}
@@ -647,7 +626,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                         htmlFor="featured_image_url"
                         className="text-sm font-medium"
                       >
-                        Atau masukkan URL gambar
+                        Or enter image URL
                       </Label>
                       <Input
                         id="featured_image_url"
@@ -670,7 +649,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       htmlFor="author_name"
                       className="text-sm font-medium"
                     >
-                      Penulis
+                      Author
                     </Label>
                     {authors.length > 0 ? (
                       <Select
@@ -680,11 +659,11 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Pilih penulis" />
+                          <SelectValue placeholder="Select author" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">
-                            Tidak ada penulis
+                            No author
                           </SelectItem>
                           {authors.map((author) => (
                             <SelectItem key={author.id} value={author.id}>
@@ -705,7 +684,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                         onChange={(e) =>
                           handleInputChange("author_name", e.target.value)
                         }
-                        placeholder="Nama penulis"
+                        placeholder="Author name"
                       />
                     )}
 
@@ -728,7 +707,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       htmlFor="category_id"
                       className="text-sm font-medium"
                     >
-                      Kategori
+                      Category
                     </Label>
                     {categories.length > 0 ? (
                       <Select
@@ -738,11 +717,11 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Pilih kategori" />
+                          <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">
-                            Tidak ada kategori
+                            No category
                           </SelectItem>
                           {categories.map((category) => (
                             <SelectItem key={category.id} value={category.id}>
@@ -762,7 +741,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                         onChange={(e) =>
                           handleInputChange("category_id", e.target.value)
                         }
-                        placeholder="UUID kategori (opsional)"
+                        placeholder="Category UUID (optional)"
                       />
                     )}
 
@@ -789,7 +768,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       onChange={(e) =>
                         handleInputChange("meta_title", e.target.value)
                       }
-                      placeholder="Title untuk SEO (default: judul artikel)"
+                      placeholder="Title for SEO (default: article title)"
                     />
                     {getCharacterCount(formData.meta_title, 60)}
                   </div>
@@ -808,7 +787,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       onChange={(e) =>
                         handleInputChange("meta_description", e.target.value)
                       }
-                      placeholder="Deskripsi untuk SEO (default: excerpt artikel)"
+                      placeholder="Description for SEO (default: article excerpt)"
                       rows={3}
                     />
                     {getCharacterCount(formData.meta_description, 160)}
@@ -829,10 +808,10 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       onChange={(e) =>
                         handleInputChange("meta_keywords", e.target.value)
                       }
-                      placeholder="Kata kunci dipisahkan dengan koma"
+                      placeholder="Keywords separated by commas"
                     />
                     <p className="text-xs text-muted-foreground">
-                      Contoh: web development, teknologi, inovasi
+                      Example: web development, technology, innovation
                     </p>
                   </div>
                 </TabsContent>
@@ -851,7 +830,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Pilih status artikel" />
+                        <SelectValue placeholder="Select article status" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="draft">
@@ -882,7 +861,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       htmlFor="published_at"
                       className="text-sm font-medium"
                     >
-                      Tanggal Publikasi
+                      Publication Date
                     </Label>
                     <Input
                       id="published_at"
@@ -910,7 +889,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       </p>
                     )}
                     <p className="text-xs text-muted-foreground">
-                      Kosongkan untuk publikasi otomatis saat status diubah ke
+                      Leave empty for automatic publication when status is changed to
                       Published
                     </p>
                   </div>
@@ -928,7 +907,7 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                       htmlFor="is_featured"
                       className="text-sm font-medium"
                     >
-                      Artikel Unggulan
+                      Featured Article
                     </Label>
                   </div>
                 </TabsContent>
@@ -939,11 +918,11 @@ export function PostForm({ postId, initialData }: PostFormProps) {
                 <Button type="submit" disabled={isLoading} className="gap-2">
                   {isLoading
                     ? postId
-                      ? "Menyimpan..."
-                      : "Membuat..."
+                      ? "Saving..."
+                      : "Creating..."
                     : postId
-                    ? "Simpan Perubahan"
-                    : "Buat Artikel"}
+                    ? "Save Changes"
+                    : "Create Article"}
                 </Button>
               </div>
             </form>
