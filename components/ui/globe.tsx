@@ -59,6 +59,7 @@ export type GlobeConfig = {
 interface WorldProps {
   globeConfig: GlobeConfig;
   data: Position[];
+  isInteractive?: boolean;
 }
 
 export function Globe({ globeConfig, data }: WorldProps) {
@@ -246,7 +247,7 @@ export function WebGLRendererConfig() {
 }
 
 export function World(props: WorldProps) {
-  const { globeConfig } = props;
+  const { globeConfig, isInteractive = true } = props;
 
   // Gunakan useMemo untuk scene dan camera yang persisten
   const sceneRef = useRef<Scene | null>(null);
@@ -295,6 +296,7 @@ export function World(props: WorldProps) {
         autoRotate={true}
         minPolarAngle={Math.PI / 3.5}
         maxPolarAngle={Math.PI - Math.PI / 3}
+        enabled={isInteractive}
       />
     </Canvas>
   );

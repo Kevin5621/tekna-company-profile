@@ -5,6 +5,7 @@ import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { Footer } from "@/components/layout/footer";
 import { AppHeader } from "@/components/layout/public-header";
 import { GlobeBackground } from "@/components/ui/globe-background";
+import { MainContent } from "@/components/landing/main-content";
 
 export default function LandingPage() {
   return (
@@ -18,9 +19,7 @@ export default function LandingPage() {
       <GlobeBackground />
 
       {/* Main content with sticky hero and overlapping sections */}
-      {/* Make main opt-out for pointer events so background globe can receive drag events.
-      Interactive sections must opt-in with pointer-events-auto on their root. */}
-      <main className="flex-1 relative z-20 pointer-events-none">
+      <MainContent>
         <div id="home">
           <HeroSection />
         </div>
@@ -33,9 +32,10 @@ export default function LandingPage() {
         <div id="testimonials">
           <TestimonialsSection />
         </div>
-      </main>
+      </MainContent>
 
       <Footer />
     </div>
   );
 }
+

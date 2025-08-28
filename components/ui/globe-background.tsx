@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { useMemo } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const World = dynamic(
   () => import("@/components/ui/globe").then((m) => m.World),
@@ -13,6 +14,7 @@ const World = dynamic(
 
 export function GlobeBackground() {
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
 
   // Konfigurasi globe yang responsif terhadap tema
   const getGlobeConfig = () => {
@@ -444,8 +446,15 @@ export function GlobeBackground() {
       className="fixed inset-0 flex items-center justify-center"
       style={{ zIndex: 1 }}
     >
-      <div className="w-[120vw] h-[120vh] relative pointer-events-auto">
-        <World data={sampleArcs} globeConfig={globeConfig} />
+      <div
+        className="w-[120vw] h-[120vh] relative"
+        style={{ pointerEvents: isMobile ? "none" : "auto" }}
+      >
+        <World
+          data={sampleArcs}
+          globeConfig={globeConfig}
+          isInteractive={!isMobile}
+        />
       </div>
     </div>
   );
