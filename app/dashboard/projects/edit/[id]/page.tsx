@@ -25,6 +25,17 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
     sort_order: number;
     created_at: string;
     updated_at: string;
+    // Additional fields from project_translations and project_images
+    short_description?: string;
+    meta_title?: string;
+    meta_description?: string;
+    technologies?: string;
+    client_name?: string;
+    project_date?: string;
+    project_duration?: string;
+    team_size?: string;
+    project_status?: string;
+    gallery_images?: string[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -86,16 +97,18 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
             description: project.description || "",
             featured_image_url: project.featured_image_url || "",
             is_featured: project.is_featured || false,
-            // Add placeholder values for new fields
-            short_description: "",
-            meta_title: "",
-            meta_description: "",
-            technologies: "",
-            client_name: "",
-            project_date: "",
-            project_duration: "",
-            team_size: "",
-            project_status: "completed",
+            // Use actual data from project_translations and project_images
+            overview_content: project.description || "", // This should come from project_translations.description
+            short_description: project.short_description || "",
+            meta_title: project.meta_title || "",
+            meta_description: project.meta_description || "",
+            technologies: project.technologies || "",
+            client_name: project.client_name || "",
+            project_date: project.project_date || "",
+            project_duration: project.project_duration || "",
+            team_size: project.team_size || "",
+            project_status: project.project_status || "completed",
+            gallery_images: project.gallery_images || [],
           }}
         />
       </div>

@@ -33,13 +33,14 @@ interface ProjectFormData {
   name: string;
   slug: string;
   project_url: string;
-  description: string;
+  description: string; // Landing page description
   featured_image_url: string;
   is_featured: boolean;
   // Tab 2: Project Overview 
-  gallery_images: string[]; // Array of image URLs
+  overview_content: string; // Detailed description from project_translations
+  gallery_images: string[]; // Array of image URLs from project_images
   // Tab 3: Project Information
-  short_description: string;
+  short_description: string; // Short description from project_translations
   technologies: string;
   client_name: string;
   project_date: string;
@@ -73,6 +74,7 @@ export function ProjectForm({
     featured_image_url: initialData?.featured_image_url || "",
     is_featured: initialData?.is_featured || false,
     // Tab 2: Project Overview
+    overview_content: initialData?.overview_content || "",
     gallery_images: initialData?.gallery_images || [],
     // Tab 3: Project Information
     short_description: initialData?.short_description || "",
@@ -149,6 +151,7 @@ export function ProjectForm({
               featured_image_url: formData.featured_image_url || undefined,
               is_featured: formData.is_featured,
               // New detail fields
+              overview_content: formData.overview_content || undefined,
               short_description: formData.short_description || undefined,
               meta_title: formData.meta_title || undefined,
               meta_description: formData.meta_description || undefined,
@@ -158,6 +161,7 @@ export function ProjectForm({
               project_duration: formData.project_duration || undefined,
               team_size: formData.team_size || undefined,
               project_status: formData.project_status || undefined,
+              gallery_images: formData.gallery_images || undefined,
             }),
           });
 
@@ -192,6 +196,7 @@ export function ProjectForm({
           featured_image_url: formData.featured_image_url || undefined,
           is_featured: formData.is_featured,
           // New detail fields
+          overview_content: formData.overview_content || undefined,
           short_description: formData.short_description || undefined,
           meta_title: formData.meta_title || undefined,
           meta_description: formData.meta_description || undefined,
@@ -201,6 +206,7 @@ export function ProjectForm({
           project_duration: formData.project_duration || undefined,
           team_size: formData.team_size || undefined,
           project_status: formData.project_status || undefined,
+          gallery_images: formData.gallery_images || undefined,
         });
         console.log("Update result:", result);
         toast({
@@ -432,32 +438,92 @@ export function ProjectForm({
                       Write detailed project overview using Markdown. This will be displayed in the detail page.
                     </p>
                     <MarkdownEditor
-                      value={formData.short_description}
+                      value={formData.overview_content}
                       onChange={(value) =>
                         setFormData((prev) => ({
                           ...prev,
-                          short_description: value,
+                          overview_content: value,
                         }))
                       }
                       placeholder="Write your project overview here using Markdown..."
                     />
                   </div>
 
-                  {/* Gallery Images Placeholder */}
+                  {/* Gallery Images */}
                   <div className="space-y-4">
                     <Label>Project Gallery</Label>
                     <p className="text-sm text-muted-foreground">
                       Upload multiple images for the project gallery displayed in detail page.
                     </p>
+                    
+                    {/* Current Gallery Images */}
+                    {formData.gallery_images && formData.gallery_images.length > 0 && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {formData.gallery_images.map((imageUrl, index) => (
+                          <div key={index} className="relative group">
+                            <Image
+                              src={imageUrl}
+                              alt={`Gallery image ${index + 1}`}
+                              width={200}
+                              height={150}
+                              className="rounded-lg border object-cover w-full h-32"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => {
+                                const newImages = formData.gallery_images.filter((_, i) => i !== index);
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  gallery_images: newImages,
+                                }));
+                              }}
+                            >
+                              <IconX className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Upload New Gallery Images */}
                     <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
                       <div className="text-center">
                         <IconUpload className="mx-auto h-12 w-12 text-muted-foreground" />
                         <p className="mt-2 text-sm text-muted-foreground">
-                          Gallery upload feature will be implemented soon
+                          Drag & drop gallery images here or click to select
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          For now, use featured image in Landing Page tab
+                          Multiple images supported
                         </p>
+                        <MediaUpload
+                          folder="project-gallery"
+                          allowedTypes={["image/*"]}
+                          maxFileSize={10 * 1024 * 1024} // 10MB
+                          onUploadSuccess={(file: MediaFile) => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              gallery_images: [...(prev.gallery_images || []), file.file_url],
+                            }));
+                            toast({
+                              title: "Image Added!",
+                              description: "Gallery image has been added successfully.",
+                              variant: "success",
+                            });
+                          }}
+                          onUploadError={(error: string) => {
+                            toast({
+                              title: "Upload Failed",
+                              description: error,
+                              variant: "destructive",
+                            });
+                          }}
+                          placeholder="Select gallery images"
+                          accept="image/*"
+                          multiple={true}
+                        />
                       </div>
                     </div>
                   </div>

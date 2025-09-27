@@ -35,6 +35,7 @@ export class ClientDashboardService {
     featured_image_url?: string;
     is_featured?: boolean;
     // New detail fields
+    overview_content?: string;
     short_description?: string;
     meta_title?: string;
     meta_description?: string;
@@ -44,21 +45,85 @@ export class ClientDashboardService {
     project_duration?: string;
     team_size?: string;
     project_status?: string;
+    gallery_images?: string[];
   }) {
     const supabase = createClient();
 
     try {
-      const { data, error } = await supabase
+      // Separate data for different tables
+      const {
+        overview_content,
+        short_description,
+        meta_title,
+        meta_description,
+        gallery_images,
+        ...projectBasicData
+      } = projectData;
+
+      // Create project in projects table
+      const { data: project, error: projectError } = await supabase
         .from("projects")
         .insert({
-          ...projectData,
+          ...projectBasicData,
           is_active: true,
         })
         .select()
         .single();
 
-      if (error) throw error;
-      return data;
+      if (projectError) throw projectError;
+
+      // Get default language ID
+      const { data: defaultLang } = await supabase
+        .from("languages")
+        .select("id")
+        .eq("is_default", true)
+        .single();
+
+      if (defaultLang && (overview_content || short_description || meta_title || meta_description)) {
+        // Create project translation
+        const translationData = {
+          project_id: project.id,
+          language_id: defaultLang.id,
+          description: overview_content,
+          short_description,
+          meta_title,
+          meta_description,
+        };
+
+        // Remove undefined values
+        const cleanTranslationData = Object.fromEntries(
+          Object.entries(translationData).filter(([, v]) => v !== undefined)
+        );
+
+        const { error: translationError } = await supabase
+          .from("project_translations")
+          .insert(cleanTranslationData);
+
+        if (translationError) {
+          console.error("Translation creation error:", translationError);
+          // Don't throw here, just log the error
+        }
+      }
+
+      // Handle gallery images if provided
+      if (gallery_images && Array.isArray(gallery_images) && gallery_images.length > 0) {
+        const imageInserts = gallery_images.map((imageUrl, index) => ({
+          project_id: project.id,
+          image_url: imageUrl,
+          sort_order: index,
+        }));
+
+        const { error: imagesError } = await supabase
+          .from("project_images")
+          .insert(imageInserts);
+
+        if (imagesError) {
+          console.error("Images creation error:", imagesError);
+          // Don't throw here, just log the error
+        }
+      }
+
+      return project;
     } catch (error) {
       console.error("Error creating project:", error);
       throw new Error("Failed to create new project");
@@ -78,6 +143,7 @@ export class ClientDashboardService {
       featured_image_url?: string;
       is_featured?: boolean;
       // New detail fields
+      overview_content?: string;
       short_description?: string;
       meta_title?: string;
       meta_description?: string;
@@ -87,6 +153,7 @@ export class ClientDashboardService {
       project_duration?: string;
       team_size?: string;
       project_status?: string;
+      gallery_images?: string[];
     }
   ) {
     const supabase = createClient();
@@ -95,21 +162,96 @@ export class ClientDashboardService {
       console.log("Updating project with ID:", projectId);
       console.log("Update data:", projectData);
 
-      const { data, error } = await supabase
+      // Separate data for different tables
+      const {
+        overview_content,
+        short_description,
+        meta_title,
+        meta_description,
+        gallery_images,
+        ...projectBasicData
+      } = projectData;
+
+      // Update projects table with basic data
+      const { data: projectResult, error: projectError } = await supabase
         .from("projects")
-        .update(projectData)
+        .update(projectBasicData)
         .eq("id", projectId)
         .eq("is_active", true)
         .select()
         .single();
 
-      if (error) {
-        console.error("Update error:", error);
-        throw error;
+      if (projectError) {
+        console.error("Project update error:", projectError);
+        throw projectError;
       }
 
-      console.log("Update success, returned data:", data);
-      return data;
+      // Get default language ID
+      const { data: defaultLang } = await supabase
+        .from("languages")
+        .select("id")
+        .eq("is_default", true)
+        .single();
+
+      if (defaultLang) {
+        // Update or create project translation
+        const translationData = {
+          project_id: projectId,
+          language_id: defaultLang.id,
+          description: overview_content,
+          short_description,
+          meta_title,
+          meta_description,
+        };
+
+        // Remove undefined values
+        const cleanTranslationData = Object.fromEntries(
+          Object.entries(translationData).filter(([, v]) => v !== undefined)
+        );
+
+        if (Object.keys(cleanTranslationData).length > 2) { // More than just project_id and language_id
+          const { error: translationError } = await supabase
+            .from("project_translations")
+            .upsert(cleanTranslationData, {
+              onConflict: "project_id,language_id"
+            });
+
+          if (translationError) {
+            console.error("Translation update error:", translationError);
+            // Don't throw here, just log the error
+          }
+        }
+      }
+
+      // Handle gallery images if provided
+      if (gallery_images && Array.isArray(gallery_images)) {
+        // First, delete existing images
+        await supabase
+          .from("project_images")
+          .delete()
+          .eq("project_id", projectId);
+
+        // Then insert new images
+        if (gallery_images.length > 0) {
+          const imageInserts = gallery_images.map((imageUrl, index) => ({
+            project_id: projectId,
+            image_url: imageUrl,
+            sort_order: index,
+          }));
+
+          const { error: imagesError } = await supabase
+            .from("project_images")
+            .insert(imageInserts);
+
+          if (imagesError) {
+            console.error("Images update error:", imagesError);
+            // Don't throw here, just log the error
+          }
+        }
+      }
+
+      console.log("Update success, returned data:", projectResult);
+      return projectResult;
     } catch (error) {
       console.error("Error updating project:", error);
       throw new Error("Failed to update project");
@@ -123,7 +265,8 @@ export class ClientDashboardService {
     const supabase = createClient();
 
     try {
-      const { data, error } = await supabase
+      // Get project basic data
+      const { data: project, error: projectError } = await supabase
         .from("projects")
         .select(
           `
@@ -136,6 +279,12 @@ export class ClientDashboardService {
           is_featured,
           is_active,
           sort_order,
+          technologies,
+          client_name,
+          project_date,
+          project_duration,
+          team_size,
+          project_status,
           created_at,
           updated_at
         `
@@ -144,8 +293,57 @@ export class ClientDashboardService {
         .eq("is_active", true)
         .single();
 
-      if (error) throw error;
-      return data;
+      if (projectError) throw projectError;
+
+      // Get project translations (for default language)
+      const { data: translations, error: translationsError } = await supabase
+        .from("project_translations")
+        .select(`
+          id,
+          language_id,
+          description,
+          short_description,
+          meta_title,
+          meta_description,
+          meta_keywords
+        `)
+        .eq("project_id", projectId)
+        .limit(1);
+
+      if (translationsError) {
+        console.warn("Error fetching project translations:", translationsError);
+      }
+
+      // Get project images
+      const { data: images, error: imagesError } = await supabase
+        .from("project_images")
+        .select(`
+          id,
+          image_url,
+          alt_text,
+          caption,
+          sort_order
+        `)
+        .eq("project_id", projectId)
+        .order("sort_order", { ascending: true });
+
+      if (imagesError) {
+        console.warn("Error fetching project images:", imagesError);
+      }
+
+      // Combine all data
+      const translation = translations?.[0];
+      return {
+        ...project,
+        // Use translation data if available, fallback to project data
+        description: translation?.description || project.description,
+        short_description: translation?.short_description || "",
+        meta_title: translation?.meta_title || "",
+        meta_description: translation?.meta_description || "",
+        meta_keywords: translation?.meta_keywords || "",
+        gallery_images: images?.map(img => img.image_url) || [],
+        images: images || []
+      };
     } catch (error) {
       console.error("Error fetching project:", error);
       throw new Error("Failed to fetch project data");
