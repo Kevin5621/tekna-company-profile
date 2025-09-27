@@ -86,24 +86,14 @@ export function ProjectDetailClient({
 }: Readonly<ProjectDetailClientProps>) {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
-  // Combine featured image with gallery images for display
+  // Sort gallery images by sort_order
   const sortedImages = project.images.toSorted((a, b) => a.sort_order - b.sort_order);
-  const allImages = [
-    ...(project.featured_image_url
-      ? [
-          {
-            id: "featured",
-            image_url: project.featured_image_url,
-            alt_text: `${project.name} - Featured Image`,
-            caption: "Featured Image",
-            sort_order: -1,
-          },
-        ]
-      : []),
-    ...sortedImages,
-  ];
+  
+  // Only use gallery images, don't include featured image
+  const allImages = sortedImages;
 
-  const hasGallery = allImages.length > 1;
+  const hasGallery = allImages.length > 0;
+
 
   useEffect(() => {
     // Track page view (analytics)

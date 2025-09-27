@@ -85,13 +85,13 @@ export class PublicService {
         .eq("is_active", true);
 
       // Apply filters
-      if (search && search.trim()) {
+      if (search?.trim()) {
         query = query.or(
           `title.ilike.%${search.trim()}%,excerpt.ilike.%${search.trim()}%`
         );
       }
 
-      if (category && category.trim()) {
+      if (category?.trim()) {
         // Fix: Filter by category_id instead of categories.slug
         query = query.eq("category_id", category);
       }
@@ -578,6 +578,7 @@ export class PublicService {
         console.error("Error fetching project images:", imagesError);
       }
 
+
       return {
         id: project.id,
         name: project.name,
@@ -626,7 +627,7 @@ export class PublicService {
 
     try {
       // If search is provided, use search function
-      if (search && search.trim()) {
+      if (search?.trim()) {
         const { data: searchResults, error: searchError } = await supabase.rpc(
           "search_projects",
           {

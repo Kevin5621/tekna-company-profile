@@ -89,6 +89,7 @@ export function ProjectForm({
     meta_description: initialData?.meta_description || "",
   });
 
+
   const { toast } = useToast();
 
   const handleNameChange = (value: string) => {
@@ -458,74 +459,81 @@ export function ProjectForm({
                     
                     {/* Current Gallery Images */}
                     {formData.gallery_images && formData.gallery_images.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {formData.gallery_images.map((imageUrl, index) => (
-                          <div key={index} className="relative group">
-                            <Image
-                              src={imageUrl}
-                              alt={`Gallery image ${index + 1}`}
-                              width={200}
-                              height={150}
-                              className="rounded-lg border object-cover w-full h-32"
-                            />
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="sm"
-                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => {
-                                const newImages = formData.gallery_images.filter((_, i) => i !== index);
-                                setFormData((prev) => ({
-                                  ...prev,
-                                  gallery_images: newImages,
-                                }));
-                              }}
-                            >
-                              <IconX className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm font-medium">
+                            Current Gallery Images ({formData.gallery_images.length})
+                          </Label>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {formData.gallery_images.map((imageUrl, index) => (
+                            <div key={`gallery-${index}-${imageUrl}`} className="relative group border rounded-lg overflow-hidden">
+                              <div className="aspect-video relative">
+                                <Image
+                                  src={imageUrl}
+                                  alt={`Gallery image ${index + 1}`}
+                                  fill
+                                  className="object-cover"
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="sm"
+                                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => {
+                                    const newImages = formData.gallery_images.filter((_, i) => i !== index);
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      gallery_images: newImages,
+                                    }));
+                                  }}
+                                >
+                                  <IconX className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="p-3 bg-muted/50">
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {imageUrl.split('/').pop()}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Image {index + 1}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 
                     {/* Upload New Gallery Images */}
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
-                      <div className="text-center">
-                        <IconUpload className="mx-auto h-12 w-12 text-muted-foreground" />
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          Drag & drop gallery images here or click to select
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Multiple images supported
-                        </p>
-                        <MediaUpload
-                          folder="project-gallery"
-                          allowedTypes={["image/*"]}
-                          maxFileSize={10 * 1024 * 1024} // 10MB
-                          onUploadSuccess={(file: MediaFile) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              gallery_images: [...(prev.gallery_images || []), file.file_url],
-                            }));
-                            toast({
-                              title: "Image Added!",
-                              description: "Gallery image has been added successfully.",
-                              variant: "success",
-                            });
-                          }}
-                          onUploadError={(error: string) => {
-                            toast({
-                              title: "Upload Failed",
-                              description: error,
-                              variant: "destructive",
-                            });
-                          }}
-                          placeholder="Select gallery images"
-                          accept="image/*"
-                          multiple={true}
-                        />
-                      </div>
-                    </div>
+                    <MediaUpload
+                      folder="project-gallery"
+                      allowedTypes={["image/*"]}
+                      maxFileSize={10 * 1024 * 1024} // 10MB
+                      onUploadSuccess={(file: MediaFile) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          gallery_images: [...(prev.gallery_images || []), file.file_url],
+                        }));
+                        toast({
+                          title: "Image Added!",
+                          description: "Gallery image has been added successfully.",
+                          variant: "success",
+                        });
+                      }}
+                      onUploadError={(error: string) => {
+                        toast({
+                          title: "Upload Failed",
+                          description: error,
+                          variant: "destructive",
+                        });
+                      }}
+                      placeholder="Drag & drop gallery images here or click to select"
+                      accept="image/*"
+                      multiple={true}
+                    />
                   </div>
                 </div>
               </TabsContent>
