@@ -96,7 +96,7 @@ export default async function ProjectsPage({ searchParams }: Readonly<ProjectsPa
                 "@type": "CreativeWork",
                 position: index + 1,
                 name: project.name,
-                description: project.short_description || project.description,
+                description: project.description,
                 url: `https://tekna.co.id/projects/${project.slug}`,
                 ...(project.featured_image_url && {
                   image: project.featured_image_url,

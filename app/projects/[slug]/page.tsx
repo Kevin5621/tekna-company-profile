@@ -23,7 +23,7 @@ export async function generateMetadata({
   }
 
   const title = project.meta_title || project.name;
-  const description = project.meta_description || project.short_description || project.description.substring(0, 160);
+  const description = project.meta_description || project.description.substring(0, 160);
   const keywords = project.meta_keywords;
 
   return {
@@ -109,7 +109,7 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
             "@context": "https://schema.org",
             "@type": "CreativeWork",
             name: project.name,
-            description: project.short_description || project.description,
+            description: project.description,
             image: project.featured_image_url,
             url: `https://tekna.co.id/projects/${project.slug}`,
             author: {

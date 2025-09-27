@@ -14,7 +14,6 @@ interface ProjectData {
   project_url?: string;
   featured_image_url?: string;
   description: string;
-  short_description: string;
   images: {
     image_url: string;
     alt_text?: string;
@@ -264,7 +263,7 @@ function ProjectRow({
             transition={{ delay: 0.2 }}
           >
             <p className="text-muted-foreground leading-relaxed text-base">
-              {project.short_description || project.description}
+              {project.description}
             </p>
           </motion.div>
 

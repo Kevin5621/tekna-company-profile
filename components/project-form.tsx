@@ -37,7 +37,6 @@ interface ProjectFormData {
   featured_image_url: string;
   is_featured: boolean;
   // Tab 2: Project Overview 
-  overview_content: string; // Markdown content
   gallery_images: string[]; // Array of image URLs
   // Tab 3: Project Information
   short_description: string;
@@ -74,7 +73,6 @@ export function ProjectForm({
     featured_image_url: initialData?.featured_image_url || "",
     is_featured: initialData?.is_featured || false,
     // Tab 2: Project Overview
-    overview_content: initialData?.overview_content || "",
     gallery_images: initialData?.gallery_images || [],
     // Tab 3: Project Information
     short_description: initialData?.short_description || "",
@@ -434,11 +432,11 @@ export function ProjectForm({
                       Write detailed project overview using Markdown. This will be displayed in the detail page.
                     </p>
                     <MarkdownEditor
-                      value={formData.overview_content}
+                      value={formData.short_description}
                       onChange={(value) =>
                         setFormData((prev) => ({
                           ...prev,
-                          overview_content: value,
+                          short_description: value,
                         }))
                       }
                       placeholder="Write your project overview here using Markdown..."
