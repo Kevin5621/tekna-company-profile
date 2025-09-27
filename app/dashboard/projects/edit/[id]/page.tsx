@@ -86,6 +86,16 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
             description: project.description || "",
             featured_image_url: project.featured_image_url || "",
             is_featured: project.is_featured || false,
+            // Add placeholder values for new fields
+            short_description: "",
+            meta_title: "",
+            meta_description: "",
+            technologies: "",
+            client_name: "",
+            project_date: "",
+            project_duration: "",
+            team_size: "",
+            project_status: "completed",
           }}
         />
       </div>

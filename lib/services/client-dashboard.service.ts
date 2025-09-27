@@ -34,6 +34,16 @@ export class ClientDashboardService {
     description?: string;
     featured_image_url?: string;
     is_featured?: boolean;
+    // New detail fields
+    short_description?: string;
+    meta_title?: string;
+    meta_description?: string;
+    technologies?: string;
+    client_name?: string;
+    project_date?: string;
+    project_duration?: string;
+    team_size?: string;
+    project_status?: string;
   }) {
     const supabase = createClient();
 
@@ -67,6 +77,16 @@ export class ClientDashboardService {
       description?: string;
       featured_image_url?: string;
       is_featured?: boolean;
+      // New detail fields
+      short_description?: string;
+      meta_title?: string;
+      meta_description?: string;
+      technologies?: string;
+      client_name?: string;
+      project_date?: string;
+      project_duration?: string;
+      team_size?: string;
+      project_status?: string;
     }
   ) {
     const supabase = createClient();

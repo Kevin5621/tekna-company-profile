@@ -15,11 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   IconLoader2,
   IconX,
   IconUpload,
 } from "@tabler/icons-react";
+import { MarkdownEditor } from "@/components/markdown-editor";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
 import { mutate as globalMutate } from "swr";
 import { MediaUpload } from "@/components/media-upload";
@@ -34,6 +36,20 @@ interface ProjectFormData {
   description: string;
   featured_image_url: string;
   is_featured: boolean;
+  // Tab 2: Project Overview 
+  overview_content: string; // Markdown content
+  gallery_images: string[]; // Array of image URLs
+  // Tab 3: Project Information
+  short_description: string;
+  technologies: string;
+  client_name: string;
+  project_date: string;
+  project_duration: string;
+  team_size: string;
+  project_status: string;
+  // Tab 4: SEO & Meta
+  meta_title: string;
+  meta_description: string;
 }
 
 interface ProjectFormProps {
@@ -57,6 +73,20 @@ export function ProjectForm({
     description: initialData?.description || "",
     featured_image_url: initialData?.featured_image_url || "",
     is_featured: initialData?.is_featured || false,
+    // Tab 2: Project Overview
+    overview_content: initialData?.overview_content || "",
+    gallery_images: initialData?.gallery_images || [],
+    // Tab 3: Project Information
+    short_description: initialData?.short_description || "",
+    technologies: initialData?.technologies || "",
+    client_name: initialData?.client_name || "",
+    project_date: initialData?.project_date || "",
+    project_duration: initialData?.project_duration || "",
+    team_size: initialData?.team_size || "",
+    project_status: initialData?.project_status || "completed",
+    // Tab 4: SEO & Meta
+    meta_title: initialData?.meta_title || "",
+    meta_description: initialData?.meta_description || "",
   });
 
   const { toast } = useToast();
@@ -90,13 +120,20 @@ export function ProjectForm({
         };
 
         // update local cache
-        interface _P { id: string; name: string; description?: string; featured_image_url?: string; is_featured?: boolean; is_active?: boolean }
+        interface ProjectCacheItem { 
+          id: string; 
+          name: string; 
+          description?: string; 
+          featured_image_url?: string; 
+          is_featured?: boolean; 
+          is_active?: boolean;
+        }
 
         globalMutate(
           "/api/projects",
-          async (current: { data?: _P[] } | undefined) => {
-            const existing = (current?.data as _P[]) || [];
-            return { success: true, data: [optimisticProject as _P, ...existing] };
+          async (current: { data?: ProjectCacheItem[] } | undefined) => {
+            const existing = (current?.data as ProjectCacheItem[]) || [];
+            return { success: true, data: [optimisticProject as ProjectCacheItem, ...existing] };
           },
           false
         );
@@ -113,6 +150,16 @@ export function ProjectForm({
               description: formData.description || undefined,
               featured_image_url: formData.featured_image_url || undefined,
               is_featured: formData.is_featured,
+              // New detail fields
+              short_description: formData.short_description || undefined,
+              meta_title: formData.meta_title || undefined,
+              meta_description: formData.meta_description || undefined,
+              technologies: formData.technologies || undefined,
+              client_name: formData.client_name || undefined,
+              project_date: formData.project_date || undefined,
+              project_duration: formData.project_duration || undefined,
+              team_size: formData.team_size || undefined,
+              project_status: formData.project_status || undefined,
             }),
           });
 
@@ -139,13 +186,23 @@ export function ProjectForm({
           });
         }
       } else if (mode === "edit" && projectId) {
-  const result = await ClientDashboardService.updateProject(projectId, {
+        const result = await ClientDashboardService.updateProject(projectId, {
           name: formData.name,
           slug: formData.slug,
           project_url: formData.project_url || undefined,
           description: formData.description || undefined,
           featured_image_url: formData.featured_image_url || undefined,
           is_featured: formData.is_featured,
+          // New detail fields
+          short_description: formData.short_description || undefined,
+          meta_title: formData.meta_title || undefined,
+          meta_description: formData.meta_description || undefined,
+          technologies: formData.technologies || undefined,
+          client_name: formData.client_name || undefined,
+          project_date: formData.project_date || undefined,
+          project_duration: formData.project_duration || undefined,
+          team_size: formData.team_size || undefined,
+          project_status: formData.project_status || undefined,
         });
         console.log("Update result:", result);
         toast({
@@ -190,217 +247,442 @@ export function ProjectForm({
     });
   };
 
-  // Remove featured image
-  const removeFeaturedImage = () => {
-    setFormData((prev) => ({
-      ...prev,
-      featured_image_url: "",
-    }));
-  };
-
   return (
     <div className="space-y-6">
       {/* Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Project Information</CardTitle>
+          <CardTitle>
+            {mode === "create" ? "Create Project" : "Edit Project"}
+          </CardTitle>
           <CardDescription>
-            Complete the project information correctly
+            {mode === "create"
+              ? "Add a new project to your portfolio with complete information."
+              : "Update project information and details."}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              {/* Project Name */}
-              <div className="space-y-2">
-                <Label htmlFor="name">Project Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="Example: Modern E-commerce Website"
-                  required
-                />
-              </div>
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="basic">Landing Page</TabsTrigger>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="info">Project Info</TabsTrigger>
+                <TabsTrigger value="seo">SEO Meta</TabsTrigger>
+              </TabsList>
 
-              {/* Slug */}
-              <div className="space-y-2">
-                <SlugInput
-                  value={formData.slug}
-                  onChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      slug: value,
-                    }))
-                  }
-                  entityType="project"
-                  excludeId={projectId}
-                  label="Slug"
-                  placeholder="website-e-commerce-modern"
-                  description="URL slug will be automatically generated from the project name"
-                  autoGenerate
-                  sourceField="name"
-                  sourceValue={formData.name}
-                />
-              </div>
-
-              {/* Project Description */}
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="description">Project Description</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  placeholder="Complete description about this project..."
-                  rows={4}
-                />
-              </div>
-
-              {/* Project URL */}
-              <div className="space-y-2">
-                <Label htmlFor="project_url">Project URL</Label>
-                <Input
-                  id="project_url"
-                  type="url"
-                  value={formData.project_url}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      project_url: e.target.value,
-                    }))
-                  }
-                  placeholder="https://example.com"
-                />
-              </div>
-            </div>
-
-            {/* Featured Image Upload */}
-            <div className="space-y-4">
-              <Label htmlFor="featured_image">Featured Project Image</Label>
-              
-              {/* Current Image Display */}
-              {formData.featured_image_url && (
-                <div className="relative">
-                  <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
-                    <Image
-                      src={formData.featured_image_url}
-                      alt="Featured project image"
-                      fill
-                      className="object-cover"
+              {/* Tab 1: Landing Page Information */}
+              <TabsContent value="basic" className="space-y-6 mt-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Project Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Project Name *</Label>
+                    <Input
+                      id="name"
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => handleNameChange(e.target.value)}
+                      placeholder="Enter project name"
+                      required
                     />
+                  </div>
+
+                  {/* Project Slug */}
+                  <div className="space-y-2">
+                    <Label htmlFor="slug">Project Slug *</Label>
+                    <SlugInput
+                      value={formData.slug}
+                      onChange={(value) =>
+                        setFormData((prev) => ({ ...prev, slug: value }))
+                      }
+                      placeholder="project-slug"
+                      entityType="project"
+                    />
+                  </div>
+
+                  {/* Description for Landing */}
+                  <div className="md:col-span-2 space-y-2">
+                    <Label htmlFor="description">Landing Page Description *</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      placeholder="Brief description shown on landing page..."
+                      rows={4}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This will be displayed on the landing page projects section
+                    </p>
+                  </div>
+
+                  {/* Featured Image Section */}
+                  <div className="md:col-span-2 space-y-4">
+                    <Label>Featured Image for Landing Page</Label>
+                    
+                    {/* Current Image Preview */}
+                    {formData.featured_image_url && (
+                      <div className="relative w-full max-w-md">
+                        <Image
+                          src={formData.featured_image_url}
+                          alt="Featured image preview"
+                          width={400}
+                          height={200}
+                          className="rounded-lg border object-cover"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2"
+                          onClick={() =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              featured_image_url: "",
+                            }))
+                          }
+                        >
+                          <IconX className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Upload Button */}
                     <Button
                       type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 h-8 w-8"
-                      onClick={removeFeaturedImage}
-                      aria-label="Remove image"
+                      variant="outline"
+                      onClick={() => setShowImageUpload(!showImageUpload)}
+                      className="w-full sm:w-auto"
                     >
-                      <IconX className="h-4 w-4" />
+                      <IconUpload className="h-4 w-4 mr-2" />
+                      Upload Featured Image
                     </Button>
+
+                    {/* Image Upload Dialog */}
+                    {showImageUpload && (
+                      <div className="border rounded-lg p-4 bg-muted/50">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="font-medium">Upload Featured Image</h4>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowImageUpload(false)}
+                          >
+                            <IconX className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <MediaUpload
+                          folder="project-media"
+                          allowedTypes={["image/*"]}
+                          maxFileSize={10 * 1024 * 1024} // 10MB
+                          onUploadSuccess={handleMediaUploadSuccess}
+                          onUploadError={handleMediaUploadError}
+                          placeholder="Drag & drop featured image here or click to select"
+                          accept="image/*"
+                        />
+                      </div>
+                    )}
+
+                    {/* Manual URL Input */}
+                    <div className="space-y-2">
+                      <Label htmlFor="featured_image_url">Or enter image URL</Label>
+                      <Input
+                        id="featured_image_url"
+                        type="url"
+                        value={formData.featured_image_url}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            featured_image_url: e.target.value,
+                          }))
+                        }
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2 text-center">
-                    Image has been selected. Click remove to change image
-                  </p>
-                </div>
-              )}
 
-              {/* Upload Button */}
-              {!formData.featured_image_url && (
-                <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowImageUpload(true)}
-                    className="w-full"
-                  >
-                    <IconUpload className="h-4 w-4 mr-2" />
-                    Upload Project Image
-                  </Button>
-                  <p className="text-xs text-muted-foreground text-center">
-                    Upload project image (JPG, PNG, WebP, SVG - max 5MB)
-                  </p>
-                </div>
-              )}
-
-              {/* Image Upload Dialog */}
-              {showImageUpload && (
-                <div
-                  className="border rounded-lg p-4 bg-muted/50"
-                  role="dialog"
-                  aria-labelledby="upload-dialog-title"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 id="upload-dialog-title" className="font-medium">
-                      Upload Project Image
-                    </h4>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowImageUpload(false)}
-                      aria-label="Close upload dialog"
-                    >
-                      <IconX className="h-4 w-4" />
-                    </Button>
+                  {/* Is Featured */}
+                  <div className="md:col-span-2 flex items-center space-x-2">
+                    <Checkbox
+                      id="is_featured"
+                      checked={formData.is_featured}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          is_featured: !!checked,
+                        }))
+                      }
+                    />
+                    <Label htmlFor="is_featured">Make project featured on landing page</Label>
                   </div>
-                  <MediaUpload
-                    folder="project-media"
-                    allowedTypes={["image/*"]}
-                    maxFileSize={10 * 1024 * 1024} // 10MB
-                    onUploadSuccess={handleMediaUploadSuccess}
-                    onUploadError={handleMediaUploadError}
-                    placeholder="Drag & drop project image here or click to select"
-                    accept="image/*"
-                  />
                 </div>
-              )}
+              </TabsContent>
 
-              {/* Manual URL Input */}
-              <div className="space-y-2">
-                <Label htmlFor="featured_image_url">
-                  Or enter a manual image URL
-                </Label>
-                <Input
-                  id="featured_image_url"
-                  type="url"
-                  value={formData.featured_image_url}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      featured_image_url: e.target.value,
-                    }))
-                  }
-                  placeholder="https://example.com/image.jpg"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Optional: You can enter an external image URL as an alternative to upload
-                </p>
-              </div>
+              {/* Tab 2: Project Overview with Markdown */}
+              <TabsContent value="overview" className="space-y-6 mt-6">
+                <div className="space-y-6">
+                  {/* Project Overview Content */}
+                  <div className="space-y-2">
+                    <Label>Project Overview Content</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Write detailed project overview using Markdown. This will be displayed in the detail page.
+                    </p>
+                    <MarkdownEditor
+                      value={formData.overview_content}
+                      onChange={(value) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          overview_content: value,
+                        }))
+                      }
+                      placeholder="Write your project overview here using Markdown..."
+                    />
+                  </div>
 
-              {/* Is Featured */}
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="is_featured"
-                  checked={formData.is_featured}
-                  onCheckedChange={(checked) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      is_featured: !!checked,
-                    }))
-                  }
-                />
-                <Label htmlFor="is_featured">Make project featured</Label>
-              </div>
-            </div>
+                  {/* Gallery Images Placeholder */}
+                  <div className="space-y-4">
+                    <Label>Project Gallery</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Upload multiple images for the project gallery displayed in detail page.
+                    </p>
+                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
+                      <div className="text-center">
+                        <IconUpload className="mx-auto h-12 w-12 text-muted-foreground" />
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          Gallery upload feature will be implemented soon
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          For now, use featured image in Landing Page tab
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Tab 3: Project Information */}
+              <TabsContent value="info" className="space-y-6 mt-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Short Description */}
+                  <div className="md:col-span-2 space-y-2">
+                    <Label htmlFor="short_description">Short Description</Label>
+                    <Textarea
+                      id="short_description"
+                      value={formData.short_description}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          short_description: e.target.value,
+                        }))
+                      }
+                      placeholder="Brief project summary for detail page sidebar..."
+                      rows={3}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Used in project detail sidebar (recommended 100-150 characters)
+                    </p>
+                  </div>
+
+                  {/* Technologies Used */}
+                  <div className="md:col-span-2 space-y-2">
+                    <Label htmlFor="technologies">Technologies Used</Label>
+                    <Input
+                      id="technologies"
+                      type="text"
+                      value={formData.technologies}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          technologies: e.target.value,
+                        }))
+                      }
+                      placeholder="React, Next.js, TypeScript, Tailwind CSS"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Separate technologies with commas
+                    </p>
+                  </div>
+
+                  {/* Client Name */}
+                  <div className="space-y-2">
+                    <Label htmlFor="client_name">Client Name</Label>
+                    <Input
+                      id="client_name"
+                      type="text"
+                      value={formData.client_name}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          client_name: e.target.value,
+                        }))
+                      }
+                      placeholder="Client or company name"
+                    />
+                  </div>
+
+                  {/* Project Date */}
+                  <div className="space-y-2">
+                    <Label htmlFor="project_date">Project Date</Label>
+                    <Input
+                      id="project_date"
+                      type="text"
+                      value={formData.project_date}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          project_date: e.target.value,
+                        }))
+                      }
+                      placeholder="January 2024"
+                    />
+                  </div>
+
+                  {/* Project Duration */}
+                  <div className="space-y-2">
+                    <Label htmlFor="project_duration">Project Duration</Label>
+                    <Input
+                      id="project_duration"
+                      type="text"
+                      value={formData.project_duration}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          project_duration: e.target.value,
+                        }))
+                      }
+                      placeholder="3 months"
+                    />
+                  </div>
+
+                  {/* Team Size */}
+                  <div className="space-y-2">
+                    <Label htmlFor="team_size">Team Size</Label>
+                    <Input
+                      id="team_size"
+                      type="text"
+                      value={formData.team_size}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          team_size: e.target.value,
+                        }))
+                      }
+                      placeholder="5 developers"
+                    />
+                  </div>
+
+                  {/* Project Status */}
+                  <div className="space-y-2">
+                    <Label htmlFor="project_status">Project Status</Label>
+                    <Input
+                      id="project_status"
+                      type="text"
+                      value={formData.project_status}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          project_status: e.target.value,
+                        }))
+                      }
+                      placeholder="Completed"
+                    />
+                  </div>
+
+                  {/* Project URL */}
+                  <div className="md:col-span-2 space-y-2">
+                    <Label htmlFor="project_url">Project URL (Optional)</Label>
+                    <Input
+                      id="project_url"
+                      type="url"
+                      value={formData.project_url}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          project_url: e.target.value,
+                        }))
+                      }
+                      placeholder="https://project-url.com"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Live project URL if available
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* SEO & Meta Tab */}
+              <TabsContent value="seo" className="space-y-6 mt-6">
+                <div className="grid gap-6">
+                  {/* Meta Title */}
+                  <div className="space-y-2">
+                    <Label htmlFor="meta_title">Meta Title</Label>
+                    <Input
+                      id="meta_title"
+                      type="text"
+                      value={formData.meta_title}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          meta_title: e.target.value,
+                        }))
+                      }
+                      placeholder="Project Name - PT Sapujagat Nirmana Tekna"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Recommended: 50-60 characters for optimal SEO
+                    </p>
+                  </div>
+
+                  {/* Meta Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="meta_description">Meta Description</Label>
+                    <Textarea
+                      id="meta_description"
+                      value={formData.meta_description}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          meta_description: e.target.value,
+                        }))
+                      }
+                      placeholder="Discover our innovative project built with modern technologies..."
+                      rows={4}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Recommended: 150-160 characters for optimal SEO
+                    </p>
+                  </div>
+
+                  {/* Preview Card */}
+                  <div className="border rounded-lg p-4 bg-muted/20">
+                    <h4 className="font-medium mb-2">Search Engine Preview</h4>
+                    <div className="space-y-1">
+                      <div className="text-blue-600 text-sm font-medium">
+                        {formData.meta_title || formData.name || "Project Title"}
+                      </div>
+                      <div className="text-green-600 text-xs">
+                        https://tekna.co.id/projects/{formData.slug || "project-slug"}
+                      </div>
+                      <div className="text-gray-600 text-sm">
+                        {formData.meta_description || 
+                         formData.short_description || 
+                         formData.description?.substring(0, 160) + "..." || 
+                         "Project description will appear here..."}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
 
             {/* Submit Buttons */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-6 border-t">
               <Button type="submit" disabled={isLoading}>
                 {isLoading && (
                   <IconLoader2 className="h-4 w-4 mr-2 animate-spin" />
