@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import {
   IconEdit,
   IconTrash,
   IconLoader2,
+  IconExternalLink,
 } from "@tabler/icons-react";
 import { ClientDashboardService } from "@/lib/services/client-dashboard.service";
 import useSWR, { mutate as globalMutate } from "swr";
@@ -23,6 +25,7 @@ import { DashboardPageTemplate } from "@/components/dashboard/dashboard-page-tem
 interface Project {
   id: string;
   name: string;
+  slug: string;
   description?: string;
   is_featured: boolean;
   is_active: boolean;
@@ -188,6 +191,17 @@ export default function ProjectsPageClient({
                     </p>
                   )}
                   <div className="flex gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      asChild
+                    >
+                      <Link href={`/projects/${project.slug}`} target="_blank">
+                        <IconExternalLink className="h-4 w-4 mr-1" />
+                        View
+                      </Link>
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"

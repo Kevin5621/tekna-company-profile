@@ -147,6 +147,7 @@ export class DashboardService {
           `
           id,
           name,
+          slug,
           description,
           is_featured,
           is_active,

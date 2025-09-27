@@ -539,4 +539,305 @@ export class PublicService {
       return [];
     }
   }
+
+  /**
+   * Get single project by slug with full details, translations, and images.
+   */
+  static async getProjectBySlug(slug: string, language: string = "en") {
+    const supabase = await createClient();
+    try {
+      // Get project basic info with translation using the database function
+      const { data: projectData, error: projectError } = await supabase.rpc(
+        "get_project_by_slug",
+        {
+          project_slug: slug,
+          language_code: language,
+        }
+      );
+
+      if (projectError) {
+        console.error("Error fetching project by slug:", projectError);
+        return null;
+      }
+
+      if (!projectData || projectData.length === 0) {
+        return null;
+      }
+
+      const project = projectData[0];
+
+      // Get project images
+      const { data: images, error: imagesError } = await supabase.rpc(
+        "get_project_images",
+        {
+          project_id: project.id,
+        }
+      );
+
+      if (imagesError) {
+        console.error("Error fetching project images:", imagesError);
+      }
+
+      return {
+        id: project.id,
+        name: project.name,
+        slug: project.slug,
+        project_url: project.project_url,
+        description: project.translated_description || project.description,
+        short_description: project.short_description,
+        featured_image_url: project.featured_image_url,
+        is_featured: project.is_featured,
+        is_active: project.is_active,
+        sort_order: project.sort_order,
+        created_at: project.created_at,
+        updated_at: project.updated_at,
+        meta_title: project.meta_title,
+        meta_description: project.meta_description,
+        meta_keywords: project.meta_keywords,
+        images: images || [],
+      };
+    } catch (error) {
+      console.error("Error fetching project by slug:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Get all projects with pagination, search, and filtering.
+   */
+  static async getAllProjects(
+    params: {
+      page?: number;
+      limit?: number;
+      search?: string;
+      featured?: boolean;
+      language?: string;
+    } = {}
+  ) {
+    const supabase = await createClient();
+    const {
+      page = 1,
+      limit = 12,
+      search,
+      featured,
+      language = "en",
+    } = params;
+    const offset = (page - 1) * limit;
+
+    try {
+      // If search is provided, use search function
+      if (search && search.trim()) {
+        const { data: searchResults, error: searchError } = await supabase.rpc(
+          "search_projects",
+          {
+            search_query: search.trim(),
+            language_code: language,
+            limit_count: limit,
+            offset_count: offset,
+          }
+        );
+
+        if (searchError) {
+          console.error("Error searching projects:", searchError);
+          return {
+            data: [],
+            pagination: {
+              page,
+              limit,
+              total: 0,
+              totalPages: 0,
+              hasNext: false,
+              hasPrev: false,
+            },
+          };
+        }
+
+        // Get total count for pagination (approximation for search)
+        const total = searchResults?.length || 0;
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+          data: searchResults || [],
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages,
+            hasNext: page < totalPages,
+            hasPrev: page > 1,
+          },
+        };
+      }
+
+      // Regular query without search
+      const { data: languageData, error: languageError } = await supabase
+        .from("languages")
+        .select("id")
+        .eq("code", language)
+        .eq("is_active", true)
+        .single();
+
+      if (languageError || !languageData) {
+        console.error("Language not found:", language, languageError);
+        return {
+          data: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          },
+        };
+      }
+
+      let query = supabase
+        .from("projects")
+        .select(
+          `
+          id,
+          name,
+          slug,
+          project_url,
+          description,
+          featured_image_url,
+          is_featured,
+          is_active,
+          sort_order,
+          created_at,
+          updated_at,
+          project_translations!project_translations_project_id_fkey(
+            description,
+            short_description,
+            meta_title,
+            meta_description
+          )
+        `,
+          { count: "exact" }
+        )
+        .eq("is_active", true);
+
+      // Apply featured filter
+      if (featured !== undefined) {
+        query = query.eq("is_featured", featured);
+      }
+
+      // Apply pagination and ordering
+      const { data: projects, error, count } = await query
+        .order("is_featured", { ascending: false })
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) {
+        console.error("Error fetching projects:", error);
+        return {
+          data: [],
+          pagination: {
+            page,
+            limit,
+            total: 0,
+            totalPages: 0,
+            hasNext: false,
+            hasPrev: false,
+          },
+        };
+      }
+
+      const totalPages = Math.ceil((count || 0) / limit);
+
+      // Transform data to include translations
+      const result = projects?.map((project) => {
+        const translation = project.project_translations?.[0];
+        return {
+          id: project.id,
+          name: project.name,
+          slug: project.slug,
+          project_url: project.project_url,
+          featured_image_url: project.featured_image_url,
+          description: translation?.description || project.description,
+          short_description: translation?.short_description || "",
+          is_featured: project.is_featured,
+          is_active: project.is_active,
+          sort_order: project.sort_order,
+          created_at: project.created_at,
+          updated_at: project.updated_at,
+          meta_title: translation?.meta_title,
+          meta_description: translation?.meta_description,
+        };
+      });
+
+      return {
+        data: result || [],
+        pagination: {
+          page,
+          limit,
+          total: count || 0,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      return {
+        data: [],
+        pagination: {
+          page,
+          limit,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+      };
+    }
+  }
+
+  /**
+   * Get related projects for a given project.
+   */
+  static async getRelatedProjects(
+    projectId: string,
+    language: string = "en",
+    limit: number = 3
+  ) {
+    const supabase = await createClient();
+    try {
+      const { data: relatedProjects, error } = await supabase.rpc(
+        "get_related_projects",
+        {
+          current_project_id: projectId,
+          language_code: language,
+          limit_count: limit,
+        }
+      );
+
+      if (error) {
+        console.error("Error fetching related projects:", error);
+        return [];
+      }
+
+      return relatedProjects || [];
+    } catch (error) {
+      console.error("Error fetching related projects:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Increment project view count for analytics.
+   */
+  static async incrementProjectViews(projectId: string) {
+    const supabase = await createClient();
+    try {
+      await supabase.rpc("increment_project_views", {
+        project_id: projectId,
+      });
+    } catch (error) {
+      console.error("Error incrementing project views:", error);
+      // Don't throw error as this is not critical
+    }
+  }
 }

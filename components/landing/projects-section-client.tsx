@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { Eye } from "lucide-react";
 import { useRef } from "react";
 import { motion, useInView, Variants } from "framer-motion";
 
@@ -24,9 +25,9 @@ interface ProjectData {
 
 export function ProjectsSectionClient({
   projects,
-}: {
+}: Readonly<{
   projects: ProjectData[];
-}) {
+}>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isVisible = useInView(containerRef, { once: true, margin: "-100px" });
 
@@ -276,28 +277,22 @@ function ProjectRow({
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            {project.project_url && (
-              <motion.div
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            <motion.div
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            >
+              <Button
+                size="lg"
+                className="flex items-center gap-2 shadow-lg"
+                asChild
               >
-                <Button
-                  size="lg"
-                  className="flex items-center gap-2 shadow-lg"
-                  asChild
-                >
-                  <a
-                    href={project.project_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Lihat Proyek
-                  </a>
-                </Button>
-              </motion.div>
-            )}
+                <Link href={`/projects/${project.slug}`}>
+                  <Eye className="w-4 h-4" />
+                  Detail Proyek
+                </Link>
+              </Button>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
