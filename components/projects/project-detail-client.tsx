@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { ContentRenderer } from "@/components/content-renderer";
 
 interface ProjectImage {
   id: string;
@@ -221,11 +222,11 @@ export function ProjectDetailClient({
                       Detailed information about this project
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="prose prose-foreground max-w-none">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: project.description.replace(/\n/g, "<br />"),
-                      }}
+                  <CardContent className="px-8 py-6">
+                    <ContentRenderer
+                      content={project.description || ""}
+                      contentType="markdown"
+                      className="prose prose-foreground max-w-none prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-p:text-sm prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-img:rounded-lg prose-img:shadow-md prose-pre:bg-slate-50 prose-pre:border prose-pre:rounded-md prose-pre:p-3 prose-pre:text-xs prose-blockquote:border-l-2 prose-blockquote:border-primary prose-blockquote:bg-muted/30 prose-blockquote:rounded-r-md prose-blockquote:px-4 prose-blockquote:py-2 prose-blockquote:text-sm prose-li:text-sm prose-li:leading-relaxed prose-table:text-sm prose-th:text-xs prose-td:text-xs"
                     />
                   </CardContent>
                 </Card>
