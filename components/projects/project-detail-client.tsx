@@ -74,6 +74,13 @@ interface ProjectDetailData {
   meta_description?: string;
   meta_keywords?: string;
   images: ProjectImage[];
+  // Additional project information
+  technologies?: string;
+  client_name?: string;
+  project_date?: string;
+  project_duration?: string;
+  team_size?: string;
+  project_status?: string;
 }
 
 interface ProjectDetailClientProps {
@@ -302,6 +309,90 @@ export function ProjectDetailClient({
                     {project.is_active ? "Active" : "Inactive"}
                   </Badge>
                 </div>
+
+                {project.project_status && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-medium text-sm text-muted-foreground mb-1">
+                        Project Status
+                      </h4>
+                      <p className="text-sm capitalize">
+                        {project.project_status}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {project.client_name && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-medium text-sm text-muted-foreground mb-1">
+                        Client
+                      </h4>
+                      <p className="text-sm">
+                        {project.client_name}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {project.technologies && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-medium text-sm text-muted-foreground mb-1">
+                        Technologies
+                      </h4>
+                      <p className="text-sm">
+                        {project.technologies}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {project.project_date && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-medium text-sm text-muted-foreground mb-1">
+                        Project Date
+                      </h4>
+                      <p className="text-sm">
+                        {project.project_date}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {project.project_duration && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-medium text-sm text-muted-foreground mb-1">
+                        Duration
+                      </h4>
+                      <p className="text-sm">
+                        {project.project_duration}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {project.team_size && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="font-medium text-sm text-muted-foreground mb-1">
+                        Team Size
+                      </h4>
+                      <p className="text-sm">
+                        {project.team_size}
+                      </p>
+                    </div>
+                  </>
+                )}
 
                 <Separator />
 

@@ -37,7 +37,13 @@ RETURNS TABLE (
     short_description VARCHAR(500),
     meta_title VARCHAR(255),
     meta_description TEXT,
-    meta_keywords TEXT
+    meta_keywords TEXT,
+    technologies TEXT,
+    client_name VARCHAR(255),
+    project_date VARCHAR(100),
+    project_duration VARCHAR(100),
+    team_size VARCHAR(100),
+    project_status VARCHAR(50)
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -76,7 +82,13 @@ BEGIN
         pt.short_description,
         pt.meta_title,
         pt.meta_description,
-        pt.meta_keywords
+        pt.meta_keywords,
+        p.technologies,
+        p.client_name,
+        p.project_date,
+        p.project_duration,
+        p.team_size,
+        p.project_status
     FROM projects p
     LEFT JOIN project_translations pt ON p.id = pt.project_id AND pt.language_id = lang_id
     WHERE p.slug = project_slug 

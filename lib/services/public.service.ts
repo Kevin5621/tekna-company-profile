@@ -579,6 +579,16 @@ export class PublicService {
       }
 
 
+      // Debug: Log additional project information
+      console.log("Project additional info:", {
+        technologies: project.technologies,
+        client_name: project.client_name,
+        project_date: project.project_date,
+        project_duration: project.project_duration,
+        team_size: project.team_size,
+        project_status: project.project_status,
+      });
+
       return {
         id: project.id,
         name: project.name,
@@ -596,6 +606,13 @@ export class PublicService {
         meta_description: project.meta_description,
         meta_keywords: project.meta_keywords,
         images: images || [],
+        // Additional project information
+        technologies: project.technologies,
+        client_name: project.client_name,
+        project_date: project.project_date,
+        project_duration: project.project_duration,
+        team_size: project.team_size,
+        project_status: project.project_status,
       };
     } catch (error) {
       console.error("Error fetching project by slug:", error);
