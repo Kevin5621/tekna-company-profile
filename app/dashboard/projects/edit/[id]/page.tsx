@@ -26,6 +26,7 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
     created_at: string;
     updated_at: string;
     // Additional fields from project_translations and project_images
+    overview_content?: string; // From project_translations.description
     short_description?: string;
     meta_title?: string;
     meta_description?: string;
@@ -98,7 +99,7 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
             featured_image_url: project.featured_image_url || "",
             is_featured: project.is_featured || false,
             // Use actual data from project_translations and project_images
-            overview_content: project.description || "", // This should come from project_translations.description
+            overview_content: project.overview_content || "", // This comes from project_translations.description
             short_description: project.short_description || "",
             meta_title: project.meta_title || "",
             meta_description: project.meta_description || "",

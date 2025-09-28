@@ -579,15 +579,6 @@ export class PublicService {
       }
 
 
-      // Debug: Log additional project information
-      console.log("Project additional info:", {
-        technologies: project.technologies,
-        client_name: project.client_name,
-        project_date: project.project_date,
-        project_duration: project.project_duration,
-        team_size: project.team_size,
-        project_status: project.project_status,
-      });
 
       return {
         id: project.id,
@@ -774,7 +765,7 @@ export class PublicService {
           slug: project.slug,
           project_url: project.project_url,
           featured_image_url: project.featured_image_url,
-          description: translation?.description || project.description,
+          description: project.description, // Use original project description for landing page
           short_description: translation?.short_description || "",
           is_featured: project.is_featured,
           is_active: project.is_active,

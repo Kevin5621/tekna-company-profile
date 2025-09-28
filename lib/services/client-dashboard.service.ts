@@ -335,8 +335,10 @@ export class ClientDashboardService {
       const translation = translations?.[0];
       return {
         ...project,
-        // Use translation data if available, fallback to project data
-        description: translation?.description || project.description,
+        // Keep original project description for landing page
+        description: project.description,
+        // Overview content from project_translations for detail page
+        overview_content: translation?.description || "",
         short_description: translation?.short_description || "",
         meta_title: translation?.meta_title || "",
         meta_description: translation?.meta_description || "",
