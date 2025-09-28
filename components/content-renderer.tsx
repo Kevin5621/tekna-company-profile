@@ -20,7 +20,10 @@ interface ContentRendererProps {
 }
 
 // Custom components for markdown rendering
-const CodeBlock = ({ className, children, ...props }: any) => {
+const CodeBlock = ({ className, children, ...props }: {
+  className?: string;
+  children?: React.ReactNode;
+}) => {
   const match = /language-(\w+)/.exec(className || "");
   const isInline = !className || !match;
   return !isInline ? (
@@ -39,61 +42,61 @@ const CodeBlock = ({ className, children, ...props }: any) => {
   );
 };
 
-const Heading1 = ({ children }: { children: React.ReactNode }) => (
+const Heading1 = ({ children }: { children?: React.ReactNode }) => (
   <h1 className="text-4xl font-bold mb-6 text-foreground border-b border-border pb-2">
     {children}
   </h1>
 );
 
-const Heading2 = ({ children }: { children: React.ReactNode }) => (
+const Heading2 = ({ children }: { children?: React.ReactNode }) => (
   <h2 className="text-3xl font-bold mb-4 text-foreground border-b border-border pb-1">
     {children}
   </h2>
 );
 
-const Heading3 = ({ children }: { children: React.ReactNode }) => (
+const Heading3 = ({ children }: { children?: React.ReactNode }) => (
   <h3 className="text-2xl font-bold mb-3 text-foreground">
     {children}
   </h3>
 );
 
-const Heading4 = ({ children }: { children: React.ReactNode }) => (
+const Heading4 = ({ children }: { children?: React.ReactNode }) => (
   <h4 className="text-xl font-bold mb-2 text-foreground">
     {children}
   </h4>
 );
 
-const Heading5 = ({ children }: { children: React.ReactNode }) => (
+const Heading5 = ({ children }: { children?: React.ReactNode }) => (
   <h5 className="text-lg font-bold mb-2 text-foreground">
     {children}
   </h5>
 );
 
-const Heading6 = ({ children }: { children: React.ReactNode }) => (
+const Heading6 = ({ children }: { children?: React.ReactNode }) => (
   <h6 className="text-base font-bold mb-2 text-foreground">
     {children}
   </h6>
 );
 
-const UnorderedList = ({ children, depth }: { children: React.ReactNode; depth?: number }) => (
+const UnorderedList = ({ children, depth }: { children?: React.ReactNode; depth?: number }) => (
   <ul className={`list-disc space-y-1 mb-4 ${depth && depth > 0 ? 'ml-4' : ''}`}>
     {children}
   </ul>
 );
 
-const OrderedList = ({ children, depth }: { children: React.ReactNode; depth?: number }) => (
+const OrderedList = ({ children, depth }: { children?: React.ReactNode; depth?: number }) => (
   <ol className={`list-decimal space-y-1 mb-4 ${depth && depth > 0 ? 'ml-4' : ''}`}>
     {children}
   </ol>
 );
 
-const ListItem = ({ children }: { children: React.ReactNode }) => (
+const ListItem = ({ children }: { children?: React.ReactNode }) => (
   <li className="leading-relaxed">
     {children}
   </li>
 );
 
-const Link = ({ children, href }: { children: React.ReactNode; href?: string }) => (
+const Link = ({ children, href }: { children?: React.ReactNode; href?: string }) => (
   <a
     href={href}
     className="text-primary hover:text-primary/80 underline"
@@ -104,13 +107,13 @@ const Link = ({ children, href }: { children: React.ReactNode; href?: string }) 
   </a>
 );
 
-const Blockquote = ({ children }: { children: React.ReactNode }) => (
+const Blockquote = ({ children }: { children?: React.ReactNode }) => (
   <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground mb-4">
     {children}
   </blockquote>
 );
 
-const Table = ({ children }: { children: React.ReactNode }) => (
+const Table = ({ children }: { children?: React.ReactNode }) => (
   <div className="overflow-x-auto mb-6 border border-border rounded-lg">
     <table className="min-w-full divide-y divide-border">
       {children}
@@ -118,31 +121,31 @@ const Table = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const TableHead = ({ children }: { children: React.ReactNode }) => (
+const TableHead = ({ children }: { children?: React.ReactNode }) => (
   <thead className="bg-muted/50">
     {children}
   </thead>
 );
 
-const TableBody = ({ children }: { children: React.ReactNode }) => (
+const TableBody = ({ children }: { children?: React.ReactNode }) => (
   <tbody className="divide-y divide-border">
     {children}
   </tbody>
 );
 
-const TableHeader = ({ children }: { children: React.ReactNode }) => (
+const TableHeader = ({ children }: { children?: React.ReactNode }) => (
   <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
     {children}
   </th>
 );
 
-const TableCell = ({ children }: { children: React.ReactNode }) => (
+const TableCell = ({ children }: { children?: React.ReactNode }) => (
   <td className="px-4 py-3 text-sm text-muted-foreground">
     {children}
   </td>
 );
 
-const TableRow = ({ children }: { children: React.ReactNode }) => (
+const TableRow = ({ children }: { children?: React.ReactNode }) => (
   <tr className="hover:bg-muted/25 transition-colors">
     {children}
   </tr>
@@ -152,7 +155,7 @@ const HorizontalRule = () => (
   <hr className="my-8 border-t border-border" />
 );
 
-const Paragraph = ({ children }: { children: React.ReactNode }) => (
+const Paragraph = ({ children }: { children?: React.ReactNode }) => (
   <p className="mb-4 leading-relaxed text-muted-foreground">
     {children}
   </p>
