@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker
+  output: 'standalone',
   webpack: (config) => {
     // Handle GLB and GLTF files
     config.module.rules.push({
