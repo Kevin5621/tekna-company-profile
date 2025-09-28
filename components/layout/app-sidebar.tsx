@@ -19,9 +19,10 @@ import {
   Settings,
   Shield,
   User,
-  Footprints,
   Briefcase,
   Handshake,
+  HelpCircle,
+  Users,
 } from "lucide-react";
 
 interface NavigationItem {
@@ -64,10 +65,22 @@ const navigationItems: NavigationItem[] = [
     roles: ["admin", "hr"],
   },
   {
-    title: "Footer",
-    href: "/dashboard/footer",
-    icon: Footprints,
-    roles: ["admin"],
+    title: "About Us",
+    href: "/dashboard/about-us",
+    icon: FileText,
+    roles: ["admin", "editor"],
+  },
+  {
+    title: "FAQ",
+    href: "/dashboard/faq",
+    icon: HelpCircle,
+    roles: ["admin", "editor"],
+  },
+  {
+    title: "Team",
+    href: "/dashboard/team",
+    icon: Users,
+    roles: ["admin", "editor"],
   },
   {
     title: "Admin",

@@ -26,6 +26,7 @@ import {
   IconSearch,
   IconSortAscending,
   IconSortDescending,
+  IconEye,
 } from "@tabler/icons-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -148,6 +149,10 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
 
   const handleAddNew = () => {
     router.push("/dashboard/blog/new");
+  };
+
+  const handleViewPost = (slug: string) => {
+    router.push(`/blog/${slug}`);
   };
 
   const getStatusBadge = (status: string) => {
@@ -323,6 +328,15 @@ export function BlogPageClient({ initialPosts }: BlogPageClientProps) {
                     
                     {/* Hover overlay with actions */}
                     <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => handleViewPost(post.slug)}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 px-3"
+                      >
+                        <IconEye className="w-3 h-3 mr-1" />
+                        View
+                      </Button>
                       <Button
                         size="sm"
                         variant="secondary"

@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=https://rarxrbqpndlfxchdxnat.supabase.co
+      - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhcnhyYnFwbmRsZnhjaGR4bmF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MDg0MTEsImV4cCI6MjA3MTE4NDQxMX0.OVKOB4skWbCFGrkvorSp0lxH4CLUsqxdKWF_E2Upt_E
+      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhcnhyYnFwbmRsZnhjaGR4bmF0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTYwODQxMSwiZXhwIjoyMDcxMTg0NDExfQ.6YeEQ85oBhy2iZoY7rdzDHI3kjVubZUI4WBXCtbb4KQ
+      - RESEND_API_KEY=re_dCWAJxcV_LYdVdxx7vkMAuw61BLcWowGk
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

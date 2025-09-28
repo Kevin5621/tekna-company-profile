@@ -147,10 +147,13 @@ export class DashboardService {
           `
           id,
           name,
+          slug,
           description,
           is_featured,
           is_active,
-          featured_image_url
+          featured_image_url,
+          created_at,
+          updated_at
         `
         )
         .eq("is_active", true)
